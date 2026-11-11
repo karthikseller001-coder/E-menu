@@ -108,25 +108,25 @@
   </div>
 
   <!-- Page 1: Hero Section (Home Page) -->
-  <div id="page-home" class="page-view relative bg-brand-900 text-white text-center py-20 md:py-28 px-4 overflow-hidden flex-1 flex flex-col justify-start pt-24 md:pt-32 items-center min-h-[calc(100vh-68px)] w-full mb-0 pb-20">
+  <div id="page-home" class="page-view relative bg-brand-900 text-white text-center py-16 md:py-20 px-4 overflow-hidden flex-1 flex flex-col justify-start pt-16 md:pt-20 items-center min-h-[calc(100vh-68px)] w-full mb-0 pb-16">
     <div id="homeBgImage" class="absolute inset-0 bg-cover bg-center opacity-30 scale-105" style="background-image: url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1400');"></div>
     <div class="absolute inset-0 bg-gradient-to-b from-brand-900/60 via-brand-900/40 to-brand-900"></div>
-    <div class="relative max-w-3xl mx-auto space-y-4 py-4 z-10">
+    <div class="relative max-w-3xl mx-auto space-y-3 py-2 z-10">
       <span id="homeBadgeText" class="inline-block bg-amber-500/20 text-amber-300 text-xs px-4 py-1.5 rounded-full font-semibold uppercase tracking-wider">Welcome to Royal Bites</span>
-      <h2 id="homeHeadingText" class="text-4xl md:text-6xl font-black text-amber-300 drop-shadow-sm">Fresh, Tasty and Crafted with Passion</h2>
-      <p id="homeDescText" class="text-base md:text-lg text-amber-100/90 max-w-xl mx-auto">Order your favorite dishes directly from your table for an exquisite dining experience.</p>
+      <h2 id="homeHeadingText" class="text-3xl md:text-5xl font-black text-amber-300 drop-shadow-sm">Fresh, Tasty and Crafted with Passion</h2>
+      <p id="homeDescText" class="text-sm md:text-base text-amber-100/90 max-w-xl mx-auto">Order your favorite dishes directly from your table for an exquisite dining experience.</p>
       
       <!-- Table Detected Banner if scanned via QR -->
       <div id="detectedTableBanner" class="hidden bg-amber-500 text-brand-900 font-bold px-4 py-2 rounded-xl text-sm max-w-xs mx-auto shadow-md">
         <i class="fa-solid fa-chair"></i> Table Number: <span id="detectedTableNum"></span>
       </div>
 
-      <div class="pt-2 flex justify-center items-center gap-3">
-        <button onclick="switchPage('menu')" class="inline-flex items-center gap-3 bg-brand-800 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-base">
+      <div class="pt-1 flex justify-center items-center gap-3">
+        <button onclick="switchPage('menu')" class="inline-flex items-center gap-3 bg-brand-800 hover:bg-red-700 text-white font-bold px-8 py-3.5 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-base">
           <span>Explore Food Menu</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
-        <button id="masterHomeEditBtn" onclick="openHomeEditModal()" class="hidden bg-amber-500 hover:bg-amber-600 text-brand-900 font-bold px-4 py-4 rounded-2xl shadow-xl text-sm z-20 relative">
+        <button id="masterHomeEditBtn" onclick="openHomeEditModal()" class="hidden bg-amber-500 hover:bg-amber-600 text-brand-900 font-bold px-4 py-3.5 rounded-2xl shadow-xl text-sm z-20 relative">
           <i class="fa-solid fa-pen"></i> Edit Home
         </button>
       </div>
@@ -275,8 +275,8 @@
         
         <!-- Passcode Login Box -->
         <div id="loginBox" class="max-w-md mx-auto space-y-4 p-6 bg-stone-50 rounded-xl border border-stone-200">
-          <h3 class="font-bold text-stone-800 text-center">Enter Passcode</h3>
-          <input id="passcode" type="password" maxlength="10" placeholder="Enter Passcode" class="w-full px-4 py-3 text-center tracking-widest text-lg font-bold rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500">
+          <h3 class="font-bold text-stone-800 text-center">Enter Security Passcode</h3>
+          <input id="passcode" type="password" maxlength="10" placeholder="Enter 10-digit Passcode" class="w-full px-4 py-3 text-center tracking-widest text-lg font-bold rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500">
           <button onclick="loginWithPasscode()" class="w-full bg-brand-800 hover:bg-brand-900 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors">Login</button>
           <p id="loginMsg" class="text-xs text-red-600 text-center font-medium"></p>
         </div>
@@ -284,7 +284,7 @@
         <!-- Standard Admin Box -->
         <div id="adminBox" class="hidden space-y-8">
           <div class="flex justify-between items-center border-b pb-4">
-            <span class="text-xs font-bold text-emerald-700 flex items-center gap-2">
+            <span class="text-sm font-bold text-emerald-700 flex items-center gap-2">
               <i class="fa-solid fa-circle-check"></i> Admin Panel Unlocked
             </span>
             <div class="flex items-center gap-3">
@@ -292,26 +292,6 @@
                 <i class="fa-solid fa-wand-magic-sparkles"></i> Enable Screen Layout Editing
               </button>
               <button onclick="logout()" class="text-xs bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1.5 rounded-lg font-medium transition-colors">Logout</button>
-            </div>
-          </div>
-
-          <!-- Table QR Generator Tool -->
-          <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 space-y-4">
-            <h3 class="font-bold text-brand-900 text-base flex items-center gap-2">
-              <i class="fa-solid fa-qrcode"></i> Table QR Code Generator & Session Timer
-            </h3>
-            <p class="text-xs text-stone-500">Generate table QR codes and configure custom session time limit for customers.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-              <input id="tableGenNumber" type="number" placeholder="Table Number (e.g., 1)" class="px-3 py-2 rounded-lg border border-stone-300 text-sm">
-              <input id="sessionMinutesInput" type="number" placeholder="Session Time (Mins)" value="45" class="px-3 py-2 rounded-lg border border-stone-300 text-sm">
-              <button onclick="generateTableQR()" class="bg-brand-800 hover:bg-brand-900 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors">Generate QR</button>
-            </div>
-            
-            <div id="tableQRResult" class="hidden flex flex-col items-center p-4 bg-white rounded-xl border border-stone-200 text-center max-w-xs space-y-2 mx-auto">
-              <h4 id="tableQRTitle" class="font-bold text-brand-800 text-sm"></h4>
-              <img id="tableQRImg" class="w-40 h-40 border p-1 rounded-lg" alt="Table QR">
-              <p class="text-[10px] text-stone-400 break-all" id="tableQRUrl"></p>
-              <button onclick="window.print()" class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded-md font-semibold">Print Sticker</button>
             </div>
           </div>
 
@@ -398,22 +378,6 @@
             <div id="orders" class="space-y-3"></div>
           </div>
 
-          <!-- Payment Settings -->
-          <div class="bg-stone-50 p-5 rounded-xl border border-stone-200 space-y-4">
-            <h3 class="font-bold text-stone-800 text-base">UPI Payment Settings</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs text-stone-500 mb-1">Merchant UPI ID (e.g., yourname@upi)</label>
-                <input id="upiId" type="text" placeholder="upi@bank" class="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm">
-              </div>
-              <div>
-                <label class="block text-xs text-stone-500 mb-1">Payee Name</label>
-                <input id="payee" type="text" placeholder="Royal Bites" class="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm">
-              </div>
-            </div>
-            <button onclick="savePayment()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors">Save UPI Settings</button>
-          </div>
-
           <!-- Admin Password Change Section -->
           <div class="bg-stone-50 p-5 rounded-xl border border-stone-200 space-y-4">
             <h3 class="font-bold text-stone-800 text-base"><i class="fa-solid fa-key"></i> Change Admin Passcode</h3>
@@ -435,6 +399,26 @@
               <i class="fa-solid fa-user-shield text-purple-700"></i> Master Control Panel
             </span>
             <button onclick="logout()" class="text-xs bg-purple-200 hover:bg-purple-300 text-purple-900 px-3 py-1.5 rounded-lg font-bold transition-colors">Logout</button>
+          </div>
+
+          <!-- Table QR Generator Tool (Moved here to Master Panel) -->
+          <div class="bg-white p-5 rounded-xl border border-purple-200 space-y-4">
+            <h3 class="font-bold text-purple-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-qrcode"></i> Table QR Code Generator & Session Timer
+            </h3>
+            <p class="text-xs text-stone-500">Generate table QR codes and configure custom session time limit for customers.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+              <input id="tableGenNumber" type="number" placeholder="Table Number (e.g., 1)" class="px-3 py-2 rounded-lg border border-stone-300 text-sm">
+              <input id="sessionMinutesInput" type="number" placeholder="Session Time (Mins)" value="45" class="px-3 py-2 rounded-lg border border-stone-300 text-sm">
+              <button onclick="generateTableQR()" class="bg-purple-800 hover:bg-purple-900 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors">Generate QR</button>
+            </div>
+            
+            <div id="tableQRResult" class="hidden flex flex-col items-center p-4 bg-stone-50 rounded-xl border border-stone-200 text-center max-w-xs space-y-2 mx-auto">
+              <h4 id="tableQRTitle" class="font-bold text-brand-800 text-sm"></h4>
+              <img id="tableQRImg" class="w-40 h-40 border p-1 rounded-lg bg-white" alt="Table QR">
+              <p class="text-[10px] text-stone-400 break-all" id="tableQRUrl"></p>
+              <button onclick="window.print()" class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded-md font-semibold">Print Sticker</button>
+            </div>
           </div>
 
           <!-- Firebase Database Integration Settings -->
@@ -659,6 +643,18 @@
   </div>
 
 <script>
+// ==========================================
+// FIXED CONFIGURATION CONSTANTS (Hardcoded)
+// ==========================================
+const upi = "7013557763@ybl";               // <-- మీ UPI ID ఇక్కడ ఎంటర్ చేయండి
+const payee = "Royal Bites Restaurant";    // <-- మీ రెస్టారెంట్ పేరు ఇక్కడ ఇవ్వండి
+
+let defaultFirebaseConfig = {
+  apiKey: "",          // <-- మీ Firebase API Key ఇక్కడ ఇవ్వండి
+  dbUrl: ""            // <-- మీ Firebase Database URL ఇక్కడ ఇవ్వండి
+};
+// ==========================================
+
 let defaultFoods = [
   {id:1, name:"Chicken Biryani", price:220, category:"Biryani", type:"Non-Veg", image:"https://images.unsplash.com/photo-1563379091339-03246963d96c?w=600"},
   {id:2, name:"Veg Biryani", price:160, category:"Biryani", type:"Veg", image:"https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=600"},
@@ -700,86 +696,6 @@ if (isTableQRScan) {
     localStorage.setItem("rb_is_table_session", "false");
     localStorage.removeItem("rb_scanned_table");
     localStorage.removeItem("rb_session_start");
-  }
-}
-
-// Ensure saved foods (including custom image URLs) persist permanently
-try {
-  let savedFoods = JSON.parse(localStorage.getItem("rb_foods"));
-  foods = (savedFoods && savedFoods.length) ? savedFoods : defaultFoods;
-} catch(e) {
-  foods = defaultFoods;
-}
-
-function saveFoods() {
-  localStorage.setItem("rb_foods", JSON.stringify(foods));
-  if (dbRef) {
-    dbRef.ref('foods').set(foods);
-  }
-}
-
-function addFood() {
-  let name = document.getElementById("foodName").value.trim();
-  let price = Number(document.getElementById("foodPrice").value);
-  let image = document.getElementById("foodImage").value.trim();
-  let category = document.getElementById("foodCategory").value.trim();
-  let type = document.getElementById("foodType").value;
-
-  if (!name || price <= 0 || !category) {
-    alert("Please fill in all food details correctly.");
-    return;
-  }
-
-  let newFood = {
-    id: Date.now(),
-    name,
-    price,
-    category,
-    type,
-    image: image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600"
-  };
-
-  foods.push(newFood);
-  saveFoods();
-  renderCategoryButtons();
-  filterFood(activeCategory);
-  renderManage();
-
-  document.getElementById("foodName").value = "";
-  document.getElementById("foodPrice").value = "";
-  document.getElementById("foodImage").value = "";
-  document.getElementById("foodCategory").value = "";
-  alert("Food item added successfully with image URL!");
-}
-
-function renderManage() {
-  const container = document.getElementById("manageFoods");
-  if (!container) return;
-
-  container.innerHTML = foods.map(f => `
-    <div class="flex justify-between items-center py-2 text-xs">
-      <div class="flex items-center gap-3">
-        <img src="${f.image}" class="w-10 h-10 object-cover rounded-lg border" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600'">
-        <div>
-          <span class="font-bold text-stone-800">${f.name}</span>
-          <p class="text-stone-500">₹${f.price} • ${f.category} (${f.type})</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="openDirectEditModal(${f.id})" class="bg-amber-500 hover:bg-amber-600 text-brand-900 px-2 py-1 rounded font-bold text-[10px]">Edit</button>
-        <button onclick="deleteFood(${f.id})" class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded font-semibold text-[10px]">Delete</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function deleteFood(id) {
-  if (confirm("Are you sure you want to delete this food item?")) {
-    foods = foods.filter(f => f.id !== id);
-    saveFoods();
-    renderCategoryButtons();
-    filterFood(activeCategory);
-    renderManage();
   }
 }
 
