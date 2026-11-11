@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Bites Restaurant</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f5f7;color:#222;font-family:Arial,sans-serif}
+header{background:#171717;color:white;text-align:center;padding:22px}
+header h1{margin:0;color:#ffbd59}
+.container{max-width:950px;margin:auto;padding:15px}
+.card{background:white;border-radius:12px;padding:18px;margin:14px 0;box-shadow:0 2px 9px #0001}
+h2{margin-top:0}
+button{border:0;padding:11px 15px;border-radius:7px;background:#171717;color:white;cursor:pointer;margin:4px}
+button:disabled{opacity:.5}
+input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:7px;margin:7px 0}
+.item{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:12px 0}
+.price{color:#159447;font-weight:bold}
+.hidden{display:none!important}
+.green{background:#138b4b}
+.red{background:#c83232}
+.orange{background:#e58a18}
+.muted{color:#777;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:#f5f5f5;padding:15px;border-radius:9px}
+.order{border:1px solid #ddd;border-radius:9px;padding:13px;margin:12px 0}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+<h1 id="brand">ROYAL BITES</h1>
+<p>Restaurant Ordering System</p>
+</header>
+
+<div class="container">
+
+<!-- CUSTOMER MENU -->
+<section id="customer">
+
+<div class="card">
+<h2>🍽 Food Menu</h2>
+<p class="muted" id="tableInfo">Select your table</p>
+<div id="menu"></div>
+</div>
+
+<div class="card">
+<h2>🛒 Your Cart</h2>
+<div id="cart">No items selected</div>
+<h2>Total: ₹<span id="total">0</span></h2>
+
+<label>Table Number</label>
+<select id="table">
+<option>Table 01</option>
+<option>Table 02</option>
+<option>Table 03</option>
+<option>Table 04</option>
+<option>Table 05</option>
+<option>Table 06</option>
+</select>
+
+<label>Payment Method</label>
+<select id="payment">
+<option value="Cash">Cash at Counter</option>
+<option value="UPI">PhonePe / UPI</option>
+</select>
+
+<div id="upiInfo" class="hidden">
+<p>UPI payment is not connected in this demo.</p>
+<p>Configure a verified payment gateway before accepting online payments.</p>
+</div>
+
+<button class="green" onclick="placeOrder()">Place Order</button>
+<p id="customerMessage"></p>
+</div>
+
+</section>
+
+<!-- ADMIN LOGIN -->
+<section id="adminLogin" class="card">
+<h2>🔐 Admin Login</h2>
+<input id="adminPassword" type="password" placeholder="Enter Admin Password">
+<button onclick="adminLogin()">Login as Admin</button>
+</section>
+
+<!-- MASTER LOGIN -->
+<section id="masterLogin" class="card">
+<h2>👑 Master Panel Login</h2>
+<input id="masterPassword" type="password" placeholder="Enter Master Password">
+<button onclick="masterLogin()">Login as Master</button>
+</section>
+
+<!-- ADMIN PANEL -->
+<section id="adminPanel" class="hidden">
+
+<div class="card">
+<h2>📊 Admin Dashboard</h2>
+<div class="grid">
+<div class="stat">Total Orders<br><b id="orderCount">0</b></div>
+<div class="stat">Total Sales<br><b id="sales">₹0</b></div>
+</div>
+<button onclick="renderOrders()">Refresh Orders</button>
+<button class="red" onclick="logout()">Logout</button>
+</div>
+
+<div class="card">
+<h2>📋 Table-wise Orders</h2>
+<div id="tableStats"></div>
+</div>
+
+<div class="card">
+<h2>All Orders</h2>
+<div id="orders"></div>
+</div>
+
+<div class="card">
+<h2>🍔 Manage Menu</h2>
+<input id="newFood" placeholder="Food name">
+<input id="newPrice" type="number" placeholder="Price">
+<button onclick="addFood()">Add Food Item</button>
+<div id="foodManage"></div>
+</div>
+
+</section>
+
+<!-- MASTER PANEL -->
+<section id="masterPanel" class="hidden">
+
+<div class="card">
+<h2>👑 Master Control Panel</h2>
+<p>Restaurant Settings</p>
+
+<label>Restaurant Name</label>
+<input id="newBrand" placeholder="Restaurant Name">
+<button onclick="changeBrand()">Update Restaurant Name</button>
+
+<h3>Change Admin Password</h3>
+<input id="newAdminPassword" type="password" placeholder="New Admin Password">
+<button onclick="changeAdminPassword()">Update Admin Password</button>
+
+<h3>Restaurant Information</h3>
+<p id="masterInfo"></p>
+
+<button class="red" onclick="logout()">Logout</button>
+</div>
+
+</section>
+
+</div>
+
+<script>
+// DEMO SETTINGS
+// These passwords are for testing only.
+// Never use client-side passwords for a public website.
+
+const MASTER_PASSWORD="master123";
+
+let adminPass=localStorage.getItem("adminPass")||"admin123";
+
+let products=JSON.parse(localStorage.getItem("products"))||[
+{name:"Chicken Biryani",price:180},
+{name:"Veg Biryani",price:120},
+{name:"Fried Rice",price:100},
+{name:"Chicken 65",price:150},
+{name:"Cool Drink",price:30},
+{name:"Paneer Curry",price:140}
+];
+
+let orders=JSON.parse(localStorage.getItem("orders"))||[];
+let cart={};
+
+const money=n=>"₹"+Number(n).toFixed(2);
+
+function save(){
+localStorage.setItem("orders",JSON.stringify(orders));
+localStorage.setItem("products",JSON.stringify(products));
+localStorage.setItem("adminPass",adminPass);
+}
+
+function renderMenu(){
+let html="";
+products.forEach((p,i)=>{
+html+=`
+<div class="item">
+<div>
+<b>${p.name}</b><br>
+<span class="price">${money(p.price)}</span>
+</div>
+<button onclick="addToCart(${i})">Add +</button>
+</div>`;
+});
+document.getElementById("menu").innerHTML=html;
+}
+
+function addToCart(i){
+cart[i]=(cart[i]||0)+1;
+renderCart();
+}
+
+function removeFromCart(i){
+if(cart[i]){
+cart[i]--;
+if(cart[i]<=0)delete cart[i];
+}
+renderCart();
+}
+
+function renderCart(){
+let html="";
+let total=0;
+
+products.forEach((p,i)=>{
+if(cart[i]){
+let amount=p.price*cart[i];
+total+=amount;
+html+=`
+<div class="item">
+<div>${p.name}<br>
+${cart[i]} × ${money(p.price)}
+</div>
+<div>
+<b>${money(amount)}</b>
+<button onclick="removeFromCart(${i})">−</button>
+</div>
+</div>`;
+}
+});
+
+document.getElementById("cart").innerHTML=html||"No items selected";
+document.getElementById("total").innerText=total.toFixed(2);
+}
+
+document.getElementById("payment").addEventListener("change",function(){
+document.getElementById("upiInfo").classList.toggle("hidden",this.value!=="UPI");
+});
+
+function placeOrder(){
+let items=[];
+let total=0;
+
+products.forEach((p,i)=>{
+if(cart[i]){
+items.push({
+name:p.name,
+qty:cart[i],
+price:p.price
+});
+total+=p.price*cart[i];
+}
+});
+
+if(items.length===0){
+alert("Please select food items");
+return;
+}
+
+let payment=document.getElementById("payment").value;
+
+if(payment==="UPI"){
+alert("UPI gateway is not connected yet. Please configure verified PhonePe payments before using this option.");
+return;
+}
+
+let order={
+id:Date.now(),
+table:document.getElementById("table").value,
+items:items,
+total:total,
+payment:payment,
+paid:false,
+status:"New",
+time:new Date().toLocaleString()
+};
+
+orders.push(order);
+save();
+
+cart={};
+renderCart();
+
+document.getElementById("customerMessage").innerText=
+"Order placed successfully! Order #"+order.id;
+
+alert("Your order has been sent. Please pay at the counter.");
+}
+
+function adminLogin(){
+if(document.getElementById("adminPassword").value===adminPass){
+hideAll();
+document.getElementById("adminPanel").classList.remove("hidden");
+renderOrders();
+}else{
+alert("Incorrect Admin Password");
+}
+}
+
+function masterLogin(){
+if(document.getElementById("masterPassword").value===MASTER_PASSWORD){
+hideAll();
+document.getElementById("masterPanel").classList.remove("hidden");
+document.getElementById("masterInfo").innerText=
+"Total Orders: "+orders.length;
+}else{
+alert("Incorrect Master Password");
+}
+}
+
+function hideAll(){
+["customer","adminLogin","masterLogin","adminPanel","masterPanel"]
+.forEach(id=>document.getElementById(id).classList.add("hidden"));
+}
+
+function logout(){
+hideAll();
+document.getElementById("customer").classList.remove("hidden");
+document.getElementById("adminLogin").classList.remove("hidden");
+document.getElementById("masterLogin").classList.remove("hidden");
+}
+
+function renderOrders(){
+let html="";
+let salesTotal=0;
+
+orders.slice().reverse().forEach(o=>{
+if(o.paid)salesTotal+=o.total;
+
+html+=`
+<div class="order">
+<h3>${o.table} | Order #${o.id}</h3>
+<p>${o.items.map(i=>i.name+" × "+i.qty).join("<br>")}</p>
+<h3>${money(o.total)}</h3>
+<p>Payment: ${o.payment}</p>
+<p>Payment Status:
+<b>${o.paid?"PAID":"UNPAID"}</b></p>
+<p>Order Status: <b>${o.status}</b></p>
+<p class="muted">${o.time}</p>
+
+<button class="green" onclick="updateStatus(${o.id},'Accepted')">Accept</button>
+<button class="red" onclick="updateStatus(${o.id},'Rejected')">Reject</button>
+<button class="orange" onclick="markPaid(${o.id})">Mark Paid</button>
+<button onclick="printBill(${o.id})">Print Bill</button>
+</div>`;
+});
+
+document.getElementById("orders").innerHTML=html||"No orders yet";
+
+document.getElementById("orderCount").innerText=orders.length;
+document.getElementById("sales").innerText=money(salesTotal);
+
+let stats="";
+for(let i=1;i<=6;i++){
+let name="Table "+String(i).padStart(2,"0");
+let count=orders.filter(o=>o.table===name).length;
+stats+=`<div class="stat">${name}: <b>${count} Orders</b></div>`;
+}
+document.getElementById("tableStats").innerHTML=stats;
+
+renderFoodManage();
+}
+
+function updateStatus(id,status){
+let o=orders.find(x=>x.id===id);
+if(!o)return;
+o.status=status;
+save();
+renderOrders();
+}
+
+function markPaid(id){
+let o=orders.find(x=>x.id===id);
+if(!o)return;
+o.paid=true;
+save();
+renderOrders();
+}
+
+function printBill(id){
+let o=orders.find(x=>x.id===id);
+if(!o)return;
+
+let w=window.open("","_blank","width=350,height=600");
+if(!w){
+alert("Please allow popups to print.");
+return;
+}
+
+w.document.write(`
+<html>
+<head><title>Restaurant Bill</title>
+<style>
+body{font-family:monospace;width:280px;margin:10px}
+h2{text-align:center}
+hr{border:1px dashed black}
+</style></head>
+<body>
+<h2>${document.getElementById("brand").innerText}</h2>
+<center>Restaurant Receipt</center>
+<hr>
+Table: ${o.table}<br>
+Order: #${o.id}<br>
+${o.time}
+<hr>
+${o.items.map(i=>`
+<p>${i.name} × ${i.qty}<br>
+${money(i.price*i.qty)}</p>`).join("")}
+<hr>
+<h3>Total: ${money(o.total)}</h3>
+Payment: ${o.payment}<br>
+Status: ${o.paid?"PAID":"UNPAID"}
+<hr>
+<center>Thank You! Visit Again.</center>
+<script>
+window.onload=function(){window.print();}
+<\/script>
+</body></html>
+`);
+
+w.document.close();
+}
+
+function addFood(){
+let name=document.getElementById("newFood").value.trim();
+let price=Number(document.getElementById("newPrice").value);
+
+if(!name||price<=0){
+alert("Enter valid food name and price");
+return;
+}
+
+products.push({name,price});
+save();
+renderMenu();
+renderFoodManage();
+
+document.getElementById("newFood").value="";
+document.getElementById("newPrice").value="";
+}
+
+function deleteFood(i){
+if(!confirm("Delete this food item?"))return;
+products.splice(i,1);
+save();
+renderMenu();
+renderFoodManage();
+}
+
+function renderFoodManage(){
+document.getElementById("foodManage").innerHTML=
+products.map((p,i)=>`
+<div class="item">
+${p.name} - ${money(p.price)}
+<button class="red" onclick="deleteFood(${i})">Delete</button>
+</div>`).join("");
+}
+
+function changeBrand(){
+let name=document.getElementById("newBrand").value.trim();
+if(!name)return;
+document.getElementById("brand").innerText=name;
+localStorage.setItem("brand",name);
+alert("Restaurant name updated");
+}
+
+function changeAdminPassword(){
+let p=document.getElementById("newAdminPassword").value;
+if(p.length<6){
+alert("Password must contain at least 6 characters");
+return;
+}
+adminPass=p;
+save();
+alert("Admin password updated");
+document.getElementById("newAdminPassword").value="";
+}
+
+let savedBrand=localStorage.getItem("brand");
+if(savedBrand)document.getElementById("brand").innerText=savedBrand;
+
+renderMenu();
+renderCart();
+
+// Refresh order list when another tab updates local storage
+window.addEventListener("storage",()=>{
+orders=JSON.parse(localStorage.getItem("orders")||"[]");
+renderOrders();
+});
+</script>
+</body>
+</html>
