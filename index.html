@@ -1,57 +1,108 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Royal Bites Restaurant</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f4f5f7;color:#222;font-family:Arial,sans-serif}
-header{background:#171717;color:white;text-align:center;padding:22px}
-header h1{margin:0;color:#ffbd59}
-.container{max-width:950px;margin:auto;padding:15px}
-.card{background:white;border-radius:12px;padding:18px;margin:14px 0;box-shadow:0 2px 9px #0001}
-h2{margin-top:0}
-button{border:0;padding:11px 15px;border-radius:7px;background:#171717;color:white;cursor:pointer;margin:4px}
-button:disabled{opacity:.5}
-input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:7px;margin:7px 0}
-.item{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:12px 0}
-.price{color:#159447;font-weight:bold}
-.hidden{display:none!important}
-.green{background:#138b4b}
-.red{background:#c83232}
-.orange{background:#e58a18}
-.muted{color:#777;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.stat{background:#f5f5f5;padding:15px;border-radius:9px}
-.order{border:1px solid #ddd;border-radius:9px;padding:13px;margin:12px 0}
-@media(max-width:500px){.grid{grid-template-columns:1fr}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial;background:#111;color:white}
+header{background:#080808;padding:18px 5%;
+display:flex;justify-content:space-between;align-items:center;
+border-bottom:2px solid #dcae32}
+.logo{color:#ffc43d;font-size:25px;font-weight:bold}
+nav a{color:white;text-decoration:none;margin:10px}
+button{background:#f7bd37;color:#17100a;border:0;
+padding:11px 20px;border-radius:25px;font-weight:bold;cursor:pointer}
+.hero{padding:75px 7%;min-height:380px;
+background:linear-gradient(90deg,#130b07eF,#130b0755),
+url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1400')
+center/cover}
+.hero h1{font-size:48px;color:white}
+.hero h1 span{color:#ffc52f}
+.hero p{margin:20px 0}
+section{padding:40px 6%}
+h2{text-align:center;color:#ffc43d;margin-bottom:25px}
+.filters{text-align:center;margin-bottom:25px}
+.filters button{margin:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px}
+.food{background:#242424;border:1px solid #555;border-radius:15px;overflow:hidden}
+.food img{width:100%;height:155px;object-fit:cover}
+.food .info{padding:15px}
+.food h3{margin-bottom:10px}
+.food p{color:#ffc43d;margin-bottom:12px}
+.food button{width:100%}
+.panel{background:#202020;padding:25px;border-radius:15px;margin:20px 0}
+input,select{padding:12px;width:100%;margin:8px 0;
+border-radius:7px;border:1px solid #aaa}
+.qr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px}
+.qr-card{background:white;color:#111;padding:20px;text-align:center;border-radius:12px}
+.qr{display:flex;justify-content:center;margin:15px}
+.qr-card button{margin:5px}
+footer{text-align:center;background:#050505;padding:30px;color:#ffc43d}
+@media(max-width:600px){
+nav{display:none}
+.hero h1{font-size:36px}
+}
 </style>
 </head>
 <body>
 
 <header>
-<h1 id="brand">ROYAL BITES</h1>
-<p>Restaurant Ordering System</p>
+<div class="logo">👑 Royal Bites</div>
+<nav>
+<a href="#home">Home</a>
+<a href="#menu">Menu</a>
+<a href="#orders">Orders</a>
+<a href="#booking">Book</a>
+<a href="#admin">Admin</a>
+</nav>
 </header>
 
-<div class="container">
-
-<!-- CUSTOMER MENU -->
-<section id="customer">
-
-<div class="card">
-<h2>🍽 Food Menu</h2>
-<p class="muted" id="tableInfo">Select your table</p>
-<div id="menu"></div>
+<div class="hero" id="home">
+<h1>Good Food<br><span>Good Mood</span></h1>
+<p>Delicious food, great ambiance and unforgettable moments!</p>
+<a href="#menu"><button>View Menu →</button></a>
 </div>
 
-<div class="card">
-<h2>🛒 Your Cart</h2>
-<div id="cart">No items selected</div>
-<h2>Total: ₹<span id="total">0</span></h2>
+<section id="menu">
+<h2>Our Menu</h2>
+<div class="filters">
+<button onclick="filterMenu('All')">All</button>
+<button onclick="filterMenu('Pizza')">Pizza</button>
+<button onclick="filterMenu('Burger')">Burgers</button>
+<button onclick="filterMenu('Drinks')">Drinks</button>
+<button onclick="filterMenu('Starters')">Starters</button>
+</div>
+<div class="grid" id="foodGrid"></div>
+</section>
 
-<label>Table Number</label>
+<section id="orders">
+<h2>Your Order</h2>
+<div class="panel">
+<div id="cart"></div>
+<h3 id="total">Total: ₹0</h3>
+<button onclick="checkout()">Proceed to Pay</button>
+</div>
+</section>
+
+<section id="payment">
+<h2>Secure Payment</h2>
+<div class="panel">
+<input id="upi" placeholder="Enter Restaurant UPI ID">
+<p id="payAmount">Total: ₹0</p>
+<div id="paymentQR" class="qr"></div>
+<button onclick="makePaymentQR()">Generate Payment QR</button>
+</div>
+</section>
+
+<section id="booking">
+<h2>Book a Table</h2>
+<div class="panel">
+<input id="customer" placeholder="Customer Name">
+<input id="phone" placeholder="Mobile Number">
 <select id="table">
 <option>Table 01</option>
 <option>Table 02</option>
@@ -60,432 +111,170 @@ input,select{width:100%;padding:12px;border:1px solid #ccc;border-radius:7px;mar
 <option>Table 05</option>
 <option>Table 06</option>
 </select>
-
-<label>Payment Method</label>
-<select id="payment">
-<option value="Cash">Cash at Counter</option>
-<option value="UPI">PhonePe / UPI</option>
-</select>
-
-<div id="upiInfo" class="hidden">
-<p>UPI payment is not connected in this demo.</p>
-<p>Configure a verified payment gateway before accepting online payments.</p>
+<input type="date" id="date">
+<input type="time" id="time">
+<button onclick="bookTable()">Book Table</button>
+<p id="bookingMsg"></p>
 </div>
-
-<button class="green" onclick="placeOrder()">Place Order</button>
-<p id="customerMessage"></p>
-</div>
-
 </section>
 
-<!-- ADMIN LOGIN -->
-<section id="adminLogin" class="card">
-<h2>🔐 Admin Login</h2>
-<input id="adminPassword" type="password" placeholder="Enter Admin Password">
-<button onclick="adminLogin()">Login as Admin</button>
-</section>
-
-<!-- MASTER LOGIN -->
-<section id="masterLogin" class="card">
-<h2>👑 Master Panel Login</h2>
-<input id="masterPassword" type="password" placeholder="Enter Master Password">
-<button onclick="masterLogin()">Login as Master</button>
-</section>
-
-<!-- ADMIN PANEL -->
-<section id="adminPanel" class="hidden">
-
-<div class="card">
-<h2>📊 Admin Dashboard</h2>
-<div class="grid">
-<div class="stat">Total Orders<br><b id="orderCount">0</b></div>
-<div class="stat">Total Sales<br><b id="sales">₹0</b></div>
-</div>
-<button onclick="renderOrders()">Refresh Orders</button>
-<button class="red" onclick="logout()">Logout</button>
+<section id="admin">
+<h2>Restaurant Admin Dashboard</h2>
+<div class="panel" id="loginPanel">
+<h3>Admin Login</h3>
+<input type="password" id="adminPass" placeholder="Admin Password">
+<button onclick="login()">Login</button>
+<p id="loginMsg"></p>
 </div>
 
-<div class="card">
-<h2>📋 Table-wise Orders</h2>
-<div id="tableStats"></div>
-</div>
-
-<div class="card">
-<h2>All Orders</h2>
-<div id="orders"></div>
-</div>
-
-<div class="card">
-<h2>🍔 Manage Menu</h2>
-<input id="newFood" placeholder="Food name">
-<input id="newPrice" type="number" placeholder="Price">
-<button onclick="addFood()">Add Food Item</button>
-<div id="foodManage"></div>
-</div>
-
-</section>
-
-<!-- MASTER PANEL -->
-<section id="masterPanel" class="hidden">
-
-<div class="card">
-<h2>👑 Master Control Panel</h2>
-<p>Restaurant Settings</p>
-
-<label>Restaurant Name</label>
-<input id="newBrand" placeholder="Restaurant Name">
-<button onclick="changeBrand()">Update Restaurant Name</button>
-
+<div class="panel" id="dashboard" style="display:none">
+<h3>Welcome, Restaurant Owner!</h3>
+<p id="sales">Total Orders: 0</p>
+<h3>QR Code Management</h3>
+<p>Scan each QR to open the menu for that table.</p>
+<div class="qr-grid" id="tableQR"></div>
 <h3>Change Admin Password</h3>
-<input id="newAdminPassword" type="password" placeholder="New Admin Password">
-<button onclick="changeAdminPassword()">Update Admin Password</button>
-
-<h3>Restaurant Information</h3>
-<p id="masterInfo"></p>
-
-<button class="red" onclick="logout()">Logout</button>
+<input type="password" id="newPass" placeholder="New Admin Password">
+<button onclick="changePassword()">Change Password</button>
+<h3>Orders Management</h3>
+<div id="adminOrders"></div>
+<button onclick="logout()">Logout</button>
 </div>
-
 </section>
 
-</div>
+<footer>© 2026 Royal Bites Restaurant | Good Food Good Mood</footer>
 
 <script>
-// DEMO SETTINGS
-// These passwords are for testing only.
-// Never use client-side passwords for a public website.
-
-const MASTER_PASSWORD="master123";
-
-let adminPass=localStorage.getItem("adminPass")||"admin123";
-
-let products=JSON.parse(localStorage.getItem("products"))||[
-{name:"Chicken Biryani",price:180},
-{name:"Veg Biryani",price:120},
-{name:"Fried Rice",price:100},
-{name:"Chicken 65",price:150},
-{name:"Cool Drink",price:30},
-{name:"Paneer Curry",price:140}
+const foods=[
+{name:"Veg Pizza",price:199,cat:"Pizza",
+img:"https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500"},
+{name:"Paneer Butter Masala",price:249,cat:"Starters",
+img:"https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500"},
+{name:"Chicken Biryani",price:299,cat:"Starters",
+img:"https://images.unsplash.com/photo-1563379091339-03246963d96c?w=500"},
+{name:"Veg Burger",price:149,cat:"Burger",
+img:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500"},
+{name:"Pasta Alfredo",price:249,cat:"Starters",
+img:"https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=500"},
+{name:"Cold Drink",price:59,cat:"Drinks",
+img:"https://images.unsplash.com/photo-1544145945-f90425340c7e?w=500"}
 ];
 
-let orders=JSON.parse(localStorage.getItem("orders"))||[];
-let cart={};
+let cartItems=[];
+let orders=JSON.parse(localStorage.getItem("rbOrders")||"[]");
+let password=localStorage.getItem("rbAdminPass")||"CHANGE_THIS_PASSWORD";
 
-const money=n=>"₹"+Number(n).toFixed(2);
-
-function save(){
-localStorage.setItem("orders",JSON.stringify(orders));
-localStorage.setItem("products",JSON.stringify(products));
-localStorage.setItem("adminPass",adminPass);
-}
-
-function renderMenu(){
-let html="";
-products.forEach((p,i)=>{
-html+=`
-<div class="item">
-<div>
-<b>${p.name}</b><br>
-<span class="price">${money(p.price)}</span>
-</div>
-<button onclick="addToCart(${i})">Add +</button>
-</div>`;
+function renderMenu(category="All"){
+let grid=document.getElementById("foodGrid");
+grid.innerHTML="";
+foods.filter(f=>category==="All"||f.cat===category).forEach((f,i)=>{
+let realIndex=foods.indexOf(f);
+grid.innerHTML+=`
+<div class="food">
+<img src="${f.img}">
+<div class="info">
+<h3>${f.name}</h3>
+<p>₹${f.price}</p>
+<button onclick="addCart(${realIndex})">Add +</button>
+</div></div>`;
 });
-document.getElementById("menu").innerHTML=html;
 }
 
-function addToCart(i){
-cart[i]=(cart[i]||0)+1;
-renderCart();
-}
+function filterMenu(cat){renderMenu(cat)}
 
-function removeFromCart(i){
-if(cart[i]){
-cart[i]--;
-if(cart[i]<=0)delete cart[i];
-}
+function addCart(i){
+cartItems.push(foods[i]);
 renderCart();
 }
 
 function renderCart(){
 let html="";
 let total=0;
-
-products.forEach((p,i)=>{
-if(cart[i]){
-let amount=p.price*cart[i];
-total+=amount;
-html+=`
-<div class="item">
-<div>${p.name}<br>
-${cart[i]} × ${money(p.price)}
-</div>
-<div>
-<b>${money(amount)}</b>
-<button onclick="removeFromCart(${i})">−</button>
-</div>
-</div>`;
-}
+cartItems.forEach((f,i)=>{
+total+=f.price;
+html+=`<p>${f.name} - ₹${f.price}
+<button onclick="removeItem(${i})">Remove</button></p>`;
 });
-
-document.getElementById("cart").innerHTML=html||"No items selected";
-document.getElementById("total").innerText=total.toFixed(2);
+document.getElementById("cart").innerHTML=html||"Cart is empty";
+document.getElementById("total").innerText="Total: ₹"+total;
+document.getElementById("payAmount").innerText="Total: ₹"+total;
 }
 
-document.getElementById("payment").addEventListener("change",function(){
-document.getElementById("upiInfo").classList.toggle("hidden",this.value!=="UPI");
-});
-
-function placeOrder(){
-let items=[];
-let total=0;
-
-products.forEach((p,i)=>{
-if(cart[i]){
-items.push({
-name:p.name,
-qty:cart[i],
-price:p.price
-});
-total+=p.price*cart[i];
-}
-});
-
-if(items.length===0){
-alert("Please select food items");
-return;
-}
-
-let payment=document.getElementById("payment").value;
-
-if(payment==="UPI"){
-alert("UPI gateway is not connected yet. Please configure verified PhonePe payments before using this option.");
-return;
-}
-
-let order={
-id:Date.now(),
-table:document.getElementById("table").value,
-items:items,
-total:total,
-payment:payment,
-paid:false,
-status:"New",
-time:new Date().toLocaleString()
-};
-
-orders.push(order);
-save();
-
-cart={};
+function removeItem(i){
+cartItems.splice(i,1);
 renderCart();
-
-document.getElementById("customerMessage").innerText=
-"Order placed successfully! Order #"+order.id;
-
-alert("Your order has been sent. Please pay at the counter.");
 }
 
-function adminLogin(){
-if(document.getElementById("adminPassword").value===adminPass){
-hideAll();
-document.getElementById("adminPanel").classList.remove("hidden");
+function checkout(){
+if(!cartItems.length)return alert("Add items first");
+document.getElementById("payment").scrollIntoView();
+makePaymentQR();
+}
+
+function makePaymentQR(){
+let id=document.getElementById("upi").value.trim();
+let amount=cartItems.reduce((s,f)=>s+f.price,0);
+if(!id)return alert("Enter your UPI ID");
+if(!amount)return alert("Your cart is empty");
+let link=`upi://pay?pa=${encodeURIComponent(id)}&pn=Royal%20Bites&am=${amount}&cu=INR`;
+let target=document.getElementById("paymentQR");
+target.innerHTML="";
+new QRCode(target,{text:link,width:190,height:190});
+}
+
+function bookTable(){
+let name=document.getElementById("customer").value;
+let phone=document.getElementById("phone").value;
+if(!name||!phone)return alert("Enter name and phone");
+document.getElementById("bookingMsg").innerText="Booking request submitted!";
+}
+
+function login(){
+if(document.getElementById("adminPass").value===password){
+document.getElementById("loginPanel").style.display="none";
+document.getElementById("dashboard").style.display="block";
+renderTables();
 renderOrders();
 }else{
-alert("Incorrect Admin Password");
+document.getElementById("loginMsg").innerText="Incorrect Password";
 }
 }
 
-function masterLogin(){
-if(document.getElementById("masterPassword").value===MASTER_PASSWORD){
-hideAll();
-document.getElementById("masterPanel").classList.remove("hidden");
-document.getElementById("masterInfo").innerText=
-"Total Orders: "+orders.length;
-}else{
-alert("Incorrect Master Password");
-}
-}
-
-function hideAll(){
-["customer","adminLogin","masterLogin","adminPanel","masterPanel"]
-.forEach(id=>document.getElementById(id).classList.add("hidden"));
+function changePassword(){
+let p=document.getElementById("newPass").value;
+if(p.length<8)return alert("Use at least 8 characters");
+password=p;
+localStorage.setItem("rbAdminPass",p);
+alert("Admin password changed");
 }
 
 function logout(){
-hideAll();
-document.getElementById("customer").classList.remove("hidden");
-document.getElementById("adminLogin").classList.remove("hidden");
-document.getElementById("masterLogin").classList.remove("hidden");
+document.getElementById("dashboard").style.display="none";
+document.getElementById("loginPanel").style.display="block";
+}
+
+function renderTables(){
+let container=document.getElementById("tableQR");
+container.innerHTML="";
+for(let i=1;i<=10;i++){
+let n=String(i).padStart(2,"0");
+let url=location.origin+location.pathname+"?table="+i+"#menu";
+let card=document.createElement("div");
+card.className="qr-card";
+card.innerHTML=`<h3>Royal Bites</h3><h2>TABLE ${n}</h2><div class="qr"></div><p>Scan to View Menu</p><button onclick="window.print()">Print QR Cards</button>`;
+container.appendChild(card);
+new QRCode(card.querySelector(".qr"),{text:url,width:145,height:145});
+}
 }
 
 function renderOrders(){
-let html="";
-let salesTotal=0;
-
-orders.slice().reverse().forEach(o=>{
-if(o.paid)salesTotal+=o.total;
-
-html+=`
-<div class="order">
-<h3>${o.table} | Order #${o.id}</h3>
-<p>${o.items.map(i=>i.name+" × "+i.qty).join("<br>")}</p>
-<h3>${money(o.total)}</h3>
-<p>Payment: ${o.payment}</p>
-<p>Payment Status:
-<b>${o.paid?"PAID":"UNPAID"}</b></p>
-<p>Order Status: <b>${o.status}</b></p>
-<p class="muted">${o.time}</p>
-
-<button class="green" onclick="updateStatus(${o.id},'Accepted')">Accept</button>
-<button class="red" onclick="updateStatus(${o.id},'Rejected')">Reject</button>
-<button class="orange" onclick="markPaid(${o.id})">Mark Paid</button>
-<button onclick="printBill(${o.id})">Print Bill</button>
-</div>`;
-});
-
-document.getElementById("orders").innerHTML=html||"No orders yet";
-
-document.getElementById("orderCount").innerText=orders.length;
-document.getElementById("sales").innerText=money(salesTotal);
-
-let stats="";
-for(let i=1;i<=6;i++){
-let name="Table "+String(i).padStart(2,"0");
-let count=orders.filter(o=>o.table===name).length;
-stats+=`<div class="stat">${name}: <b>${count} Orders</b></div>`;
+document.getElementById("sales").innerText="Total Orders: "+orders.length;
+document.getElementById("adminOrders").innerHTML=orders.map(o=>
+`<p>${o.items} - ₹${o.amount}</p>`).join("");
 }
-document.getElementById("tableStats").innerHTML=stats;
-
-renderFoodManage();
-}
-
-function updateStatus(id,status){
-let o=orders.find(x=>x.id===id);
-if(!o)return;
-o.status=status;
-save();
-renderOrders();
-}
-
-function markPaid(id){
-let o=orders.find(x=>x.id===id);
-if(!o)return;
-o.paid=true;
-save();
-renderOrders();
-}
-
-function printBill(id){
-let o=orders.find(x=>x.id===id);
-if(!o)return;
-
-let w=window.open("","_blank","width=350,height=600");
-if(!w){
-alert("Please allow popups to print.");
-return;
-}
-
-w.document.write(`
-<html>
-<head><title>Restaurant Bill</title>
-<style>
-body{font-family:monospace;width:280px;margin:10px}
-h2{text-align:center}
-hr{border:1px dashed black}
-</style></head>
-<body>
-<h2>${document.getElementById("brand").innerText}</h2>
-<center>Restaurant Receipt</center>
-<hr>
-Table: ${o.table}<br>
-Order: #${o.id}<br>
-${o.time}
-<hr>
-${o.items.map(i=>`
-<p>${i.name} × ${i.qty}<br>
-${money(i.price*i.qty)}</p>`).join("")}
-<hr>
-<h3>Total: ${money(o.total)}</h3>
-Payment: ${o.payment}<br>
-Status: ${o.paid?"PAID":"UNPAID"}
-<hr>
-<center>Thank You! Visit Again.</center>
-<script>
-window.onload=function(){window.print();}
-<\/script>
-</body></html>
-`);
-
-w.document.close();
-}
-
-function addFood(){
-let name=document.getElementById("newFood").value.trim();
-let price=Number(document.getElementById("newPrice").value);
-
-if(!name||price<=0){
-alert("Enter valid food name and price");
-return;
-}
-
-products.push({name,price});
-save();
-renderMenu();
-renderFoodManage();
-
-document.getElementById("newFood").value="";
-document.getElementById("newPrice").value="";
-}
-
-function deleteFood(i){
-if(!confirm("Delete this food item?"))return;
-products.splice(i,1);
-save();
-renderMenu();
-renderFoodManage();
-}
-
-function renderFoodManage(){
-document.getElementById("foodManage").innerHTML=
-products.map((p,i)=>`
-<div class="item">
-${p.name} - ${money(p.price)}
-<button class="red" onclick="deleteFood(${i})">Delete</button>
-</div>`).join("");
-}
-
-function changeBrand(){
-let name=document.getElementById("newBrand").value.trim();
-if(!name)return;
-document.getElementById("brand").innerText=name;
-localStorage.setItem("brand",name);
-alert("Restaurant name updated");
-}
-
-function changeAdminPassword(){
-let p=document.getElementById("newAdminPassword").value;
-if(p.length<6){
-alert("Password must contain at least 6 characters");
-return;
-}
-adminPass=p;
-save();
-alert("Admin password updated");
-document.getElementById("newAdminPassword").value="";
-}
-
-let savedBrand=localStorage.getItem("brand");
-if(savedBrand)document.getElementById("brand").innerText=savedBrand;
 
 renderMenu();
 renderCart();
-
-// Refresh order list when another tab updates local storage
-window.addEventListener("storage",()=>{
-orders=JSON.parse(localStorage.getItem("orders")||"[]");
-renderOrders();
-});
 </script>
 </body>
 </html>
