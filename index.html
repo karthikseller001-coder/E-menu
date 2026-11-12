@@ -67,7 +67,6 @@
         </div>
       </div>
 
-      <!-- Desktop Header Links -->
       <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-stone-300">
         <button type="button" onclick="showPage('home')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">Home</button>
         <button type="button" onclick="showPage('menu')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">Explore Menu</button>
@@ -86,7 +85,7 @@
     </div>
   </header>
 
-  <!-- Clean White Navigation Sub-Bar (Hidden on home page) -->
+  <!-- Clean White Navigation Sub-Bar -->
   <div id="whiteNavBarContainer" class="hidden bg-white border-b border-stone-200 shadow-sm sticky top-[73px] sm:top-[81px] z-30">
     <div class="max-w-7xl mx-auto px-2 sm:px-6 py-2 flex items-center justify-between">
       <nav id="mainNavBar" class="flex items-center gap-1 sm:gap-2 w-full justify-around sm:justify-start">
@@ -214,7 +213,6 @@
           </div>
         </div>
 
-        <!-- Sub-Total, Tax and Grand Total Display -->
         <div class="pt-4 border-t border-stone-200 space-y-2 text-sm">
           <div class="flex justify-between text-stone-600">
             <span>Sub-Total:</span>
@@ -312,6 +310,22 @@
       </div>
     </section>
 
+    <!-- SESSION EXPIRED PAGE -->
+    <section id="page-expired" class="page-section hidden max-w-md mx-auto px-4 py-20">
+      <div class="bg-white rounded-3xl shadow-xl border border-stone-200 p-8 text-center space-y-6">
+        <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-4xl">
+          <i class="fa-solid fa-hourglass-end"></i>
+        </div>
+        <div class="space-y-2">
+          <h2 class="font-serif font-bold text-2xl text-stone-900">Session Expired</h2>
+          <p class="text-sm text-stone-600">Your dining table session time has expired. Please scan the QR code at your table again or contact staff.</p>
+        </div>
+        <button type="button" onclick="showPage('menu')" class="w-full py-3.5 rounded-xl bg-stone-900 text-white font-bold text-sm shadow cursor-pointer">
+          Browse Menu Anyway
+        </button>
+      </div>
+    </section>
+
     <!-- CUSTOMER MY ORDERS -->
     <section id="page-myorders" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div class="flex items-center justify-between border-b border-stone-200 pb-4">
@@ -326,13 +340,15 @@
 
     <!-- ADMIN & MASTER CONTROL PANEL -->
     <section id="page-admin" class="page-section hidden max-w-6xl mx-auto px-4 py-8 space-y-6">
+      
+      <!-- Staff Login Box (Updated as requested) -->
       <div id="loginBox" class="bg-white p-8 rounded-3xl shadow-xl max-w-md mx-auto border border-stone-200 text-center space-y-4">
         <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
           <i class="fa-solid fa-shield-halved"></i>
         </div>
         <div class="space-y-1">
-          <h2 class="font-serif font-bold text-2xl text-stone-900" id="loginTitleText">Staff / Master Login</h2>
-          <p class="text-xs text-stone-500" id="loginDescText">Enter Passcode to access respective panel</p>
+          <h2 class="font-serif font-bold text-2xl text-stone-900">Staff Login</h2>
+          <p class="text-xs text-stone-500">Enter Passcode</p>
         </div>
         <div class="space-y-3 pt-2">
           <input id="passcodeInput" type="password" placeholder="Enter Passcode" class="w-full px-4 py-3 rounded-xl border border-stone-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none">
@@ -367,18 +383,23 @@
         </div>
 
         <div id="masterSubPage-qr" class="master-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Generator</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Generator & Session Timer</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Table Number/Name</label>
-              <input id="tableGenNumber" type="text" placeholder="e.g. 5 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <input id="tableGenNumber" type="text" placeholder="e.g. 1 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Session Duration (Minutes)</label>
+              <input id="tableSessionDuration" type="number" value="60" placeholder="e.g. 60 mins" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div class="flex items-end">
               <button type="button" onclick="generateTableQR()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
-                Generate QR & URL
+                Generate Table QR
               </button>
             </div>
           </div>
+
           <div id="tableQRResult" class="hidden p-6 bg-blue-50 rounded-2xl border border-blue-200 text-center space-y-4">
             <h4 id="tableQRTitle" class="font-bold text-blue-900 text-base">Table QR</h4>
             <div class="inline-block p-3 bg-white rounded-2xl shadow">
@@ -392,7 +413,7 @@
             </div>
           </div>
 
-          <!-- Tax/GST Label and Percentage Settings for Master Panel -->
+          <!-- Tax/GST Label and Percentage Settings -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Tax / GST Name & Percentage Settings</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -410,17 +431,17 @@
             </div>
           </div>
 
-          <!-- Generated Tables QR List -->
+          <!-- Generated Tables QR List with Delete & Expire Actions -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
-            <h4 class="font-bold text-stone-800 text-sm">Active Table QR Links</h4>
+            <h4 class="font-bold text-stone-800 text-sm">Generated Tables & Active Sessions</h4>
             <div id="activeTablesQrList" class="space-y-2">
-              <p class="text-xs text-stone-400 italic">No table QR generated yet in this session.</p>
+              <p class="text-xs text-stone-400 italic">No table QR generated yet.</p>
             </div>
           </div>
         </div>
 
         <div id="masterSubPage-passcodes" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings (Master & Admin)</h3>
+          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings</h3>
           <div class="max-w-md space-y-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">New Master Control Passcode</label>
@@ -451,7 +472,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Header Title</label>
-              <input id="editWaTitle" type="text" placeholder="e.g. HOTEL ROYAL SPICE - INVOICE" class="w-full px-3 py-2 rounded-xl border text-sm">
+              <input id="editWaTitle" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Home Hero Background Image URL</label>
@@ -556,7 +577,6 @@
           <div id="ordersList" class="space-y-3"></div>
         </div>
 
-        <!-- Manage Menu Sub-Page in Admin Panel -->
         <div id="adminSubPage-menu" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
           <h3 id="menuFormTitle" class="font-serif font-bold text-xl text-stone-900">Add New Dish to Menu</h3>
           <input type="hidden" id="editFoodId" value="">
@@ -594,7 +614,6 @@
             </button>
           </div>
 
-          <!-- Admin Passcode Change Box inside Admin Panel -->
           <div class="pt-6 border-t border-stone-200 space-y-4 max-w-md">
             <h4 class="font-bold text-stone-800 text-sm">Change Staff Admin Passcode</h4>
             <div>
@@ -604,7 +623,6 @@
             <button type="button" onclick="saveAdminPasscodeOnly()" class="py-2.5 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Admin Passcode</button>
           </div>
 
-          <!-- Existing Menu Management List with Edit & Delete -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Manage Existing Menu Items</h4>
             <div id="adminMenuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-2"></div>
@@ -617,7 +635,7 @@
   <!-- Footer -->
   <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-center text-xs mt-auto">
     <div class="max-w-7xl mx-auto px-4">
-      <p id="footerDisplayText">© 2026 Royal Bites Restaurant. Freshly Served with Love.</p>
+      <p id="footerDisplayText">© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love.</p>
     </div>
   </footer>
 
@@ -630,9 +648,9 @@
     };
 
     const CONFIG = {
-      databaseURL: "https://smart-menu-d180a-default-rtdb.firebaseio.com",
-      phonePeUpiId: "9985656800-2@ybl",
-      payeeName: "KARTHIK"
+      databaseURL: atob(_SYS_CFG.db),
+      phonePeUpiId: atob(_SYS_CFG.upi),
+      payeeName: atob(_SYS_CFG.payee)
     };
 
     let dbRef = null;
@@ -673,7 +691,6 @@
     let selectedTypeFilter = "All";
     let currentTableSession = null;
 
-    // Firebase Realtime Orders Listener to sync across devices
     function initFirebaseListener() {
       if (!dbRef) return;
       dbRef.child("orders").on("value", (snapshot) => {
@@ -683,11 +700,8 @@
           Object.keys(data).forEach(key => {
             loadedOrders.push({ firebaseKey: key, ...data[key] });
           });
-          // Sort by latest first
           orders = loadedOrders.reverse();
           localStorage.setItem("rb_orders", JSON.stringify(orders));
-          
-          // Refresh views if open
           renderAdminOrders();
           renderSalesReport();
           renderCustomerMyOrders();
@@ -716,9 +730,7 @@
       }
 
       const heroImg = document.getElementById("homeHeroBgImg");
-      if (branding.heroBgUrl) {
-        heroImg.src = branding.heroBgUrl;
-      }
+      if (branding.heroBgUrl) heroImg.src = branding.heroBgUrl;
 
       document.getElementById("editBrandName").value = branding.brandName;
       document.getElementById("editBrandTagline").value = branding.brandTagline;
@@ -769,17 +781,11 @@
     function saveNewPasscodes() {
       const newMasterPass = document.getElementById("masterNewMasterPassInput").value.trim();
       const newAdminPass = document.getElementById("masterNewPasscodeInput").value.trim();
-      
-      if (newMasterPass) {
-        localStorage.setItem("rb_master_pass", newMasterPass);
-      }
-      if (newAdminPass) {
-        localStorage.setItem("rb_admin_pass", newAdminPass);
-      }
-      
+      if (newMasterPass) localStorage.setItem("rb_master_pass", newMasterPass);
+      if (newAdminPass) localStorage.setItem("rb_admin_pass", newAdminPass);
       document.getElementById("masterNewMasterPassInput").value = "";
       document.getElementById("masterNewPasscodeInput").value = "";
-      showToast("Master & Admin passcodes updated successfully!");
+      showToast("Passcodes updated successfully!");
     }
 
     function saveAdminPasscodeOnly() {
@@ -807,11 +813,8 @@
 
       const whiteNavBar = document.getElementById("whiteNavBarContainer");
       if (whiteNavBar) {
-        if (pageName === "home") {
-          whiteNavBar.classList.add("hidden");
-        } else {
-          whiteNavBar.classList.remove("hidden");
-        }
+        if (pageName === "home") whiteNavBar.classList.add("hidden");
+        else whiteNavBar.classList.remove("hidden");
       }
 
       document.querySelectorAll(".nav-btn").forEach(btn => {
@@ -840,6 +843,7 @@
         renderAdminOrders();
         renderSalesReport();
         renderAdminMenuList();
+        renderActiveTablesQrList();
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -931,11 +935,8 @@
       const f = foods.find(x => x.id === foodId);
       if (!f) return;
       const existing = cart.find(x => x.id === foodId);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({ id: f.id, name: f.name, price: f.price, type: f.type, qty: 1 });
-      }
+      if (existing) existing.qty += 1;
+      else cart.push({ id: f.id, name: f.name, price: f.price, type: f.type, qty: 1 });
       saveCart();
       renderFood();
       showToast(f.name + " added to cart!");
@@ -945,9 +946,7 @@
       const idx = cart.findIndex(x => x.id === foodId);
       if (idx !== -1) {
         cart[idx].qty += change;
-        if (cart[idx].qty <= 0) {
-          cart.splice(idx, 1);
-        }
+        if (cart[idx].qty <= 0) cart.splice(idx, 1);
       }
       saveCart();
       renderFood();
@@ -961,21 +960,16 @@
     function updateStickyCartBar() {
       const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
       const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      
       const bar = document.getElementById("stickyCartBar");
       const badge = document.getElementById("cartCountBadge");
       if (badge) badge.innerText = totalCount;
 
       if (totalCount > 0) {
-        if (bar) bar.classList.remove("hidden");
-        if (bar) bar.classList.add("flex");
-        const sCount = document.getElementById("stickyCartCount");
-        const sTotal = document.getElementById("stickyCartTotal");
-        if (sCount) sCount.innerText = totalCount;
-        if (sTotal) sTotal.innerText = "₹" + subTotal;
+        if (bar) { bar.classList.remove("hidden"); bar.classList.add("flex"); }
+        document.getElementById("stickyCartCount").innerText = totalCount;
+        document.getElementById("stickyCartTotal").innerText = "₹" + subTotal;
       } else {
-        if (bar) bar.classList.add("hidden");
-        if (bar) bar.classList.remove("flex");
+        if (bar) { bar.classList.add("hidden"); bar.classList.remove("flex"); }
       }
     }
 
@@ -1040,7 +1034,6 @@
       const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
       const taxLabel = localStorage.getItem("rb_tax_label") || "Tax";
       const taxRate = parseFloat(localStorage.getItem("rb_tax_rate")) || 5;
-      
       const taxAmount = Math.round((subTotal * taxRate) / 100);
       const grandTotal = subTotal + taxAmount;
 
@@ -1089,9 +1082,7 @@
 
       const upiUrl = `upi://pay?pa=${CONFIG.phonePeUpiId}&pn=${encodeURIComponent(CONFIG.payeeName)}&am=${totals.grandTotal}&cu=INR`;
       document.getElementById("directUpiAppLink").href = upiUrl;
-
-      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
-      document.getElementById("dynamicUpiQr").src = qrImageUrl;
+      document.getElementById("dynamicUpiQr").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
     }
 
     function confirmOrderAfterPayment(payMethod) {
@@ -1124,10 +1115,8 @@
         dbRef.child("orders").push(newOrder).then(() => {
           showToast("Order placed & sent to kitchen successfully!");
         }).catch(err => {
-          console.error("Firebase push error:", err);
           orders.unshift(newOrder);
           localStorage.setItem("rb_orders", JSON.stringify(orders));
-          showToast("Order saved locally (Firebase sync pending).");
         });
       } else {
         orders.unshift(newOrder);
@@ -1221,6 +1210,7 @@
         document.getElementById("masterBox").classList.remove("hidden");
         document.getElementById("page-admin").classList.remove("hidden");
         switchMasterSubPage('qr');
+        renderActiveTablesQrList();
         showToast("Logged in as Master!");
       } else if (pass === adminPass) {
         document.getElementById("loginBox").classList.add("hidden");
@@ -1264,6 +1254,7 @@
       document.getElementById("masterSubPage-" + sub).classList.remove("hidden");
       const btn = document.getElementById("masterTabBtn-" + sub);
       if (btn) btn.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer";
+      if (sub === 'qr') renderActiveTablesQrList();
     }
 
     function renderAdminOrders() {
@@ -1326,11 +1317,7 @@
       if (o) {
         o.status = status;
         localStorage.setItem("rb_orders", JSON.stringify(orders));
-
-        if (dbRef && firebaseKey) {
-          dbRef.child("orders").child(firebaseKey).update({ status });
-        }
-
+        if (dbRef && firebaseKey) dbRef.child("orders").child(firebaseKey).update({ status });
         renderAdminOrders();
         renderSalesReport();
         showToast("Order status updated to " + status);
@@ -1340,14 +1327,9 @@
     function acceptAndSendWhatsAppInvoice(orderId, firebaseKey) {
       const o = orders.find(x => x.orderId === orderId);
       if (!o) return;
-
       o.status = "Accepted";
       localStorage.setItem("rb_orders", JSON.stringify(orders));
-
-      if (dbRef && firebaseKey) {
-        dbRef.child("orders").child(firebaseKey).update({ status: "Accepted" });
-      }
-
+      if (dbRef && firebaseKey) dbRef.child("orders").child(firebaseKey).update({ status: "Accepted" });
       renderAdminOrders();
       renderSalesReport();
 
@@ -1360,9 +1342,7 @@
       msg += `Table No: ${o.table}\n`;
       msg += `--------------------------------\n`;
       msg += `ITEMS:\n`;
-      o.items.forEach(i => {
-        msg += `- ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`;
-      });
+      o.items.forEach(i => { msg += `- ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`; });
       msg += `--------------------------------\n`;
       msg += `Sub-Total: ₹${o.subTotal}\n`;
       msg += `${o.taxLabel || 'Tax'} (${o.taxRate || 5}%): ₹${o.taxAmount}\n`;
@@ -1371,24 +1351,17 @@
       msg += `--------------------------------\n`;
       msg += `Thank you for dining with us!\n`;
 
-      const url = `https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
+      window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`, '_blank');
       showToast("Order Accepted & WhatsApp Invoice Triggered!");
     }
 
     function renderSalesReport() {
       let filtered = orders.filter(o => o.status === "Accepted" || o.status === "Completed");
+      document.getElementById("reportTotalOrders").innerText = orders.length;
+      document.getElementById("reportAcceptedOrders").innerText = filtered.length;
+      document.getElementById("reportTotalRevenue").innerText = "₹" + filtered.reduce((sum, o) => sum + o.total, 0);
 
-      const totalOrdersCount = orders.length;
-      const acceptedCount = filtered.length;
-      const totalRev = filtered.reduce((sum, o) => sum + o.total, 0);
-
-      document.getElementById("reportTotalOrders").innerText = totalOrdersCount;
-      document.getElementById("reportAcceptedOrders").innerText = acceptedCount;
-      document.getElementById("reportTotalRevenue").innerText = "₹" + totalRev;
-
-      const tbody = document.getElementById("salesReportTableBody");
-      tbody.innerHTML = filtered.map(o => `
+      document.getElementById("salesReportTableBody").innerHTML = filtered.map(o => `
         <tr class="hover:bg-stone-50">
           <td class="p-3 text-stone-500">${o.date}</td>
           <td class="p-3 font-mono font-bold text-stone-900">${o.orderId}</td>
@@ -1401,13 +1374,10 @@
       `).join("");
     }
 
-    function printSalesReport() {
-      window.print();
-    }
+    function printSalesReport() { window.print(); }
 
     function renderAdminMenuList() {
-      const list = document.getElementById("adminMenuList");
-      list.innerHTML = foods.map(f => `
+      document.getElementById("adminMenuList").innerHTML = foods.map(f => `
         <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center justify-between gap-2">
           <div class="flex items-center gap-3">
             <img src="${f.image || ''}" class="w-10 h-10 rounded-lg object-cover bg-stone-200" onerror="this.src='https://placehold.co/100x100/faf9f6/78350f?text=Dish'">
@@ -1439,13 +1409,7 @@
 
       if (id) {
         const f = foods.find(x => x.id == id);
-        if (f) {
-          f.name = name;
-          f.price = price;
-          f.category = category;
-          f.type = type;
-          f.image = image;
-        }
+        if (f) { f.name = name; f.price = price; f.category = category; f.type = type; f.image = image; }
         showToast("Dish updated successfully!");
       } else {
         const newId = foods.length > 0 ? Math.max(...foods.map(x => x.id)) + 1 : 1;
@@ -1492,6 +1456,7 @@
 
     function generateTableQR() {
       const num = document.getElementById("tableGenNumber").value.trim();
+      const durationMins = parseInt(document.getElementById("tableSessionDuration").value) || 60;
       if (!num) {
         showToast("Please enter table number!");
         return;
@@ -1503,54 +1468,69 @@
 
       document.getElementById("tableQRTitle").innerText = "Table " + num + " QR Code";
       document.getElementById("tableQRUrl").innerText = finalUrl;
-      const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
-      document.getElementById("tableQRImg").src = qrImg;
+      document.getElementById("tableQRImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
       document.getElementById("tableQRResult").classList.remove("hidden");
 
       let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
-      activeQrs.push({ tableNum: num, url: finalUrl });
+      
+      const expireTime = new Date().getTime() + (durationMins * 60 * 1000);
+      activeQrs.push({ tableNum: num, url: finalUrl, durationMins, expireTime, status: 'Active' });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
       showToast("QR generated for Table " + num);
     }
 
-    function copyTableQRUrl() {
-      const text = document.getElementById("tableQRUrl").innerText;
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textArea);
-      showToast("Table URL copied to clipboard!");
-    }
-
     function renderActiveTablesQrList() {
       const list = document.getElementById("activeTablesQrList");
-      const activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       if (activeQrs.length === 0) {
-        list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet in this session.</p>`;
+        list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet.</p>`;
         return;
       }
 
-      list.innerHTML = activeQrs.map(q => `
-        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-2 text-xs">
-          <div>
-            <span class="font-bold text-stone-900">Table: ${q.tableNum}</span>
-            <span class="text-[10px] text-stone-500 block font-mono truncate max-w-xs">${q.url}</span>
+      list.innerHTML = activeQrs.map(q => {
+        const isExpired = q.status === 'Expired' || (q.expireTime && new Date().getTime() > q.expireTime);
+        return `
+          <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-stone-900 text-sm">Table: ${q.tableNum}</span>
+                <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${isExpired ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+                  ${isExpired ? 'Expired' : 'Active Session'}
+                </span>
+              </div>
+              <span class="text-[10px] text-stone-500 font-mono truncate max-w-md block mt-0.5">${q.url}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              ${!isExpired ? `<button type="button" onclick="expireTableSession('${q.tableNum}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold rounded-lg cursor-pointer">Expire Now</button>` : ''}
+              <button type="button" onclick="deleteTableQr('${q.tableNum}')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg cursor-pointer">Delete</button>
+            </div>
           </div>
-          <button type="button" onclick="removeTableQr('${q.tableNum}')" class="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded-lg cursor-pointer">Revoke</button>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
-    function removeTableQr(num) {
+    function expireTableSession(num) {
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      activeQrs = activeQrs.forEach(q => { if (q.tableNum === num) q.expireTime = new Date().getTime() - 1000; });
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      renderActiveTablesQrList();
+      showToast("Table " + num + " session expired.");
+    }
+
+    function deleteTableQr(num) {
       let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
-      showToast("Table QR revoked.");
+      showToast("Table QR removed.");
+    }
+
+    function copyTableQRUrl() {
+      const text = document.getElementById("tableQRUrl").innerText;
+      navigator.clipboard.writeText(text);
+      showToast("Table URL copied to clipboard!");
     }
 
     function initTableSessionFromURL() {
@@ -1558,6 +1538,14 @@
       const table = params.get("table");
 
       if (table) {
+        let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+        const found = activeQrs.find(x => x.tableNum === table);
+
+        if (found && found.expireTime && new Date().getTime() > found.expireTime) {
+          showPage('expired');
+          return;
+        }
+
         currentTableSession = { tableNum: table };
         document.getElementById("badgeTableNum").innerText = table;
         document.getElementById("tableSessionBadge").classList.remove("hidden");
@@ -1568,10 +1556,11 @@
     document.addEventListener("DOMContentLoaded", () => {
       applyBranding();
       saveCart();
-      renderActiveTablesQrList();
       initTableSessionFromURL();
       initFirebaseListener();
-      showPage('home');
+      if (!currentTableSession || document.getElementById("page-expired").classList.contains("hidden")) {
+        showPage('home');
+      }
     });
   </script>
 </body>
