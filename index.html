@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -649,9 +648,9 @@
   <!-- Application Script -->
   <script>
     const _SYS_CFG = {
-      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20=",
-      upi: "OTM5MDE0MTY3MUB5Ymw=",
-      payee: "Um95YWwgQml0ZXMgUmVzdGF1cmFudA=="
+      db: "https://smart-menu-d180a-default-rtdb.firebaseio.com/",
+      upi: "9985656800-2@ybl",
+      payee: "karthik"
     };
 
     const CONFIG = {
@@ -662,7 +661,8 @@
 
     let dbRef = null;
     try {
-      const firebaseConfig = { databaseURL: CONFIG.databaseURL };
+      const firebaseConfig = { databaseURL: CONFIG.databaseURL,
+                             apikey:"AIzaSyCK1c5Q3GNjw2zytme_xFwyG612Qq9cAWQ"};
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       dbRef = firebase.database().ref("royal_bites_restaurant");
     } catch (e) {
