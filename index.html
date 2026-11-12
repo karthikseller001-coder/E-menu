@@ -84,21 +84,9 @@
 
       <!-- Desktop Header Links -->
       <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-stone-300">
-        <a href="#" onclick="showPage('home')" class="hover:text-amber-400 transition-colors">Home</a>
-        <div class="relative group">
-          <button type="button" class="flex items-center gap-1 hover:text-amber-400 transition-colors py-2 cursor-pointer">
-            <span>Explore Menu</span>
-            <i class="fa-solid fa-chevron-down text-xs"></i>
-          </button>
-          <div class="absolute left-0 mt-1 w-48 bg-stone-900 border border-stone-800 rounded-xl shadow-xl py-2 hidden group-hover:block z-50 text-xs">
-            <a href="#" onclick="showPage('menu'); setTypeFilter('Veg');" class="block px-4 py-2 hover:bg-stone-800 text-stone-300 hover:text-amber-400"><i class="fa-solid fa-seedling mr-2 text-emerald-400"></i> Veg Menu</a>
-            <a href="#" onclick="showPage('menu'); setTypeFilter('Non-Veg');" class="block px-4 py-2 hover:bg-stone-800 text-stone-300 hover:text-amber-400"><i class="fa-solid fa-drumstick-bite mr-2 text-red-400"></i> Non-Veg Menu</a>
-            <a href="#" onclick="showPage('menu'); selectCategory('Beverages');" class="block px-4 py-2 hover:bg-stone-800 text-stone-300 hover:text-amber-400"><i class="fa-solid fa-mug-hot mr-2 text-amber-400"></i> Beverages</a>
-            <a href="#" onclick="showPage('menu'); selectCategory('Desserts');" class="block px-4 py-2 hover:bg-stone-800 text-stone-300 hover:text-amber-400"><i class="fa-solid fa-cake-candles mr-2 text-pink-400"></i> Desserts</a>
-          </div>
-        </div>
-        <a href="#" onclick="showPage('menu')" class="hover:text-amber-400 transition-colors">About</a>
-        <a href="#" onclick="showPage('myorders')" class="hover:text-amber-400 transition-colors">Contact</a>
+        <button type="button" onclick="showPage('home')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">Home</button>
+        <button type="button" onclick="showPage('menu')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">Explore Menu</button>
+        <button type="button" onclick="showPage('myorders')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">My Orders</button>
       </nav>
 
       <div class="hidden md:flex items-center gap-3">
@@ -243,11 +231,23 @@
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-stone-200 gap-4">
-          <div class="text-center sm:text-left">
-            <span class="text-xs text-stone-500 block">Grand Total Payable</span>
-            <span id="cartTotalAmount" class="text-2xl font-black text-stone-900">₹0</span>
+        <!-- Sub-Total, Tax and Grand Total Display -->
+        <div class="pt-4 border-t border-stone-200 space-y-2 text-sm">
+          <div class="flex justify-between text-stone-600">
+            <span>Sub-Total:</span>
+            <span id="cartSubTotalAmount" class="font-bold">₹0</span>
           </div>
+          <div class="flex justify-between text-stone-600">
+            <span id="cartTaxLabel">Tax (5%):</span>
+            <span id="cartTaxAmount" class="font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-base font-black text-stone-900 pt-2 border-t border-dashed">
+            <span>Grand Total Payable:</span>
+            <span id="cartTotalAmount" class="text-amber-600">₹0</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-end items-center pt-2">
           <button type="button" onclick="proceedToPayment()" class="w-full sm:w-auto gold-gradient text-stone-950 font-extrabold px-8 py-3.5 rounded-xl text-sm shadow-lg hover:opacity-95 transition-all cursor-pointer">
             Proceed to Payment <i class="fa-solid fa-arrow-right ml-1"></i>
           </button>
@@ -348,13 +348,13 @@
           <i class="fa-solid fa-shield-halved"></i>
         </div>
         <div class="space-y-1">
-          <h2 class="font-serif font-bold text-2xl text-stone-900">Staff Login</h2>
-          <p class="text-xs text-stone-500">Enter Admin Passcode</p>
+          <h2 class="font-serif font-bold text-2xl text-stone-900" id="loginTitleText">Staff / Master Login</h2>
+          <p class="text-xs text-stone-500" id="loginDescText">Enter Passcode to access respective panel</p>
         </div>
         <div class="space-y-3 pt-2">
-          <input id="passcodeInput" type="password" placeholder="Enter Admin Passcode" class="w-full px-4 py-3 rounded-xl border border-stone-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none">
+          <input id="passcodeInput" type="password" placeholder="Enter Passcode" class="w-full px-4 py-3 rounded-xl border border-stone-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none">
           <button type="button" onclick="login()" class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-lg transition-all cursor-pointer">
-            Login to Panel
+            Login
           </button>
           <p id="loginMsg" class="text-xs font-bold text-red-600"></p>
         </div>
@@ -413,6 +413,24 @@
             </div>
           </div>
 
+          <!-- Tax/GST Label and Percentage Settings for Master Panel -->
+          <div class="pt-6 border-t border-stone-200 space-y-4">
+            <h4 class="font-bold text-stone-800 text-sm">Tax / GST Name & Percentage Settings</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-stone-600 mb-1">Tax / GST Label Name</label>
+                <input id="masterTaxLabelInput" type="text" value="Tax" placeholder="e.g. GST or VAT" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-stone-600 mb-1">Tax Percentage (%)</label>
+                <input id="masterTaxRateInput" type="number" step="0.1" value="5" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+              </div>
+              <div class="flex items-end">
+                <button type="button" onclick="saveMasterTaxSettings()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Save Tax Settings</button>
+              </div>
+            </div>
+          </div>
+
           <!-- Generated Tables QR & Expiry List -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Active Table QR Links & Expiry Control</h4>
@@ -422,8 +440,23 @@
           </div>
         </div>
 
+        <div id="masterSubPage-passcodes" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings (Master & Admin)</h3>
+          <div class="max-w-md space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Master Control Passcode</label>
+              <input id="masterNewMasterPassInput" type="text" placeholder="Enter new master passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Admin Passcode</label>
+              <input id="masterNewPasscodeInput" type="text" placeholder="Enter new staff admin passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <button type="button" onclick="saveNewPasscodes()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Passcodes</button>
+          </div>
+        </div>
+
         <div id="masterSubPage-branding" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding & Content Customization</h3>
+          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding & Content Customization (Image URLs)</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Brand Name</label>
@@ -435,7 +468,15 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Header Logo Image URL</label>
-              <input id="editHeaderLogoUrl" type="text" placeholder="https://... (leave empty for default icon)" class="w-full px-3 py-2 rounded-xl border text-sm">
+              <input id="editHeaderLogoUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Logo Image URL</label>
+              <input id="editWaLogoUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Header Title</label>
+              <input id="editWaTitle" type="text" placeholder="e.g. HOTEL ROYAL SPICE - INVOICE" class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Home Hero Background Image URL</label>
@@ -565,8 +606,8 @@
               </select>
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-stone-600 mb-1">Image URL</label>
-              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+              <label class="block text-xs font-bold text-stone-600 mb-1">Dish Image URL</label>
+              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
             </div>
           </div>
           <div class="flex items-center gap-3">
@@ -578,19 +619,20 @@
             </button>
           </div>
 
+          <!-- Admin Passcode Change Box inside Admin Panel -->
+          <div class="pt-6 border-t border-stone-200 space-y-4 max-w-md">
+            <h4 class="font-bold text-stone-800 text-sm">Change Staff Admin Passcode</h4>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Admin Passcode</label>
+              <input id="adminNewPassInput" type="text" placeholder="Enter new admin passcode" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <button type="button" onclick="saveAdminPasscodeOnly()" class="py-2.5 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Admin Passcode</button>
+          </div>
+
           <!-- Existing Menu Management List with Edit & Delete -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Manage Existing Menu Items</h4>
             <div id="adminMenuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-2"></div>
-          </div>
-
-          <!-- Direct Admin Passcode Change in Admin Panel -->
-          <div class="pt-6 border-t border-stone-200 space-y-3">
-            <h4 class="font-bold text-stone-800 text-sm">Change Staff Admin Passcode</h4>
-            <div class="flex gap-2 max-w-md">
-              <input id="adminPanelNewPass" type="text" placeholder="New Passcode" class="flex-1 px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
-              <button type="button" onclick="changeAdminPasscodeFromAdmin()" class="px-4 py-2 bg-stone-900 text-white font-bold text-xs rounded-xl cursor-pointer">Update Pass</button>
-            </div>
           </div>
         </div>
       </div>
@@ -606,7 +648,6 @@
 
   <!-- Application Script -->
   <script>
-    // Encoded/Obfuscated Config to prevent direct plaintext leaks
     const _SYS_CFG = {
       db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20=",
       upi: "OTM5MDE0MTY3MUB5Ymw=",
@@ -614,22 +655,19 @@
     };
 
     const CONFIG = {
-      firebaseDatabaseURL: atob(_SYS_CFG.db),
+      databaseURL: atob(_SYS_CFG.db),
       phonePeUpiId: atob(_SYS_CFG.upi),
       payeeName: atob(_SYS_CFG.payee)
     };
 
     let dbRef = null;
     try {
-      const firebaseConfig = { databaseURL: CONFIG.firebaseDatabaseURL };
+      const firebaseConfig = { databaseURL: CONFIG.databaseURL };
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       dbRef = firebase.database().ref("royal_bites_restaurant");
     } catch (e) {
       console.log("Offline mode active");
     }
-
-    const upi = CONFIG.phonePeUpiId;
-    const payee = CONFIG.payeeName;
 
     let foods = JSON.parse(localStorage.getItem("rb_foods")) || [
       { id: 1, name: "Hyderabadi Chicken Dum Biryani", price: 280, category: "Biryani", type: "Non-Veg", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
@@ -647,6 +685,8 @@
       brandName: "Hotel Royal Spice",
       brandTagline: "Restaurant",
       headerLogoUrl: "",
+      waLogoUrl: "",
+      waTitle: "Hotel Royal Spice - INVOICE",
       heroBgUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
       homeBadge: "Welcome to Royal Dining",
       homeTitle1: "Good Food",
@@ -655,11 +695,10 @@
       footerText: "© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love."
     };
 
-    let activeCategory = "All";
-    let activeTypeFilter = "All";
-    let fixedTableNumber = null;
+    let selectedCategory = "All";
+    let selectedTypeFilter = "All";
+    let currentTableSession = null;
     let sessionTimerInterval = null;
-    let generatedTableQrList = JSON.parse(localStorage.getItem("rb_gen_tables")) || [];
 
     function applyBranding() {
       document.getElementById("headerBrandName").innerText = branding.brandName;
@@ -689,12 +728,21 @@
       document.getElementById("editBrandName").value = branding.brandName;
       document.getElementById("editBrandTagline").value = branding.brandTagline;
       document.getElementById("editHeaderLogoUrl").value = branding.headerLogoUrl || "";
+      document.getElementById("editWaLogoUrl").value = branding.waLogoUrl || "";
+      document.getElementById("editWaTitle").value = branding.waTitle || "HOTEL ROYAL SPICE - TAX INVOICE";
       document.getElementById("editHeroBgUrl").value = branding.heroBgUrl || "";
       document.getElementById("editHomeBadge").value = branding.homeBadge;
       document.getElementById("editHomeTitle1").value = branding.homeTitle1;
       document.getElementById("editHomeTitle2").value = branding.homeTitle2;
       document.getElementById("editHomeDesc").value = branding.homeDesc;
       document.getElementById("editFooterText").value = branding.footerText;
+
+      const savedTaxLabel = localStorage.getItem("rb_tax_label") || "Tax";
+      const savedTaxRate = localStorage.getItem("rb_tax_rate") || "5";
+      const taxLabelInput = document.getElementById("masterTaxLabelInput");
+      const taxRateInput = document.getElementById("masterTaxRateInput");
+      if (taxLabelInput) taxLabelInput.value = savedTaxLabel;
+      if (taxRateInput) taxRateInput.value = savedTaxRate;
     }
 
     function saveBrandingSettings() {
@@ -702,6 +750,8 @@
         brandName: document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice",
         brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
         headerLogoUrl: document.getElementById("editHeaderLogoUrl").value.trim(),
+        waLogoUrl: document.getElementById("editWaLogoUrl").value.trim(),
+        waTitle: document.getElementById("editWaTitle").value.trim() || "Hotel Royal Spice - INVOICE",
         heroBgUrl: document.getElementById("editHeroBgUrl").value.trim() || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
         homeBadge: document.getElementById("editHomeBadge").value.trim() || "Welcome",
         homeTitle1: document.getElementById("editHomeTitle1").value.trim() || "Good Food",
@@ -711,22 +761,43 @@
       };
       localStorage.setItem("rb_branding", JSON.stringify(branding));
       applyBranding();
-      showToast("Website branding, logos & background updated!");
+      showToast("Website branding & WhatsApp invoice settings updated!");
     }
 
-    function saveBrandingSettings() {
-      branding = {
-        brandName: document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice",
-        brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
-        homeBadge: document.getElementById("editHomeBadge").value.trim() || "Welcome",
-        homeTitle1: document.getElementById("editHomeTitle1").value.trim() || "Good Food",
-        homeTitle2: document.getElementById("editHomeTitle2").value.trim() || "Good Mood",
-        homeDesc: document.getElementById("editHomeDesc").value.trim(),
-        footerText: document.getElementById("editFooterText").value.trim()
-      };
-      localStorage.setItem("rb_branding", JSON.stringify(branding));
-      applyBranding();
-      showToast("Website branding & text updated!");
+    function saveMasterTaxSettings() {
+      const label = document.getElementById("masterTaxLabelInput").value.trim() || "Tax";
+      const rate = parseFloat(document.getElementById("masterTaxRateInput").value) || 0;
+      localStorage.setItem("rb_tax_label", label);
+      localStorage.setItem("rb_tax_rate", rate);
+      showToast("Tax settings updated successfully!");
+      renderCart();
+    }
+
+    function saveNewPasscodes() {
+      const newMasterPass = document.getElementById("masterNewMasterPassInput").value.trim();
+      const newAdminPass = document.getElementById("masterNewPasscodeInput").value.trim();
+      
+      if (newMasterPass) {
+        localStorage.setItem("rb_master_pass", newMasterPass);
+      }
+      if (newAdminPass) {
+        localStorage.setItem("rb_admin_pass", newAdminPass);
+      }
+      
+      document.getElementById("masterNewMasterPassInput").value = "";
+      document.getElementById("masterNewPasscodeInput").value = "";
+      showToast("Master & Admin passcodes updated successfully!");
+    }
+
+    function saveAdminPasscodeOnly() {
+      const newAdminPass = document.getElementById("adminNewPassInput").value.trim();
+      if (!newAdminPass) {
+        showToast("Please enter a valid passcode!");
+        return;
+      }
+      localStorage.setItem("rb_admin_pass", newAdminPass);
+      document.getElementById("adminNewPassInput").value = "";
+      showToast("Staff admin passcode updated successfully!");
     }
 
     function showToast(msg) {
@@ -775,457 +846,467 @@
       } else if (pageName === "admin") {
         renderAdminOrders();
         renderSalesReport();
+        renderAdminMenuList();
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function switchAdminSubPage(tab) {
-      document.querySelectorAll(".admin-sub-page").forEach(el => el.classList.add("hidden"));
-      document.querySelectorAll(".admin-sub-btn").forEach(btn => {
-        btn.classList.remove("bg-blue-600", "text-white", "shadow");
-        btn.classList.add("bg-white", "text-blue-900");
-      });
-      const targetSub = document.getElementById("adminSubPage-" + tab);
-      if (targetSub) targetSub.classList.remove("hidden");
-      
-      const activeBtn = document.getElementById("adminTabBtn-" + tab);
-      if (activeBtn) {
-        activeBtn.classList.remove("bg-white", "text-blue-900");
-        activeBtn.classList.add("bg-blue-600", "text-white", "shadow");
-      }
-      if (tab === "sales") renderSalesReport();
-      if (tab === "orders") renderAdminOrders();
-      if (tab === "menu") renderAdminMenuList();
-    }
-
-    function switchMasterSubPage(tab) {
-      document.querySelectorAll(".master-sub-page").forEach(el => el.classList.add("hidden"));
-      document.querySelectorAll(".master-sub-btn").forEach(btn => {
-        btn.classList.remove("bg-blue-600", "text-white", "shadow");
-        btn.classList.add("bg-white", "text-blue-900");
-      });
-      document.getElementById("masterSubPage-" + tab).classList.remove("hidden");
-      const activeBtn = document.getElementById("masterTabBtn-" + tab);
-      if (activeBtn) {
-        activeBtn.classList.remove("bg-white", "text-blue-900");
-        activeBtn.classList.add("bg-blue-600", "text-white", "shadow");
-      }
-    }
-
-    function initTableSessionFromURL() {
-      const params = new URLSearchParams(window.location.search);
-      const tableParam = params.get("table");
-      const minsParam = parseInt(params.get("mins")) || 45;
-      const tokenParam = params.get("sid") || "default";
-
-      if (tableParam) {
-        const sessionKey = `rb_session_${tableParam}_${tokenParam}`;
-        const isExpired = localStorage.getItem(`rb_expired_${tableParam}_${tokenParam}`);
-        
-        if (isExpired === "true") {
-          document.getElementById("sessionExpiredModal").classList.remove("hidden");
-          return;
-        }
-
-        fixedTableNumber = tableParam;
-        let expiryTimestamp = localStorage.getItem(sessionKey);
-
-        if (!expiryTimestamp) {
-          expiryTimestamp = Date.now() + minsParam * 60 * 1000;
-          localStorage.setItem(sessionKey, expiryTimestamp);
-        } else {
-          expiryTimestamp = parseInt(expiryTimestamp);
-        }
-
-        document.getElementById("tableSessionBadge").classList.remove("hidden");
-        document.getElementById("tableSessionBadge").classList.add("flex");
-        document.getElementById("badgeTableNum").innerText = fixedTableNumber;
-        applyFixedTableNumber();
-
-        if (sessionTimerInterval) clearInterval(sessionTimerInterval);
-        
-        const checkExpiry = () => {
-          const expiredCheck = localStorage.getItem(`rb_expired_${tableParam}_${tokenParam}`);
-          if (expiredCheck === "true") {
-            clearInterval(sessionTimerInterval);
-            document.getElementById("sessionTimerDisplay").innerText = "00:00";
-            document.getElementById("sessionExpiredModal").classList.remove("hidden");
-            return;
-          }
-
-          const remaining = expiryTimestamp - Date.now();
-          if (remaining <= 0) {
-            clearInterval(sessionTimerInterval);
-            document.getElementById("sessionTimerDisplay").innerText = "00:00";
-            document.getElementById("sessionExpiredModal").classList.remove("hidden");
-          } else {
-            const m = Math.floor(remaining / 60000);
-            const s = Math.floor((remaining % 60000) / 1000);
-            document.getElementById("sessionTimerDisplay").innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-          }
-        };
-
-        checkExpiry();
-        sessionTimerInterval = setInterval(checkExpiry, 1000);
-      }
-    }
-
-    function applyFixedTableNumber() {
-      const tableInput = document.getElementById("custTable");
-      const lockLabel = document.getElementById("tableLockedLabel");
-      if (fixedTableNumber && tableInput) {
-        tableInput.value = fixedTableNumber;
-        tableInput.readOnly = true;
-        tableInput.classList.add("bg-stone-100", "font-bold", "text-brand-800", "cursor-not-allowed");
-        if (lockLabel) lockLabel.classList.remove("hidden");
-      }
-    }
-
     function renderCategories() {
-      const categories = ["All", ...new Set(foods.map(f => f.category))];
+      const cats = ["All", ...new Set(foods.map(f => f.category))];
       const bar = document.getElementById("categoryBar");
-      if (!bar) return;
-      bar.innerHTML = categories.map(cat => `
-        <button type="button" onclick="selectCategory('${cat}')" class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${activeCategory === cat ? 'gold-gradient text-stone-950 shadow' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100'}">
-          ${cat}
+      bar.innerHTML = cats.map(c => `
+        <button type="button" onclick="selectCategory('${c}')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${selectedCategory === c ? 'bg-amber-500 text-stone-950 shadow' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'}">
+          ${c}
         </button>
       `).join("");
     }
 
     function selectCategory(cat) {
-      activeCategory = cat;
+      selectedCategory = cat;
       renderCategories();
       renderFood();
     }
 
     function setTypeFilter(type) {
-      activeTypeFilter = type;
-      document.querySelectorAll(".type-filter-btn").forEach(b => b.classList.remove("ring-2", "ring-amber-500"));
-      const btn = document.getElementById("typeBtn-" + type);
-      if (btn) btn.classList.add("ring-2", "ring-amber-500");
+      selectedTypeFilter = type;
+      document.querySelectorAll(".type-filter-btn").forEach(btn => {
+        btn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-100 text-stone-600 border border-stone-200 cursor-pointer";
+      });
+      const activeBtn = document.getElementById("typeBtn-" + type);
+      if (activeBtn) {
+        if (type === 'Veg') activeBtn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white cursor-pointer";
+        else if (type === 'Non-Veg') activeBtn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-red-600 text-white cursor-pointer";
+        else activeBtn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-900 text-white cursor-pointer";
+      }
       renderFood();
     }
 
     function renderFood() {
-      const query = (document.getElementById("searchInput")?.value || "").toLowerCase();
+      const query = (document.getElementById("searchInput").value || "").toLowerCase();
       const filtered = foods.filter(f => {
-        const matchCat = activeCategory === "All" || f.category === activeCategory;
-        const matchType = activeTypeFilter === "All" || f.type === activeTypeFilter;
-        const matchQuery = f.name.toLowerCase().includes(query);
-        return matchCat && matchType && matchQuery;
+        const matchesCat = selectedCategory === "All" || f.category === selectedCategory;
+        const matchesType = selectedTypeFilter === "All" || f.type === selectedTypeFilter;
+        const matchesSearch = f.name.toLowerCase().includes(query) || f.category.toLowerCase().includes(query);
+        return matchesCat && matchesType && matchesSearch;
       });
 
       const grid = document.getElementById("foodGrid");
-      if (!grid) return;
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-stone-400 text-sm">No dishes match your search.</div>`;
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-stone-400 text-sm">No dishes found.</div>`;
         return;
       }
 
-      grid.innerHTML = filtered.map(item => {
-        const inCart = cart.find(c => c.id === item.id);
+      grid.innerHTML = filtered.map(f => {
+        const inCart = cart.find(item => item.id === f.id);
+        const qty = inCart ? inCart.qty : 0;
         return `
           <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
-            <div class="relative h-44 bg-stone-100">
-              <img src="${item.image}" alt="${item.name}" onerror="this.src='https://placehold.co/600x400/292524/f59e0b?text=${encodeURIComponent(item.name)}'" class="w-full h-full object-cover">
-              <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase ${item.type === 'Veg' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}">
-                ${item.type}
+            <div class="relative h-44 bg-stone-100 overflow-hidden">
+              <img src="${f.image || 'https://placehold.co/600x400/faf9f6/78350f?text=Dish'}" alt="${f.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/faf9f6/78350f?text=Dish'">
+              <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${f.type === 'Veg' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} shadow">
+                ${f.type}
               </span>
             </div>
-            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+            <div class="p-4 space-y-2 flex-1 flex flex-col justify-between">
               <div>
-                <span class="text-[11px] text-stone-400 font-semibold">${item.category}</span>
-                <h3 class="font-bold text-stone-900 text-base leading-snug">${item.name}</h3>
+                <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">${f.category}</span>
+                <h3 class="font-serif font-bold text-base text-stone-900 line-clamp-1">${f.name}</h3>
               </div>
               <div class="flex items-center justify-between pt-2 border-t border-stone-100">
-                <span class="font-black text-lg text-stone-900">₹${item.price}</span>
-                ${inCart ? `
-                  <div class="flex items-center gap-2 bg-amber-100 px-2.5 py-1 rounded-xl">
-                    <button type="button" onclick="updateQty(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-white text-stone-900 font-bold text-sm cursor-pointer">-</button>
-                    <span class="font-bold text-xs px-1">${inCart.qty}</span>
-                    <button type="button" onclick="updateQty(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-amber-500 text-stone-950 font-bold text-sm cursor-pointer">+</button>
-                  </div>
-                ` : `
-                  <button type="button" onclick="addToCart(${item.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow-sm hover:opacity-90 cursor-pointer">
-                    Add +
+                <span class="font-black text-lg text-stone-900">₹${f.price}</span>
+                ${qty === 0 ? `
+                  <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
+                    + Add
                   </button>
+                ` : `
+                  <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
+                    <button type="button" onclick="updateQty(${f.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+                    <span class="font-bold text-xs px-1">${qty}</span>
+                    <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+                  </div>
                 `}
               </div>
             </div>
           </div>
         `;
       }).join("");
+
+      updateStickyCartBar();
     }
 
-    function addToCart(id) {
-      const food = foods.find(f => f.id === id);
-      if (!food) return;
-      const existing = cart.find(c => c.id === id);
-      if (existing) existing.qty += 1;
-      else cart.push({ ...food, qty: 1 });
+    function addToCart(foodId) {
+      const f = foods.find(x => x.id === foodId);
+      if (!f) return;
+      const existing = cart.find(x => x.id === foodId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ id: f.id, name: f.name, price: f.price, type: f.type, qty: 1 });
+      }
       saveCart();
       renderFood();
-      showToast(`Added ${food.name}`);
+      showToast(f.name + " added to cart!");
     }
 
-    function updateQty(id, delta) {
-      const idx = cart.findIndex(c => c.id === id);
-      if (idx === -1) return;
-      cart[idx].qty += delta;
-      if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    function updateQty(foodId, change) {
+      const idx = cart.findIndex(x => x.id === foodId);
+      if (idx !== -1) {
+        cart[idx].qty += change;
+        if (cart[idx].qty <= 0) {
+          cart.splice(idx, 1);
+        }
+      }
       saveCart();
       renderFood();
-      renderCart();
     }
 
     function saveCart() {
       localStorage.setItem("rb_cart", JSON.stringify(cart));
-      const count = cart.reduce((sum, i) => sum + i.qty, 0);
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-      
-      const badge = document.getElementById("cartCountBadge");
-      if (badge) badge.innerText = count;
+      updateStickyCartBar();
+    }
 
-      const stickyBar = document.getElementById("stickyCartBar");
-      if (stickyBar) {
-        if (count > 0) {
-          stickyBar.classList.remove("hidden");
-          stickyBar.classList.add("flex");
-          document.getElementById("stickyCartCount").innerText = count;
-          document.getElementById("stickyCartTotal").innerText = `₹${total}`;
-        } else {
-          stickyBar.classList.add("hidden");
-          stickyBar.classList.remove("flex");
-        }
+    function updateStickyCartBar() {
+      const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      
+      const bar = document.getElementById("stickyCartBar");
+      const badge = document.getElementById("cartCountBadge");
+      if (badge) badge.innerText = totalCount;
+
+      if (totalCount > 0) {
+        if (bar) bar.classList.remove("hidden");
+        if (bar) bar.classList.add("flex");
+        const sCount = document.getElementById("stickyCartCount");
+        const sTotal = document.getElementById("stickyCartTotal");
+        if (sCount) sCount.innerText = totalCount;
+        if (sTotal) sTotal.innerText = "₹" + subTotal;
+      } else {
+        if (bar) bar.classList.add("hidden");
+        if (bar) bar.classList.remove("flex");
       }
     }
 
     function renderCart() {
       const container = document.getElementById("cartItemsContainer");
-      const checkoutBox = document.getElementById("checkoutDetailsBox");
-      if (!container || !checkoutBox) return;
+      const detailsBox = document.getElementById("checkoutDetailsBox");
 
       if (cart.length === 0) {
         container.innerHTML = `
-          <div class="bg-white p-10 rounded-3xl text-center border border-stone-200 space-y-3">
-            <i class="fa-solid fa-basket-shopping text-4xl text-stone-300"></i>
-            <p class="text-stone-500 text-sm">Your cart is currently empty.</p>
-            <button type="button" onclick="showPage('menu')" class="gold-gradient text-stone-950 font-bold px-6 py-2.5 rounded-xl text-xs cursor-pointer">Browse Menu</button>
+          <div class="py-16 text-center space-y-3 bg-white rounded-3xl border border-stone-200">
+            <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+              <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <h3 class="font-serif font-bold text-xl text-stone-900">Your cart is empty</h3>
+            <p class="text-xs text-stone-500">Add delicious dishes from our menu to place an order.</p>
+            <button type="button" onclick="showPage('menu')" class="gold-gradient text-stone-950 font-extrabold px-6 py-2.5 rounded-xl text-xs shadow cursor-pointer">Explore Menu</button>
           </div>
         `;
-        checkoutBox.classList.add("hidden");
+        detailsBox.classList.add("hidden");
         return;
       }
 
-      checkoutBox.classList.remove("hidden");
-      applyFixedTableNumber();
-      let total = 0;
-      container.innerHTML = cart.map(item => {
-        const sub = item.price * item.qty;
-        total += sub;
-        return `
-          <div class="bg-white p-4 rounded-2xl border border-stone-200 flex items-center justify-between gap-3">
-            <div>
-              <h4 class="font-bold text-stone-900 text-sm">${item.name}</h4>
-              <p class="text-xs text-stone-500">₹${item.price} × ${item.qty}</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="flex items-center gap-2 bg-stone-100 px-2 py-1 rounded-xl">
-                <button type="button" onclick="updateQty(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg font-bold text-xs cursor-pointer">-</button>
-                <span class="font-bold text-xs">${item.qty}</span>
-                <button type="button" onclick="updateQty(${item.id}, 1)" class="w-6 h-6 bg-amber-500 text-stone-950 rounded-lg font-bold text-xs cursor-pointer">+</button>
-              </div>
-              <span class="font-black text-sm w-16 text-right">₹${sub}</span>
-            </div>
+      container.innerHTML = cart.map(item => `
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-200 flex items-center justify-between gap-4">
+          <div class="flex-1">
+            <h4 class="font-bold text-stone-900 text-sm">${item.name}</h4>
+            <span class="text-xs text-stone-500">₹${item.price} each</span>
           </div>
-        `;
-      }).join("");
-      document.getElementById("cartTotalAmount").innerText = `₹${total}`;
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
+              <button type="button" onclick="updateCartItemQty(${item.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+              <span class="font-bold text-xs px-1">${item.qty}</span>
+              <button type="button" onclick="updateCartItemQty(${item.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+            </div>
+            <span class="font-black text-sm text-stone-900 w-16 text-right">₹${item.price * item.qty}</span>
+            <button type="button" onclick="removeFromCart(${item.id})" class="text-stone-400 hover:text-red-600 p-2 cursor-pointer"><i class="fa-solid fa-trash text-xs"></i></button>
+          </div>
+        </div>
+      `).join("");
+
+      detailsBox.classList.remove("hidden");
+      calculateCartTotals();
+    }
+
+    function updateCartItemQty(id, change) {
+      const idx = cart.findIndex(x => x.id === id);
+      if (idx !== -1) {
+        cart[idx].qty += change;
+        if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      }
+      saveCart();
+      renderCart();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(x => x.id !== id);
+      saveCart();
+      renderCart();
+    }
+
+    function calculateCartTotals() {
+      const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const taxLabel = localStorage.getItem("rb_tax_label") || "Tax";
+      const taxRate = parseFloat(localStorage.getItem("rb_tax_rate")) || 5;
+      
+      const taxAmount = Math.round((subTotal * taxRate) / 100);
+      const grandTotal = subTotal + taxAmount;
+
+      document.getElementById("cartSubTotalAmount").innerText = "₹" + subTotal;
+      document.getElementById("cartTaxLabel").innerText = `${taxLabel} (${taxRate}%):`;
+      document.getElementById("cartTaxAmount").innerText = "₹" + taxAmount;
+      document.getElementById("cartTotalAmount").innerText = "₹" + grandTotal;
+
+      return { subTotal, taxLabel, taxRate, taxAmount, grandTotal };
+    }
+
+    function applyFixedTableNumber() {
+      if (currentTableSession && currentTableSession.tableNum) {
+        const tInput = document.getElementById("custTable");
+        tInput.value = currentTableSession.tableNum;
+        tInput.readOnly = true;
+        document.getElementById("tableLockedLabel").classList.remove("hidden");
+      }
     }
 
     function proceedToPayment() {
       const name = document.getElementById("custName").value.trim();
       const phone = document.getElementById("custPhone").value.trim();
       const table = document.getElementById("custTable").value.trim();
-      if (!name || phone.length < 10 || !table) {
-        showToast("Please enter Name, 10-digit Phone & Table No.");
+
+      if (!name || !phone || !table) {
+        showToast("Please fill in Name, WhatsApp Mobile Number & Table Number!");
         return;
       }
-      showPage("payment");
+      if (phone.length !== 10 || isNaN(phone)) {
+        showToast("Please enter a valid 10-digit mobile number!");
+        return;
+      }
+
+      showPage('payment');
     }
 
     function updatePaymentScreen() {
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      const totals = calculateCartTotals();
       const name = document.getElementById("custName").value.trim();
       const table = document.getElementById("custTable").value.trim();
 
-      document.getElementById("payScreenAmount").innerText = `₹${total}`;
+      document.getElementById("payScreenAmount").innerText = "₹" + totals.grandTotal;
       document.getElementById("payScreenSummary").innerText = `Table ${table} • ${name}`;
-      document.getElementById("upiBtnLabel").innerText = `Pay ₹${total} with PhonePe / Any UPI App`;
+      document.getElementById("upiBtnLabel").innerText = `Pay ₹${totals.grandTotal} with PhonePe / Any UPI App`;
 
-      const upiUri = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(payee)}&am=${total}&cu=INR`;
-      document.getElementById("directUpiAppLink").href = upiUri;
-      document.getElementById("dynamicUpiQr").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUri)}`;
+      const upiUrl = `upi://pay?pa=${upi}&pn=${encodeURIComponent(payee)}&am=${totals.grandTotal}&cu=INR`;
+      document.getElementById("directUpiAppLink").href = upiUrl;
+
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+      document.getElementById("dynamicUpiQr").src = qrImageUrl;
     }
 
-    function confirmOrderAfterPayment(method) {
+    function confirmOrderAfterPayment(payMethod) {
       const name = document.getElementById("custName").value.trim();
       const phone = document.getElementById("custPhone").value.trim();
       const table = document.getElementById("custTable").value.trim();
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      const totals = calculateCartTotals();
 
-      const newOrderId = "ORD" + Math.floor(1000 + Math.random() * 9000);
+      const orderId = "#ORD" + Math.floor(1000 + Math.random() * 9000);
       const newOrder = {
-        id: newOrderId,
+        orderId,
         date: new Date().toLocaleString(),
-        isoDate: new Date().toISOString().split("T")[0],
-        customer: name,
-        phone: phone,
-        table: table,
+        name,
+        phone,
+        table,
         items: [...cart],
-        total: total,
-        method: method,
+        subTotal: totals.subTotal,
+        taxLabel: totals.taxLabel,
+        taxRate: totals.taxRate,
+        taxAmount: totals.taxAmount,
+        total: totals.grandTotal,
+        paymentMethod: payMethod,
         status: "Pending"
       };
 
       orders.unshift(newOrder);
       localStorage.setItem("rb_orders", JSON.stringify(orders));
-      localStorage.setItem("rb_active_order_id", newOrderId);
-      currentActiveOrderId = newOrderId;
+      currentActiveOrderId = orderId;
+      localStorage.setItem("rb_active_order_id", orderId);
 
-      if (dbRef) dbRef.child("orders").set(orders);
+      if (dbRef) {
+        dbRef.child("orders").push(newOrder);
+      }
 
       cart = [];
       saveCart();
+      showPage('status');
       showToast("Order placed successfully!");
-      showPage("status");
     }
 
     function renderOrderStatusTracker() {
-      if (!currentActiveOrderId) return;
-      const ord = orders.find(o => o.id === currentActiveOrderId);
-      if (!ord) return;
+      const order = orders.find(x => x.orderId === currentActiveOrderId) || orders[0];
+      if (!order) return;
 
-      document.getElementById("trackOrderId").innerText = "#" + ord.id;
-      document.getElementById("trackTableNum").innerText = "Table " + ord.table;
-      document.getElementById("trackTotal").innerText = "₹" + ord.total;
+      document.getElementById("trackOrderId").innerText = order.orderId;
+      document.getElementById("trackTableNum").innerText = order.table;
+      document.getElementById("trackTotal").innerText = "₹" + order.total;
 
-      const iconBox = document.getElementById("statusIconBox");
-      const icon = document.getElementById("statusIcon");
       const title = document.getElementById("statusTitle");
       const desc = document.getElementById("statusDesc");
+      const icon = document.getElementById("statusIcon");
+      const iconBox = document.getElementById("statusIconBox");
 
-      if (ord.status === "Served") {
-        iconBox.className = "w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-4xl";
+      if (order.status === "Accepted") {
+        title.innerText = "Order Accepted & Preparing!";
+        desc.innerText = "Your order has been accepted by the kitchen. Fresh food is being prepared for your table.";
         icon.className = "fa-solid fa-utensils";
-        title.innerText = "Order Served / Completed";
-        desc.innerText = "Your delicious food has been served to your table. Enjoy your meal!";
-      } else if (ord.status === "Accepted") {
-        iconBox.className = "w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl";
-        icon.className = "fa-solid fa-check-circle";
-        title.innerText = "Order Accepted";
-        desc.innerText = "Your order has been accepted by the restaurant staff and is now being prepared.";
+        iconBox.className = "w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-bounce";
+      } else if (order.status === "Completed") {
+        title.innerText = "Order Served & Completed";
+        desc.innerText = "Thank you for dining with us! Hope you enjoyed your meal at Royal Bites.";
+        icon.className = "fa-solid fa-circle-check";
+        iconBox.className = "w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-4xl";
       } else {
-        iconBox.className = "w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-pulse";
-        icon.className = "fa-solid fa-clock-rotate-left";
         title.innerText = "Pending Approval";
         desc.innerText = "Your payment has been submitted. Waiting for restaurant staff to review and accept your order...";
+        icon.className = "fa-solid fa-clock-rotate-left";
+        iconBox.className = "w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-pulse";
       }
     }
 
     function renderCustomerMyOrders() {
-      const container = document.getElementById("customerMyOrdersList");
-      if (!container) return;
+      const list = document.getElementById("customerMyOrdersList");
       if (orders.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white p-10 rounded-3xl text-center border border-stone-200 space-y-3">
-            <i class="fa-solid fa-receipt text-4xl text-stone-300"></i>
-            <p class="text-stone-500 text-sm">You haven't placed any orders yet.</p>
-            <button type="button" onclick="showPage('menu')" class="gold-gradient text-stone-950 font-bold px-6 py-2.5 rounded-xl text-xs cursor-pointer">Browse Menu</button>
-          </div>
-        `;
+        list.innerHTML = `<div class="py-12 text-center text-stone-400 text-sm bg-white rounded-3xl border border-stone-200">No order history found.</div>`;
         return;
       }
 
-      container.innerHTML = orders.map(ord => {
-        let statusBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock mr-1"></i> Pending</span>`;
-        if (ord.status === "Accepted") {
-          statusBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check mr-1"></i> Order Accepted</span>`;
-        } else if (ord.status === "Served") {
-          statusBadge = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-100 text-blue-800"><i class="fa-solid fa-utensils mr-1"></i> Served / Completed</span>`;
-        }
-
-        return `
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 space-y-3">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="font-black text-base text-stone-900">#${ord.id}</span>
-                  <span class="text-xs text-stone-400">(${ord.date})</span>
-                </div>
-                <p class="text-xs font-semibold text-stone-600">Table ${ord.table} • Customer: ${ord.customer}</p>
-              </div>
-              <div>${statusBadge}</div>
+      list.innerHTML = orders.map(o => `
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+            <div>
+              <span class="font-mono font-black text-amber-600 text-sm">${o.orderId}</span>
+              <span class="text-xs text-stone-400 block">${o.date}</span>
             </div>
-            <div class="space-y-1">
-              ${ord.items.map(i => `
-                <div class="flex justify-between text-xs text-stone-700">
-                  <span>${i.name} × ${i.qty}</span>
-                  <span class="font-bold">₹${i.price * i.qty}</span>
-                </div>
-              `).join("")}
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${o.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : o.status === 'Completed' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">
+              ${o.status}
+            </span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between font-bold text-stone-700">
+              <span>Table: ${o.table}</span>
+              <span>Customer: ${o.name}</span>
             </div>
-            <div class="flex justify-between items-center pt-2 border-t text-sm font-black text-stone-900">
-              <span>Total Paid (${ord.method}):</span>
-              <span class="text-amber-600">₹${ord.total}</span>
+            <div class="border-t pt-2 space-y-1">
+              ${o.items.map(i => `<div class="flex justify-between text-stone-600"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
             </div>
           </div>
-        `;
-      }).join("");
+          <div class="pt-3 border-t flex justify-between items-center text-sm font-black">
+            <span>Total Amount (${o.taxLabel || 'Tax'} Included):</span>
+            <span class="text-amber-600">₹${o.total}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function login() {
+      const pass = document.getElementById("passcodeInput").value.trim();
+      const masterPass = localStorage.getItem("rb_master_pass") || "9999";
+      const adminPass = localStorage.getItem("rb_admin_pass") || "1234";
+
+      if (pass === masterPass) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("adminBox").classList.add("hidden");
+        document.getElementById("masterBox").classList.remove("hidden");
+        document.getElementById("page-admin").classList.remove("hidden");
+        switchMasterSubPage('qr');
+        showToast("Logged in as Master!");
+      } else if (pass === adminPass) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("masterBox").classList.add("hidden");
+        document.getElementById("adminBox").classList.remove("hidden");
+        document.getElementById("page-admin").classList.remove("hidden");
+        switchAdminSubPage('orders');
+        renderAdminOrders();
+        renderSalesReport();
+        renderAdminMenuList();
+        showToast("Logged in as Staff Admin!");
+      } else {
+        document.getElementById("loginMsg").innerText = "Incorrect Passcode!";
+      }
+    }
+
+    function logout() {
+      document.getElementById("loginBox").classList.remove("hidden");
+      document.getElementById("adminBox").classList.add("hidden");
+      document.getElementById("masterBox").classList.add("hidden");
+      document.getElementById("passcodeInput").value = "";
+      document.getElementById("loginMsg").innerText = "";
+      showPage('menu');
+    }
+
+    function switchAdminSubPage(sub) {
+      document.querySelectorAll(".admin-sub-page").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".admin-sub-btn").forEach(b => {
+        b.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
+      });
+      document.getElementById("adminSubPage-" + sub).classList.remove("hidden");
+      const btn = document.getElementById("adminTabBtn-" + sub);
+      if (btn) btn.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer";
+    }
+
+    function switchMasterSubPage(sub) {
+      document.querySelectorAll(".master-sub-page").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".master-sub-btn").forEach(b => {
+        b.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
+      });
+      document.getElementById("masterSubPage-" + sub).classList.remove("hidden");
+      const btn = document.getElementById("masterTabBtn-" + sub);
+      if (btn) btn.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer";
     }
 
     function renderAdminOrders() {
       const list = document.getElementById("ordersList");
-      if (!list) return;
       if (orders.length === 0) {
-        list.innerHTML = `<p class="text-xs text-stone-400 italic">No customer orders yet.</p>`;
+        list.innerHTML = `<div class="py-12 text-center text-stone-400 text-sm">No live orders.</div>`;
         return;
       }
-      list.innerHTML = orders.map((ord, idx) => {
-        let statusColor = "bg-orange-100 text-orange-800";
-        if (ord.status === "Accepted") statusColor = "bg-emerald-100 text-emerald-800";
-        if (ord.status === "Served") statusColor = "bg-blue-100 text-blue-800";
+
+      list.innerHTML = orders.map(o => {
+        const isAcceptedOrCompleted = o.status === 'Accepted' || o.status === 'Completed';
+        const isCompleted = o.status === 'Completed';
+        const isRejected = o.status === 'Rejected';
+
+        let statusBg = 'bg-amber-100 text-amber-700';
+        if (o.status === 'Accepted') statusBg = 'bg-emerald-100 text-emerald-700';
+        else if (o.status === 'Completed') statusBg = 'bg-blue-100 text-blue-700';
+        else if (o.status === 'Rejected') statusBg = 'bg-red-100 text-red-700';
 
         return `
-          <div class="bg-white p-4 rounded-2xl border border-stone-200 flex flex-col sm:flex-row justify-between gap-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="font-black text-sm text-stone-900">#${ord.id}</span>
-                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-900">Table ${ord.table}</span>
-                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${statusColor}">${ord.status || 'Pending'}</span>
+          <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-2">
+              <div>
+                <span class="font-mono font-black text-blue-900 text-sm">${o.orderId}</span>
+                <span class="text-xs text-stone-500 ml-2">Table: <b>${o.table}</b> | Customer: <b>${o.name}</b> (${o.phone})</span>
               </div>
-              <p class="text-xs font-semibold text-stone-700">${ord.customer} • 📞 ${ord.phone} • ${ord.method}</p>
-              <p class="text-xs text-stone-500">${ord.items.map(i => `${i.name} (×${i.qty})`).join(", ")}</p>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBg}">
+                ${o.status}
+              </span>
             </div>
-            <div class="flex flex-col sm:flex-row items-end sm:items-center justify-between sm:justify-end gap-3">
-              <span class="font-black text-base text-stone-900">₹${ord.total}</span>
-              <div class="flex items-center gap-2 flex-wrap justify-end">
-                <button type="button" onclick="printOrderBill(${idx})" class="bg-stone-800 hover:bg-stone-900 text-white font-bold px-3 py-2 rounded-xl text-xs shadow cursor-pointer" title="Print Bill">
-                  <i class="fa-solid fa-print"></i> Print
+            <div class="space-y-1 text-xs">
+              ${o.items.map(i => `<div class="flex justify-between text-stone-700"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
+            </div>
+            <div class="pt-2 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
+              <span class="font-black text-sm text-stone-900">Total: ₹${o.total} (${o.paymentMethod})</span>
+              <div class="flex items-center gap-2 flex-wrap">
+                ${!isAcceptedOrCompleted && !isRejected ? `
+                  <button type="button" onclick="acceptAndSendWhatsAppInvoice('${o.orderId}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
+                    <i class="fa-brands fa-whatsapp"></i> Accept & Invoice
+                  </button>
+                  <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Rejected')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                    Reject
+                  </button>
+                ` : ''}
+                
+                <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Completed')" ${!isAcceptedOrCompleted || isCompleted || isRejected ? 'disabled class="px-3.5 py-1.5 bg-stone-200 text-stone-400 font-bold text-xs rounded-xl cursor-not-allowed opacity-60"' : 'class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer"'}>
+                  Complete
                 </button>
-                ${ord.status !== 'Accepted' && ord.status !== 'Served' ? `
-                  <button type="button" onclick="acceptOrderAndSendWhatsApp(${idx})" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-2 rounded-xl text-xs shadow cursor-pointer">
-                    <i class="fa-brands fa-whatsapp mr-1"></i> Accept & Bill
-                  </button>
-                ` : ''}
-                ${ord.status === 'Accepted' ? `
-                  <button type="button" onclick="markOrderServed(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-2 rounded-xl text-xs shadow cursor-pointer">
-                    <i class="fa-solid fa-utensils mr-1"></i> Mark Served
-                  </button>
-                ` : ''}
-                ${ord.status === 'Served' ? `
-                  <span class="text-xs font-bold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-xl"><i class="fa-solid fa-check-double"></i> Completed</span>
-                ` : ''}
               </div>
             </div>
           </div>
@@ -1233,220 +1314,222 @@
       }).join("");
     }
 
-    function printOrderBill(idx) {
-      const ord = orders[idx];
-      if (!ord) return;
-      const printWindow = window.open('', '_blank');
-      const itemRows = ord.items.map(i => `<tr><td>${i.name} x${i.qty}</td><td style="text-align:right">₹${i.price * i.qty}</td></tr>`).join("");
-      printWindow.document.write(`
-        <html>
-        <head><title>Bill #${ord.id}</title></head>
-        <body style="font-family:monospace; padding:20px; width:300px; margin:auto;">
-          <h2 style="text-align:center; margin-bottom:5px;">${branding.brandName}</h2>
-          <p style="text-align:center; font-size:12px; margin-top:0;">${branding.brandTagline}</p>
-          <hr/>
-          <p>Order ID: #${ord.id}<br/>Date: ${ord.date}<br/>Customer: ${ord.customer}<br/>Table: ${ord.table}</p>
-          <hr/>
-          <table style="width:100%; font-size:13px;">
-            ${itemRows}
-          </table>
-          <hr/>
-          <h3 style="text-align:right;">Total: ₹${ord.total}</h3>
-          <p style="text-align:center; font-size:11px; margin-top:20px;">Thank you for dining with us!</p>
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-    }
-
-    function acceptOrderAndSendWhatsApp(idx) {
-      const ord = orders[idx];
-      if (!ord) return;
-      ord.status = "Accepted";
-      localStorage.setItem("rb_orders", JSON.stringify(orders));
-      if (dbRef) dbRef.child("orders").set(orders);
-      renderAdminOrders();
-      showToast(`Order #${ord.id} accepted!`);
-
-      if (ord.phone && ord.phone.length === 10) {
-        const msg = encodeURIComponent(`Hello ${ord.customer}, your order #${ord.id} at ${branding.brandName} has been ACCEPTED and is now being prepared! Table: ${ord.table}. Total: ₹${ord.total}. Thank you!`);
-        window.open(`https://wa.me/91${ord.phone}?text=${msg}`, '_blank');
+    function updateOrderStatus(orderId, status) {
+      const o = orders.find(x => x.orderId === orderId);
+      if (o) {
+        o.status = status;
+        localStorage.setItem("rb_orders", JSON.stringify(orders));
+        renderAdminOrders();
+        renderSalesReport();
+        showToast("Order status updated to " + status);
       }
     }
 
-    function markOrderServed(idx) {
-      const ord = orders[idx];
-      if (!ord) return;
-      ord.status = "Served";
+    function acceptAndSendWhatsAppInvoice(orderId) {
+      const o = orders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      o.status = "Accepted";
       localStorage.setItem("rb_orders", JSON.stringify(orders));
-      if (dbRef) dbRef.child("orders").set(orders);
       renderAdminOrders();
-      showToast(`Order #${ord.id} marked as Served / Completed!`);
+      renderSalesReport();
+
+      const brandTitle = branding.brandName || "Hotel Royal Spice";
+      const customWaTitle = branding.waTitle || (brandTitle + " - INVOICE");
+      let msg = `*${customWaTitle}*\n`;
+      msg += `--------------------------------\n`;
+      msg += `Order ID: ${o.orderId}\n`;
+      msg += `Date: ${o.date}\n`;
+      msg += `Customer: ${o.name}\n`;
+      msg += `Table No: ${o.table}\n`;
+      msg += `--------------------------------\n`;
+      msg += `ORDERED ITEMS:\n`;
+      o.items.forEach((i) => {
+        msg += `• ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`;
+      });
+      msg += `--------------------------------\n`;
+      msg += `Sub-Total: ₹${o.subTotal}\n`;
+      msg += `Tax (${o.taxRate || 5}%): ₹${o.taxAmount}\n`;
+      msg += `--------------------------------\n`;
+      msg += `┌──────────────────────────────┐\n`;
+      msg += `⭐ *GRAND TOTAL: ₹${o.total}* ⭐\n`;
+      msg += `└──────────────────────────────┘\n`;
+      msg += `Payment: ${o.paymentMethod}\n`;
+      msg += `--------------------------------\n`;
+      msg += `Thank you for dining with us!\n`;
+
+      const url = `https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+      showToast("Order Accepted & WhatsApp Invoice Triggered!");
     }
 
     function renderSalesReport() {
-      const filter = document.getElementById("reportFilterType")?.value || "all";
-      const todayIso = new Date().toISOString().split("T")[0];
+      const type = document.getElementById("reportFilterType").value;
+      let filtered = orders.filter(o => o.status === "Accepted" || o.status === "Completed");
 
-      let filteredOrders = orders;
-      if (filter === "daily") {
-        filteredOrders = orders.filter(o => o.isoDate === todayIso);
-      } else if (filter === "monthly") {
-        const currentMonth = todayIso.substring(0, 7);
-        filteredOrders = orders.filter(o => o.isoDate && o.isoDate.startsWith(currentMonth));
-      }
-
-      const totalOrdersCount = filteredOrders.length;
-      const acceptedOrdersCount = filteredOrders.filter(o => o.status === "Accepted" || o.status === "Served").length;
-      const totalRevenue = filteredOrders
-        .filter(o => o.status === "Accepted" || o.status === "Served")
-        .reduce((sum, o) => sum + o.total, 0);
+      const totalOrdersCount = orders.length;
+      const acceptedCount = filtered.length;
+      const totalRev = filtered.reduce((sum, o) => sum + o.total, 0);
 
       document.getElementById("reportTotalOrders").innerText = totalOrdersCount;
-      document.getElementById("reportAcceptedOrders").innerText = acceptedOrdersCount;
-      document.getElementById("reportTotalRevenue").innerText = `₹${totalRevenue}`;
+      document.getElementById("reportAcceptedOrders").innerText = acceptedCount;
+      document.getElementById("reportTotalRevenue").innerText = "₹" + totalRev;
 
       const tbody = document.getElementById("salesReportTableBody");
-      if (!tbody) return;
-      if (filteredOrders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-stone-400 italic">No sales records found for this period.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = filteredOrders.map(o => `
+      tbody.innerHTML = filtered.map(o => `
         <tr class="hover:bg-stone-50">
-          <td class="p-3 text-stone-600">${o.date}</td>
-          <td class="p-3 font-bold text-stone-900">#${o.id}</td>
-          <td class="p-3">${o.customer}</td>
-          <td class="p-3 font-semibold">Table ${o.table}</td>
+          <td class="p-3 text-stone-500">${o.date}</td>
+          <td class="p-3 font-mono font-bold text-stone-900">${o.orderId}</td>
+          <td class="p-3 font-bold">${o.name}</td>
+          <td class="p-3">${o.table}</td>
           <td class="p-3">${o.phone}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${o.status === 'Accepted' ? 'bg-emerald-100 text-emerald-800' : (o.status === 'Served' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800')}">${o.status || 'Pending'}</span></td>
-          <td class="p-3 text-right font-black">₹${o.total}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">${o.status}</span></td>
+          <td class="p-3 text-right font-black text-amber-600">₹${o.total}</td>
         </tr>
       `).join("");
     }
 
     function printSalesReport() {
-      const filter = document.getElementById("reportFilterType")?.value || "all";
-      const todayIso = new Date().toISOString().split("T")[0];
+      window.print();
+    }
 
-      let filteredOrders = orders;
-      if (filter === "daily") {
-        filteredOrders = orders.filter(o => o.isoDate === todayIso);
-      } else if (filter === "monthly") {
-        const currentMonth = todayIso.substring(0, 7);
-        filteredOrders = orders.filter(o => o.isoDate && o.isoDate.startsWith(currentMonth));
-      }
-
-      const totalOrdersCount = filteredOrders.length;
-      const acceptedOrdersCount = filteredOrders.filter(o => o.status === "Accepted" || o.status === "Served").length;
-      const totalRevenue = filteredOrders
-        .filter(o => o.status === "Accepted" || o.status === "Served")
-        .reduce((sum, o) => sum + o.total, 0);
-
-      const printWindow = window.open('', '_blank');
-      const rows = filteredOrders.map(o => `
-        <tr>
-          <td>${o.date}</td>
-          <td>#${o.id}</td>
-          <td>${o.customer}</td>
-          <td>Table ${o.table}</td>
-          <td>${o.status || 'Pending'}</td>
-          <td style="text-align:right;">₹${o.total}</td>
-        </tr>
-      `).join("");
-
-      printWindow.document.write(`
-        <html>
-        <head>
-          <title>Sales Analytics & Revenue Report - ${branding.brandName}</title>
-          <style>
-            body { font-family: sans-serif; padding: 20px; color: #1c1917; }
-            h2 { margin-bottom: 2px; }
-            p { font-size: 13px; color: #666; margin-top: 0; }
-            .summary { display: flex; gap: 20px; margin: 20px 0; }
-            .card { background: #f5f5f4; padding: 12px 20px; border-radius: 8px; border: 1px solid #e7e5e4; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-            th, td { border: 1px solid #d7d3d0; padding: 8px 12px; text-align: left; }
-            th { background: #f5f5f4; }
-          </style>
-        </head>
-        <body>
-          <h2>${branding.brandName} - Sales & Revenue Report</h2>
-          <p>Generated on: ${new Date().toLocaleString()} | Filter: ${filter.toUpperCase()}</p>
-          <div class="summary">
-            <div class="card"><strong>Total Orders:</strong> ${totalOrdersCount}</div>
-            <div class="card"><strong>Completed/Accepted:</strong> ${acceptedOrdersCount}</div>
-            <div class="card"><strong>Total Revenue:</strong> ₹${totalRevenue}</div>
+    function renderAdminMenuList() {
+      const list = document.getElementById("adminMenuList");
+      list.innerHTML = foods.map(f => `
+        <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <img src="${f.image || ''}" class="w-10 h-10 rounded-lg object-cover bg-stone-200" onerror="this.src='https://placehold.co/100x100/faf9f6/78350f?text=Dish'">
+            <div>
+              <h5 class="font-bold text-xs text-stone-900 line-clamp-1">${f.name}</h5>
+              <span class="text-[10px] text-amber-600 font-bold">₹${f.price} • ${f.type}</span>
+              <span class="text-[9px] font-bold block ${f.available === false ? 'text-red-600' : 'text-emerald-600'}">${f.available === false ? 'Not Available' : 'Available'}</span>
+            </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Table</th>
-                <th>Status</th>
-                <th style="text-align:right;">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-            </tbody>
-          </table>
-        </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="toggleFoodAvailability(${f.id})" class="px-2 py-1.5 rounded-lg text-xs font-bold ${f.available === false ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'} cursor-pointer" title="Toggle Stock">
+              ${f.available === false ? 'Make Available' : 'Mark Not Available'}
+            </button>
+            <button type="button" onclick="editFood(${f.id})" class="p-1.5 bg-stone-200 hover:bg-stone-300 rounded-lg text-stone-700 text-xs cursor-pointer"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" onclick="deleteFood(${f.id})" class="p-1.5 bg-red-100 hover:bg-red-200 rounded-lg text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `).join("");
     }
 
-    function changeAdminPasscodeFromAdmin() {
-      const p = document.getElementById("adminPanelNewPass").value.trim();
-      if (!p) { showToast("Enter a valid passcode"); return; }
-      currentAdminPass = p;
-      localStorage.setItem("rb_admin_pass", p);
-      showToast("Staff Admin passcode updated successfully!");
-      document.getElementById("adminPanelNewPass").value = "";
+    function toggleFoodAvailability(id) {
+      const f = foods.find(x => x.id === id);
+      if (f) {
+        f.available = f.available === false ? true : false;
+        localStorage.setItem("rb_foods", JSON.stringify(foods));
+        renderAdminMenuList();
+        renderFood();
+        showToast(f.name + " status updated!");
+      }
     }
 
-    function saveFoodItem() {
-      const editId = document.getElementById("editFoodId").value;
-      const name = document.getElementById("foodName").value.trim();
-      const price = parseFloat(document.getElementById("foodPrice").value);
-      const category = document.getElementById("foodCategory").value.trim();
-      const type = document.getElementById("foodType").value;
-      const image = document.getElementById("foodImage").value.trim() || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80";
+    function renderFood() {
+      const query = (document.getElementById("searchInput").value || "").toLowerCase();
+      const filtered = foods.filter(f => {
+        const matchesCat = selectedCategory === "All" || f.category === selectedCategory;
+        const matchesType = selectedTypeFilter === "All" || f.type === selectedTypeFilter;
+        const matchesSearch = f.name.toLowerCase().includes(query) || f.category.toLowerCase().includes(query);
+        return matchesCat && matchesType && matchesSearch;
+      });
 
-      if (!name || isNaN(price) || !category) {
-        showToast("Please fill in dish name, valid price, and category.");
+      const grid = document.getElementById("foodGrid");
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-stone-400 text-sm">No dishes found.</div>`;
         return;
       }
 
-      if (editId) {
-        const idx = foods.findIndex(f => f.id == editId);
-        if (idx !== -1) {
-          foods[idx] = { id: Number(editId), name, price, category, type, image };
-          showToast("Dish updated successfully!");
+      grid.innerHTML = filtered.map(f => {
+        const isAvailable = f.available !== false;
+        const inCart = cart.find(item => item.id === f.id);
+        const qty = inCart ? inCart.qty : 0;
+        return `
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow relative">
+            ${!isAvailable ? `<div class="absolute inset-0 bg-stone-950/60 backdrop-blur-[1px] z-10 flex items-center justify-center"><span class="bg-red-600 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-lg uppercase tracking-wider">Not Available</span></div>` : ''}
+            <div class="relative h-44 bg-stone-100 overflow-hidden">
+              <img src="${f.image || 'https://placehold.co/600x400/faf9f6/78350f?text=Dish'}" alt="${f.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/faf9f6/78350f?text=Dish'">
+              <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${f.type === 'Veg' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} shadow">
+                ${f.type}
+              </span>
+            </div>
+            <div class="p-4 space-y-2 flex-1 flex flex-col justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">${f.category}</span>
+                <h3 class="font-serif font-bold text-base text-stone-900 line-clamp-1">${f.name}</h3>
+              </div>
+              <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                <span class="font-black text-lg text-stone-900">₹${f.price}</span>
+                ${isAvailable ? (
+                  qty === 0 ? `
+                    <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
+                      + Add
+                    </button>
+                  ` : `
+                    <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
+                      <button type="button" onclick="updateQty(${f.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+                      <span class="font-bold text-xs px-1">${qty}</span>
+                      <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+                    </div>
+                  `
+                ) : `<span class="text-xs font-bold text-red-600">Not Available</span>`}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      updateStickyCartBar();
+    }
+
+    function saveFoodItem() {
+      const id = document.getElementById("editFoodId").value;
+      const name = document.getElementById("foodName").value.trim();
+      const price = parseFloat(document.getElementById("foodPrice").value);
+      const category = document.getElementById("foodCategory").value.trim() || "Main Course";
+      const type = document.getElementById("foodType").value;
+      const image = document.getElementById("foodImage").value.trim();
+
+      if (!name || isNaN(price)) {
+        showToast("Please enter valid Dish Name and Price!");
+        return;
+      }
+
+      if (id) {
+        const f = foods.find(x => x.id == id);
+        if (f) {
+          f.name = name;
+          f.price = price;
+          f.category = category;
+          f.type = type;
+          f.image = image;
         }
+        showToast("Dish updated successfully!");
       } else {
-        const newFood = {
-          id: Date.now(),
-          name,
-          price,
-          category,
-          type,
-          image
-        };
-        foods.push(newFood);
-        showToast("New dish added to menu successfully!");
+        const newId = foods.length > 0 ? Math.max(...foods.map(x => x.id)) + 1 : 1;
+        foods.push({ id: newId, name, price, category, type, image });
+        showToast("New dish added successfully!");
       }
 
       localStorage.setItem("rb_foods", JSON.stringify(foods));
       resetFoodForm();
-      renderFood();
       renderAdminMenuList();
+    }
+
+    function editFood(id) {
+      const f = foods.find(x => x.id === id);
+      if (!f) return;
+      document.getElementById("editFoodId").value = f.id;
+      document.getElementById("foodName").value = f.name;
+      document.getElementById("foodPrice").value = f.price;
+      document.getElementById("foodCategory").value = f.category;
+      document.getElementById("foodType").value = f.type;
+      document.getElementById("foodImage").value = f.image || "";
+      document.getElementById("menuFormTitle").innerText = "Edit Dish: " + f.name;
+      document.getElementById("saveFoodBtn").innerText = "Update Dish";
+      document.getElementById("cancelEditFoodBtn").classList.remove("hidden");
     }
 
     function resetFoodForm() {
@@ -1460,197 +1543,115 @@
       document.getElementById("cancelEditFoodBtn").classList.add("hidden");
     }
 
-    function editFoodItem(id) {
-      const food = foods.find(f => f.id == id);
-      if (!food) return;
-      document.getElementById("editFoodId").value = food.id;
-      document.getElementById("foodName").value = food.name;
-      document.getElementById("foodPrice").value = food.price;
-      document.getElementById("foodCategory").value = food.category;
-      document.getElementById("foodType").value = food.type;
-      document.getElementById("foodImage").value = food.image;
-      document.getElementById("menuFormTitle").innerText = "Edit Dish: " + food.name;
-      document.getElementById("saveFoodBtn").innerText = "Save Changes";
-      document.getElementById("cancelEditFoodBtn").classList.remove("hidden");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function deleteFoodItem(id) {
-      foods = foods.filter(f => f.id != id);
+    function deleteFood(id) {
+      foods = foods.filter(x => x.id !== id);
       localStorage.setItem("rb_foods", JSON.stringify(foods));
-      renderFood();
       renderAdminMenuList();
-      showToast("Dish deleted from menu.");
+      renderFood();
+      showToast("Dish deleted successfully!");
     }
 
-    function renderAdminMenuList() {
-      const container = document.getElementById("adminMenuList");
-      if (!container) return;
-      if (foods.length === 0) {
-        container.innerHTML = `<p class="text-xs text-stone-400">No dishes in menu.</p>`;
+    function generateTableQR() {
+      const num = document.getElementById("tableGenNumber").value.trim();
+      const mins = parseInt(document.getElementById("sessionMinutesInput").value) || 45;
+      if (!num) {
+        showToast("Please enter table number!");
         return;
       }
-      container.innerHTML = foods.map(f => `
-        <div class="bg-stone-50 p-3 rounded-xl border flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2 overflow-hidden">
-            <img src="${f.image}" class="w-10 h-10 object-cover rounded-lg shrink-0" onerror="this.src='https://placehold.co/100x100'">
-            <div class="truncate">
-              <h5 class="font-bold text-xs text-stone-900 truncate">${f.name}</h5>
-              <span class="text-[11px] text-stone-500 font-semibold">₹${f.price} • ${f.category} (${f.type})</span>
-            </div>
+
+      const expiryTime = Date.now() + (mins * 60 * 1000);
+      const urlObj = new URL(window.location.href);
+      urlObj.searchParams.set("table", num);
+      urlObj.searchParams.set("exp", expiryTime);
+      const finalUrl = urlObj.toString();
+
+      document.getElementById("tableQRTitle").innerText = "Table " + num + " QR Code (Expires in " + mins + " mins)";
+      document.getElementById("tableQRUrl").innerText = finalUrl;
+      const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
+      document.getElementById("tableQRImg").src = qrImg;
+      document.getElementById("tableQRResult").classList.remove("hidden");
+
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      activeQrs = activeQrs.filter(x => x.tableNum !== num);
+      activeQrs.push({ tableNum: num, url: finalUrl, expiry: expiryTime });
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      renderActiveTablesQrList();
+      showToast("QR generated for Table " + num);
+    }
+
+    function copyTableQRUrl() {
+      const text = document.getElementById("tableQRUrl").innerText;
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      showToast("Table URL copied to clipboard!");
+    }
+
+    function renderActiveTablesQrList() {
+      const list = document.getElementById("activeTablesQrList");
+      const activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      if (activeQrs.length === 0) {
+        list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet in this session.</p>`;
+        return;
+      }
+
+      list.innerHTML = activeQrs.map(q => `
+        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-2 text-xs">
+          <div>
+            <span class="font-bold text-stone-900">Table: ${q.tableNum}</span>
+            <span class="text-[10px] text-stone-500 block font-mono truncate max-w-xs">${q.url}</span>
           </div>
-          <div class="flex items-center gap-1 shrink-0">
-            <button type="button" onclick="editFoodItem(${f.id})" class="p-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-xs cursor-pointer" title="Edit">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            <button type="button" onclick="deleteFoodItem(${f.id})" class="p-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-xs cursor-pointer" title="Delete">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
+          <button type="button" onclick="removeTableQr('${q.tableNum}')" class="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded-lg cursor-pointer">Revoke</button>
         </div>
       `).join("");
     }
 
-    let currentAdminPass = localStorage.getItem("rb_admin_pass") || "1234";
-    let currentMasterPass = localStorage.getItem("rb_master_pass") || "9999";
+    function removeTableQr(num) {
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      activeQrs = activeQrs.filter(x => x.tableNum !== num);
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      renderActiveTablesQrList();
+      showToast("Table QR revoked.");
+    }
 
-    function login() {
-      const val = document.getElementById("passcodeInput").value.trim();
-      const msg = document.getElementById("loginMsg");
-      
-      if (!val) {
-        msg.innerText = "Incorrect password, please enter valid password.";
-        return;
-      }
+    function initTableSessionFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const table = params.get("table");
+      const exp = params.get("exp");
 
-      if (val === currentMasterPass) {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("masterBox").classList.remove("hidden");
-        document.getElementById("adminBox").classList.add("hidden");
-        msg.innerText = "";
-        showToast("Logged in as Master Owner!");
-      } else if (val === currentAdminPass) {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("masterBox").classList.add("hidden");
-        document.getElementById("adminBox").classList.remove("hidden");
-        msg.innerText = "";
-        renderAdminOrders();
-        renderSalesReport();
-        showToast("Logged in as Staff Admin!");
-      } else {
-        msg.innerText = "Incorrect password, please enter valid password.";
+      if (table && exp) {
+        const expiryTime = parseInt(exp);
+        if (Date.now() > expiryTime) {
+          document.getElementById("sessionExpiredModal").classList.remove("hidden");
+          return;
+        }
+
+        currentTableSession = { tableNum: table, expiry: expiryTime };
+        document.getElementById("badgeTableNum").innerText = table;
+        document.getElementById("tableSessionBadge").classList.remove("hidden");
+        document.getElementById("tableSessionBadge").classList.add("flex");
+
+        startSessionCountdown(expiryTime);
       }
     }
 
-    function logout() {
-      document.getElementById("loginBox").classList.remove("hidden");
-      document.getElementById("masterBox").classList.add("hidden");
-      document.getElementById("adminBox").classList.add("hidden");
-      document.getElementById("passcodeInput").value = "";
-      showToast("Logged out successfully.");
-      showPage("home");
-    }
-
-    function changeAdminPasscode() {
-      const p = document.getElementById("newAdminPasscode").value.trim();
-      if (!p) { showToast("Enter a valid passcode"); return; }
-      currentAdminPass = p;
-      localStorage.setItem("rb_admin_pass", p);
-      showToast("Admin passcode updated successfully!");
-      document.getElementById("newAdminPasscode").value = "";
-    }
-
-    function changeMasterPasscode() {
-      const p = document.getElementById("newMasterPasscode").value.trim();
-      if (!p) { showToast("Enter a valid passcode"); return; }
-      currentMasterPass = p;
-      localStorage.setItem("rb_master_pass", p);
-      showToast("Master passcode updated successfully!");
-      document.getElementById("newMasterPasscode").value = "";
-    }
-
-    function generateTableQR() {
-      const tNum = document.getElementById("tableGenNumber").value.trim();
-      const mins = document.getElementById("sessionMinutesInput").value.trim() || "45";
-      if (!tNum) { showToast("Enter table number or name"); return; }
-
-      const baseUrl = window.location.origin + window.location.pathname;
-      const sid = Math.random().toString(36).substring(2, 8);
-      const fullLink = `${baseUrl}?table=${encodeURIComponent(tNum)}&mins=${mins}&sid=${sid}`;
-
-      const qrObj = {
-        table: tNum,
-        sid: sid,
-        url: fullLink,
-        time: new Date().toLocaleTimeString()
-      };
-
-      generatedTableQrList.unshift(qrObj);
-      localStorage.setItem("rb_gen_tables", JSON.stringify(generatedTableQrList));
-      renderActiveTablesQrList();
-
-      document.getElementById("tableQRResult").classList.remove("hidden");
-      document.getElementById("tableQRTitle",).innerText = `Table ${tNum} QR Code & URL`;
-      document.getElementById("tableQRUrl").innerText = fullLink;
-      document.getElementById("tableQRImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(fullLink)}`;
-      showToast(`QR URL generated for Table ${tNum}!`);
-    }
-
-    function renderActiveTablesQrList() {
-      const container = document.getElementById("activeTablesQrList");
-      if (!container) return;
-      if (generatedTableQrList.length === 0) {
-        container.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet in this session.</p>`;
-        return;
-      }
-
-      container.innerHTML = generatedTableQrList.map((item, idx) => {
-        const isExp = localStorage.getItem(`rb_expired_${item.table}_${item.sid}`) === "true";
-        return `
-          <div class="bg-stone-50 p-3 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <div class="overflow-hidden">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-xs text-stone-900">Table ${item.table}</span>
-                <span class="text-[10px] text-stone-400">(${item.time})</span>
-                ${isExp ? '<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700">Expired</span>' : '<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-700">Active</span>'}
-              </div>
-              <p class="text-[11px] text-blue-600 font-mono truncate max-w-md">${item.url}</p>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <button type="button" onclick="navigator.clipboard.writeText('${item.url}'); showToast('URL copied!');" class="px-2.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 rounded-lg text-xs font-semibold cursor-pointer">Copy</button>
-              ${isExp ? `
-                <button type="button" onclick="reactivateTableQr('${item.table}', '${item.sid}')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold cursor-pointer">Activate QR</button>
-              ` : `
-                <button type="button" onclick="expireTableQr('${item.table}', '${item.sid}')" class="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold cursor-pointer">Expire QR</button>
-              `}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function expireTableQr(table, sid) {
-      localStorage.setItem(`rb_expired_${table}_${sid}`, "true");
-      renderActiveTablesQrList();
-      showToast(`QR Code for Table ${table} has been expired!`);
-    }
-
-    function reactivateTableQr(table, sid) {
-      localStorage.setItem(`rb_expired_${table}_${sid}`, "false");
-      renderActiveTablesQrList();
-      showToast(`QR Code for Table ${table} is now active again!`);
-    }
-
-    function copyTableQRUrl() {
-      const urlText = document.getElementById("tableQRUrl").innerText;
-      if (!urlText) return;
-      const dummy = document.createElement("textarea");
-      document.body.appendChild(dummy);
-      dummy.value = urlText;
-      dummy.select();
-      document.execCommand("copy");
-      document.body.removeChild(dummy);
-      showToast("Table URL copied to clipboard!");
+    function startSessionCountdown(expiryTime) {
+      if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+      sessionTimerInterval = setInterval(() => {
+        const diff = expiryTime - Date.now();
+        if (diff <= 0) {
+          clearInterval(sessionTimerInterval);
+          document.getElementById("sessionExpiredModal").classList.remove("hidden");
+          document.getElementById("sessionTimerDisplay").innerText = "00:00";
+          return;
+        }
+        const mins = Math.floor(diff / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        document.getElementById("sessionTimerDisplay").innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }, 1000);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
