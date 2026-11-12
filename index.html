@@ -321,7 +321,7 @@
         </div>
         <div class="space-y-2">
           <h2 class="font-serif font-bold text-2xl text-stone-900">Session Expired</h2>
-          <p class="text-sm text-stone-600">Your dining table session time has expired. Please scan the QR code at your table again or contact staff.</p>
+          <p class="text-sm text-stone-600">Your dining table session has expired or been ended. Please scan the QR code at your table again or contact staff.</p>
         </div>
         <button type="button" onclick="showPage('menu')" class="w-full py-3.5 rounded-xl bg-stone-900 text-white font-bold text-sm shadow cursor-pointer">
           Browse Menu Anyway
@@ -1647,7 +1647,7 @@
       list.innerHTML = activeQrs.map(q => {
         const isPaused = q.status === 'Paused';
         const isExpired = q.expireTime && new Date().getTime() > q.expireTime;
-        const displayStatus = isPaused ? 'Paused' : (isExpired ? 'Expired' : 'Active');
+        const displayStatus = isPaused ? 'Expired' : (isExpired ? 'Expired' : 'Active');
 
         return `
           <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
@@ -1663,7 +1663,7 @@
             </div>
             <div class="flex items-center gap-2">
               ${displayStatus !== 'Active' ? 
-                `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Active')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg cursor-pointer">Activate</button>` : 
+                `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Active')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg cursor-pointer">Active</button>` : 
                 `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Paused')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold rounded-lg cursor-pointer">Expire</button>`
               }
               <button type="button" onclick="deleteTableQr('${q.tableNum}')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg cursor-pointer">Delete</button>
@@ -1675,7 +1675,14 @@
 
     function toggleTableQrStatus(num, newStatus) {
       let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
-      activeQrs.forEach(q => { if (q.tableNum === num) q.status = newStatus; });
+      activeQrs.forEach(q => { 
+        if (q.tableNum === num) {
+          q.status = newStatus;
+          if (newStatus === 'Active') {
+            q.expireTime = new Date().getTime() + ((q.durationMins || 60) * 60 * 1000);
+          }
+        }
+      });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
       showToast("Table " + num + " status changed to " + newStatus);
