@@ -648,9 +648,9 @@
   <!-- Application Script -->
   <script>
     const _SYS_CFG = {
-      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20=",
-      upi: "OTM5MDE0MTY3MUB5Ymw=",
-      payee: "Um95YWwgQml0ZXMgUmVzdGF1cmFudA=="
+      db: "https://smart-menu-d180a-default-rtdb.firebaseio.com/",
+      upi: "9985656800-2@ybl",
+      payee: "karthik"
     };
 
     const CONFIG = {
@@ -661,7 +661,8 @@
 
     let dbRef = null;
     try {
-      const firebaseConfig = { databaseURL: CONFIG.databaseURL };
+      const firebaseConfig = { databaseURL: CONFIG.databaseURL,
+                             apikey:"AIzaSyCK1c5Q3GNjw2zytme_xFwyG612Qq9cAWQ"};
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       dbRef = firebase.database().ref("royal_bites_restaurant");
     } catch (e) {
@@ -681,17 +682,17 @@
     let orders = JSON.parse(localStorage.getItem("rb_orders")) || [];
     let currentActiveOrderId = localStorage.getItem("rb_active_order_id") || null;
     let branding = JSON.parse(localStorage.getItem("rb_branding")) || {
-      brandName: "Hotel Royal Spice",
+      brandName: "KARTHIK",
       brandTagline: "Restaurant",
       headerLogoUrl: "",
       waLogoUrl: "",
-      waTitle: "Hotel Royal Spice - INVOICE",
+      waTitle: "KARTHIK - INVOICE",
       heroBgUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
-      homeBadge: "Welcome to Royal Dining",
+      homeBadge: "KARTHIK Dining",
       homeTitle1: "Good Food",
       homeTitle2: "Good Mood",
       homeDesc: "Delicious food, great ambiance and unforgettable moments! Order fresh dishes directly from your table.",
-      footerText: "© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love."
+      footerText: "© 2026 KARTHIK Restaurant. Freshly Served with Love."
     };
 
     let selectedCategory = "All";
