@@ -42,20 +42,6 @@
 </head>
 <body class="min-h-screen flex flex-col bg-[#faf9f6] text-stone-900 overflow-x-hidden">
 
-  <!-- Session Expired Modal -->
-  <div id="sessionExpiredModal" class="hidden fixed inset-0 z-[100] bg-stone-950/95 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="bg-white max-w-md w-full rounded-3xl p-8 text-center shadow-2xl border-2 border-amber-500 space-y-4">
-      <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-3xl">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-      </div>
-      <h2 class="text-2xl font-serif font-bold text-stone-900">Session Expired</h2>
-      <p class="text-sm text-stone-600">Your table ordering session time has ended. Please scan your table's QR code again to start a fresh session.</p>
-      <div class="pt-2">
-        <span class="inline-block text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-4 py-2 rounded-full">Scan Table QR Code to Continue</span>
-      </div>
-    </div>
-  </div>
-
   <!-- Toast Notification -->
   <div id="toastBox" class="fixed bottom-20 sm:bottom-6 right-4 z-[200] pointer-events-none transform translate-y-24 opacity-0 transition-all duration-300">
     <div class="bg-stone-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-amber-500/40 flex items-center gap-3 text-sm font-medium">
@@ -96,13 +82,11 @@
 
       <div id="tableSessionBadge" class="hidden items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 px-3 py-1 rounded-full text-xs">
         <span class="font-bold text-amber-300"><i class="fa-solid fa-chair mr-1"></i>Table <span id="badgeTableNum">-</span></span>
-        <span class="text-stone-400">|</span>
-        <span id="sessionTimerDisplay" class="font-mono font-bold text-white">45:00</span>
       </div>
     </div>
   </header>
 
-  <!-- Clean White Navigation Sub-Bar -->
+  <!-- Clean White Navigation Sub-Bar (Hidden on home page) -->
   <div id="whiteNavBarContainer" class="hidden bg-white border-b border-stone-200 shadow-sm sticky top-[73px] sm:top-[81px] z-30">
     <div class="max-w-7xl mx-auto px-2 sm:px-6 py-2 flex items-center justify-between">
       <nav id="mainNavBar" class="flex items-center gap-1 sm:gap-2 w-full justify-around sm:justify-start">
@@ -347,8 +331,8 @@
           <i class="fa-solid fa-shield-halved"></i>
         </div>
         <div class="space-y-1">
-          <h2 class="font-serif font-bold text-2xl text-stone-900" id="loginTitleText">Staff Login</h2>
-          <p class="text-xs text-stone-500" id="loginDescText">Enter Passcode</p>
+          <h2 class="font-serif font-bold text-2xl text-stone-900" id="loginTitleText">Staff / Master Login</h2>
+          <p class="text-xs text-stone-500" id="loginDescText">Enter Passcode to access respective panel</p>
         </div>
         <div class="space-y-3 pt-2">
           <input id="passcodeInput" type="password" placeholder="Enter Passcode" class="w-full px-4 py-3 rounded-xl border border-stone-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none">
@@ -371,11 +355,11 @@
             </div>
             <div>
               <h2 class="font-serif font-bold text-2xl">Master Panel Dashboard</h2>
-              <p class="text-xs text-blue-200">Full system owner controls & Table QR generator</p>
+              <p class="text-xs text-blue-200">Full system owner controls & QR code generator</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="switchMasterSubPage('qr')" id="masterTabBtn-qr" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer">Tables & QR</button>
+            <button type="button" onclick="switchMasterSubPage('qr')" id="masterTabBtn-qr" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer">Table QR</button>
             <button type="button" onclick="switchMasterSubPage('passcodes')" id="masterTabBtn-passcodes" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Passcodes</button>
             <button type="button" onclick="switchMasterSubPage('branding')" id="masterTabBtn-branding" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Branding</button>
             <button type="button" onclick="logout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 cursor-pointer">Logout</button>
@@ -383,19 +367,15 @@
         </div>
 
         <div id="masterSubPage-qr" class="master-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Tables & Session QR Generator</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Generator</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Table Number/Name</label>
-              <input id="tableGenNumber" type="text" placeholder="e.g. 1 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Session Duration (Minutes)</label>
-              <input id="sessionMinutesInput" type="number" value="45" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <input id="tableGenNumber" type="text" placeholder="e.g. 5 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div class="flex items-end">
               <button type="button" onclick="generateTableQR()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
-                Generate Table QR
+                Generate QR & URL
               </button>
             </div>
           </div>
@@ -412,13 +392,13 @@
             </div>
           </div>
 
-          <!-- Tax/GST Label and Percentage Settings -->
+          <!-- Tax/GST Label and Percentage Settings for Master Panel -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Tax / GST Name & Percentage Settings</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label class="block text-xs font-bold text-stone-600 mb-1">Tax / GST Label Name</label>
-                <input id="masterTaxLabelInput" type="text" value="Tax" placeholder="e.g. GST" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+                <input id="masterTaxLabelInput" type="text" value="Tax" placeholder="e.g. GST or VAT" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
               </div>
               <div>
                 <label class="block text-xs font-bold text-stone-600 mb-1">Tax Percentage (%)</label>
@@ -430,25 +410,25 @@
             </div>
           </div>
 
-          <!-- Active Tables Status Management Section -->
+          <!-- Generated Tables QR List -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
-            <h4 class="font-bold text-stone-800 text-sm">Active Tables & Occupancy Status</h4>
+            <h4 class="font-bold text-stone-800 text-sm">Active Table QR Links</h4>
             <div id="activeTablesQrList" class="space-y-2">
-              <p class="text-xs text-stone-400 italic">No tables created yet.</p>
+              <p class="text-xs text-stone-400 italic">No table QR generated yet in this session.</p>
             </div>
           </div>
         </div>
 
         <div id="masterSubPage-passcodes" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings</h3>
+          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings (Master & Admin)</h3>
           <div class="max-w-md space-y-4">
             <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">New Master Passcode</label>
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Master Control Passcode</label>
               <input id="masterNewMasterPassInput" type="text" placeholder="Enter new master passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
             </div>
             <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Passcode</label>
-              <input id="masterNewPasscodeInput" type="text" placeholder="Enter new staff passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Admin Passcode</label>
+              <input id="masterNewPasscodeInput" type="text" placeholder="Enter new staff admin passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
             </div>
             <button type="button" onclick="saveNewPasscodes()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Passcodes</button>
           </div>
@@ -470,11 +450,11 @@
               <input id="editHeaderLogoUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Title</label>
-              <input id="editWaTitle" type="text" placeholder="Invoice Title" class="w-full px-3 py-2 rounded-xl border text-sm">
+              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Header Title</label>
+              <input id="editWaTitle" type="text" placeholder="e.g. HOTEL ROYAL SPICE - INVOICE" class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Hero Background Image URL</label>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Home Hero Background Image URL</label>
               <input id="editHeroBgUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
@@ -510,7 +490,7 @@
               <i class="fa-solid fa-utensils"></i>
             </div>
             <div>
-              <h2 class="font-serif font-bold text-2xl">Staff Kitchen & Orders Panel</h2>
+              <h2 class="font-serif font-bold text-2xl">Admin Kitchen & Orders Panel</h2>
               <p class="text-xs text-blue-200">Manage live orders, dishes & sales reports</p>
             </div>
           </div>
@@ -591,7 +571,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Category *</label>
-              <input id="foodCategory" type="text" placeholder="Starters / Biryani" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+              <input id="foodCategory" type="text" placeholder="Starters / Biryani / Drinks" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Type *</label>
@@ -601,8 +581,8 @@
               </select>
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-stone-600 mb-1">Dish Image URL</label>
-              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+              <label class="block text-xs font-bold text-stone-600 mb-1">Image URL</label>
+              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
             </div>
           </div>
           <div class="flex items-center gap-3">
@@ -614,7 +594,17 @@
             </button>
           </div>
 
-          <!-- Existing Menu Management List -->
+          <!-- Admin Passcode Change Box inside Admin Panel -->
+          <div class="pt-6 border-t border-stone-200 space-y-4 max-w-md">
+            <h4 class="font-bold text-stone-800 text-sm">Change Staff Admin Passcode</h4>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Admin Passcode</label>
+              <input id="adminNewPassInput" type="text" placeholder="Enter new admin passcode" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <button type="button" onclick="saveAdminPasscodeOnly()" class="py-2.5 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Admin Passcode</button>
+          </div>
+
+          <!-- Existing Menu Management List with Edit & Delete -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Manage Existing Menu Items</h4>
             <div id="adminMenuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-2"></div>
@@ -627,7 +617,7 @@
   <!-- Footer -->
   <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-center text-xs mt-auto">
     <div class="max-w-7xl mx-auto px-4">
-      <p id="footerDisplayText">© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love.</p>
+      <p id="footerDisplayText">© 2026 Royal Bites Restaurant. Freshly Served with Love.</p>
     </div>
   </footer>
 
@@ -670,8 +660,7 @@
       brandName: "Hotel Royal Spice",
       brandTagline: "Restaurant",
       headerLogoUrl: "",
-      waLogoUrl: "",
-      waTitle: "Hotel Royal Spice - INVOICE",
+      waTitle: "HOTEL ROYAL SPICE - TAX INVOICE",
       heroBgUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
       homeBadge: "Welcome to Royal Dining",
       homeTitle1: "Good Food",
@@ -683,7 +672,28 @@
     let selectedCategory = "All";
     let selectedTypeFilter = "All";
     let currentTableSession = null;
-    let sessionTimerInterval = null;
+
+    // Firebase Realtime Orders Listener to sync across devices
+    function initFirebaseListener() {
+      if (!dbRef) return;
+      dbRef.child("orders").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const loadedOrders = [];
+          Object.keys(data).forEach(key => {
+            loadedOrders.push({ firebaseKey: key, ...data[key] });
+          });
+          // Sort by latest first
+          orders = loadedOrders.reverse();
+          localStorage.setItem("rb_orders", JSON.stringify(orders));
+          
+          // Refresh views if open
+          renderAdminOrders();
+          renderSalesReport();
+          renderCustomerMyOrders();
+        }
+      });
+    }
 
     function applyBranding() {
       document.getElementById("headerBrandName").innerText = branding.brandName;
@@ -706,12 +716,14 @@
       }
 
       const heroImg = document.getElementById("homeHeroBgImg");
-      if (branding.heroBgUrl) heroImg.src = branding.heroBgUrl;
+      if (branding.heroBgUrl) {
+        heroImg.src = branding.heroBgUrl;
+      }
 
       document.getElementById("editBrandName").value = branding.brandName;
       document.getElementById("editBrandTagline").value = branding.brandTagline;
       document.getElementById("editHeaderLogoUrl").value = branding.headerLogoUrl || "";
-      document.getElementById("editWaTitle").value = branding.waTitle || "HOTEL ROYAL SPICE - INVOICE";
+      document.getElementById("editWaTitle").value = branding.waTitle || "HOTEL ROYAL SPICE - TAX INVOICE";
       document.getElementById("editHeroBgUrl").value = branding.heroBgUrl || "";
       document.getElementById("editHomeBadge").value = branding.homeBadge;
       document.getElementById("editHomeTitle1").value = branding.homeTitle1;
@@ -721,8 +733,10 @@
 
       const savedTaxLabel = localStorage.getItem("rb_tax_label") || "Tax";
       const savedTaxRate = localStorage.getItem("rb_tax_rate") || "5";
-      if (document.getElementById("masterTaxLabelInput")) document.getElementById("masterTaxLabelInput").value = savedTaxLabel;
-      if (document.getElementById("masterTaxRateInput")) document.getElementById("masterTaxRateInput").value = savedTaxRate;
+      const taxLabelInput = document.getElementById("masterTaxLabelInput");
+      const taxRateInput = document.getElementById("masterTaxRateInput");
+      if (taxLabelInput) taxLabelInput.value = savedTaxLabel;
+      if (taxRateInput) taxRateInput.value = savedTaxRate;
     }
 
     function saveBrandingSettings() {
@@ -730,7 +744,7 @@
         brandName: document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice",
         brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
         headerLogoUrl: document.getElementById("editHeaderLogoUrl").value.trim(),
-        waTitle: document.getElementById("editWaTitle").value.trim() || "Hotel Royal Spice - INVOICE",
+        waTitle: document.getElementById("editWaTitle").value.trim() || "HOTEL ROYAL SPICE - TAX INVOICE",
         heroBgUrl: document.getElementById("editHeroBgUrl").value.trim() || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
         homeBadge: document.getElementById("editHomeBadge").value.trim() || "Welcome",
         homeTitle1: document.getElementById("editHomeTitle1").value.trim() || "Good Food",
@@ -740,7 +754,7 @@
       };
       localStorage.setItem("rb_branding", JSON.stringify(branding));
       applyBranding();
-      showToast("Website branding updated!");
+      showToast("Website branding settings updated!");
     }
 
     function saveMasterTaxSettings() {
@@ -755,11 +769,28 @@
     function saveNewPasscodes() {
       const newMasterPass = document.getElementById("masterNewMasterPassInput").value.trim();
       const newAdminPass = document.getElementById("masterNewPasscodeInput").value.trim();
-      if (newMasterPass) localStorage.setItem("rb_master_pass", newMasterPass);
-      if (newAdminPass) localStorage.setItem("rb_admin_pass", newAdminPass);
+      
+      if (newMasterPass) {
+        localStorage.setItem("rb_master_pass", newMasterPass);
+      }
+      if (newAdminPass) {
+        localStorage.setItem("rb_admin_pass", newAdminPass);
+      }
+      
       document.getElementById("masterNewMasterPassInput").value = "";
       document.getElementById("masterNewPasscodeInput").value = "";
-      showToast("Passcodes updated successfully!");
+      showToast("Master & Admin passcodes updated successfully!");
+    }
+
+    function saveAdminPasscodeOnly() {
+      const newAdminPass = document.getElementById("adminNewPassInput").value.trim();
+      if (!newAdminPass) {
+        showToast("Please enter a valid passcode!");
+        return;
+      }
+      localStorage.setItem("rb_admin_pass", newAdminPass);
+      document.getElementById("adminNewPassInput").value = "";
+      showToast("Staff admin passcode updated successfully!");
     }
 
     function showToast(msg) {
@@ -776,8 +807,11 @@
 
       const whiteNavBar = document.getElementById("whiteNavBarContainer");
       if (whiteNavBar) {
-        if (pageName === "home") whiteNavBar.classList.add("hidden");
-        else whiteNavBar.classList.remove("hidden");
+        if (pageName === "home") {
+          whiteNavBar.classList.add("hidden");
+        } else {
+          whiteNavBar.classList.remove("hidden");
+        }
       }
 
       document.querySelectorAll(".nav-btn").forEach(btn => {
@@ -806,7 +840,6 @@
         renderAdminOrders();
         renderSalesReport();
         renderAdminMenuList();
-        renderActiveTablesQrList();
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -857,12 +890,10 @@
       }
 
       grid.innerHTML = filtered.map(f => {
-        const isAvailable = f.available !== false;
         const inCart = cart.find(item => item.id === f.id);
         const qty = inCart ? inCart.qty : 0;
         return `
-          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow relative">
-            ${!isAvailable ? `<div class="absolute inset-0 bg-stone-950/60 backdrop-blur-[1px] z-10 flex items-center justify-center"><span class="bg-red-600 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-lg uppercase tracking-wider">Not Available</span></div>` : ''}
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
             <div class="relative h-44 bg-stone-100 overflow-hidden">
               <img src="${f.image || 'https://placehold.co/600x400/faf9f6/78350f?text=Dish'}" alt="${f.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/faf9f6/78350f?text=Dish'">
               <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${f.type === 'Veg' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} shadow">
@@ -876,19 +907,17 @@
               </div>
               <div class="flex items-center justify-between pt-2 border-t border-stone-100">
                 <span class="font-black text-lg text-stone-900">₹${f.price}</span>
-                ${isAvailable ? (
-                  qty === 0 ? `
-                    <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
-                      + Add
-                    </button>
-                  ` : `
-                    <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
-                      <button type="button" onclick="updateQty(${f.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
-                      <span class="font-bold text-xs px-1">${qty}</span>
-                      <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
-                    </div>
-                  `
-                ) : `<span class="text-xs font-bold text-red-600">Not Available</span>`}
+                ${qty === 0 ? `
+                  <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
+                    + Add
+                  </button>
+                ` : `
+                  <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
+                    <button type="button" onclick="updateQty(${f.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+                    <span class="font-bold text-xs px-1">${qty}</span>
+                    <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+                  </div>
+                `}
               </div>
             </div>
           </div>
@@ -902,8 +931,11 @@
       const f = foods.find(x => x.id === foodId);
       if (!f) return;
       const existing = cart.find(x => x.id === foodId);
-      if (existing) existing.qty += 1;
-      else cart.push({ id: f.id, name: f.name, price: f.price, type: f.type, qty: 1 });
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ id: f.id, name: f.name, price: f.price, type: f.type, qty: 1 });
+      }
       saveCart();
       renderFood();
       showToast(f.name + " added to cart!");
@@ -913,7 +945,9 @@
       const idx = cart.findIndex(x => x.id === foodId);
       if (idx !== -1) {
         cart[idx].qty += change;
-        if (cart[idx].qty <= 0) cart.splice(idx, 1);
+        if (cart[idx].qty <= 0) {
+          cart.splice(idx, 1);
+        }
       }
       saveCart();
       renderFood();
@@ -927,6 +961,7 @@
     function updateStickyCartBar() {
       const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
       const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      
       const bar = document.getElementById("stickyCartBar");
       const badge = document.getElementById("cartCountBadge");
       if (badge) badge.innerText = totalCount;
@@ -934,8 +969,10 @@
       if (totalCount > 0) {
         if (bar) bar.classList.remove("hidden");
         if (bar) bar.classList.add("flex");
-        if (document.getElementById("stickyCartCount")) document.getElementById("stickyCartCount").innerText = totalCount;
-        if (document.getElementById("stickyCartTotal")) document.getElementById("stickyCartTotal").innerText = "₹" + subTotal;
+        const sCount = document.getElementById("stickyCartCount");
+        const sTotal = document.getElementById("stickyCartTotal");
+        if (sCount) sCount.innerText = totalCount;
+        if (sTotal) sTotal.innerText = "₹" + subTotal;
       } else {
         if (bar) bar.classList.add("hidden");
         if (bar) bar.classList.remove("flex");
@@ -953,7 +990,7 @@
               <i class="fa-solid fa-bag-shopping"></i>
             </div>
             <h3 class="font-serif font-bold text-xl text-stone-900">Your cart is empty</h3>
-            <p class="text-xs text-stone-500">Add dishes from our menu to place an order.</p>
+            <p class="text-xs text-stone-500">Add delicious dishes from our menu to place an order.</p>
             <button type="button" onclick="showPage('menu')" class="gold-gradient text-stone-950 font-extrabold px-6 py-2.5 rounded-xl text-xs shadow cursor-pointer">Explore Menu</button>
           </div>
         `;
@@ -1003,6 +1040,7 @@
       const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
       const taxLabel = localStorage.getItem("rb_tax_label") || "Tax";
       const taxRate = parseFloat(localStorage.getItem("rb_tax_rate")) || 5;
+      
       const taxAmount = Math.round((subTotal * taxRate) / 100);
       const grandTotal = subTotal + taxAmount;
 
@@ -1029,13 +1067,14 @@
       const table = document.getElementById("custTable").value.trim();
 
       if (!name || !phone || !table) {
-        showToast("Please fill in Name, Phone & Table Number!");
+        showToast("Please fill in Name, WhatsApp Mobile Number & Table Number!");
         return;
       }
       if (phone.length !== 10 || isNaN(phone)) {
         showToast("Please enter a valid 10-digit mobile number!");
         return;
       }
+
       showPage('payment');
     }
 
@@ -1050,7 +1089,9 @@
 
       const upiUrl = `upi://pay?pa=${CONFIG.phonePeUpiId}&pn=${encodeURIComponent(CONFIG.payeeName)}&am=${totals.grandTotal}&cu=INR`;
       document.getElementById("directUpiAppLink").href = upiUrl;
-      document.getElementById("dynamicUpiQr").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+      document.getElementById("dynamicUpiQr").src = qrImageUrl;
     }
 
     function confirmOrderAfterPayment(payMethod) {
@@ -1076,28 +1117,26 @@
         status: "Pending"
       };
 
-      orders.unshift(newOrder);
-      localStorage.setItem("rb_orders", JSON.stringify(orders));
       currentActiveOrderId = orderId;
       localStorage.setItem("rb_active_order_id", orderId);
 
-      // Mark Table Occupied in Active QRs
-      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
-      activeQrs = activeQrs.map(q => {
-        if (q.tableNum === table) q.occupied = true;
-        return q;
-      });
-      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
-
       if (dbRef) {
-        dbRef.child("orders").push(newOrder);
-        dbRef.child("tables").set(activeQrs);
+        dbRef.child("orders").push(newOrder).then(() => {
+          showToast("Order placed & sent to kitchen successfully!");
+        }).catch(err => {
+          console.error("Firebase push error:", err);
+          orders.unshift(newOrder);
+          localStorage.setItem("rb_orders", JSON.stringify(orders));
+          showToast("Order saved locally (Firebase sync pending).");
+        });
+      } else {
+        orders.unshift(newOrder);
+        localStorage.setItem("rb_orders", JSON.stringify(orders));
       }
 
       cart = [];
       saveCart();
       showPage('status');
-      showToast("Order placed successfully!");
     }
 
     function renderOrderStatusTracker() {
@@ -1115,17 +1154,22 @@
 
       if (order.status === "Accepted") {
         title.innerText = "Order Accepted & Preparing!";
-        desc.innerText = "Your order has been accepted by the kitchen.";
+        desc.innerText = "Your order has been accepted by the kitchen. Fresh food is being prepared for your table.";
         icon.className = "fa-solid fa-utensils";
         iconBox.className = "w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-bounce";
       } else if (order.status === "Completed") {
         title.innerText = "Order Served & Completed";
-        desc.innerText = "Thank you for dining with us!";
+        desc.innerText = "Thank you for dining with us! Hope you enjoyed your meal.";
         icon.className = "fa-solid fa-circle-check";
         iconBox.className = "w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-4xl";
+      } else if (order.status === "Rejected") {
+        title.innerText = "Order Rejected";
+        desc.innerText = "Sorry, your order could not be accepted at this moment. Please contact the counter.";
+        icon.className = "fa-solid fa-triangle-exclamation";
+        iconBox.className = "w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-4xl";
       } else {
         title.innerText = "Pending Approval";
-        desc.innerText = "Waiting for restaurant staff to review and accept your order...";
+        desc.innerText = "Your payment has been submitted. Waiting for restaurant staff to review and accept your order...";
         icon.className = "fa-solid fa-clock-rotate-left";
         iconBox.className = "w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-pulse";
       }
@@ -1145,7 +1189,7 @@
               <span class="font-mono font-black text-amber-600 text-sm">${o.orderId}</span>
               <span class="text-xs text-stone-400 block">${o.date}</span>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold ${o.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : o.status === 'Completed' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${o.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : o.status === 'Completed' ? 'bg-blue-100 text-blue-700' : o.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">
               ${o.status}
             </span>
           </div>
@@ -1159,7 +1203,7 @@
             </div>
           </div>
           <div class="pt-3 border-t flex justify-between items-center text-sm font-black">
-            <span>Total Amount:</span>
+            <span>Total Amount (${o.taxLabel || 'Tax'} Included):</span>
             <span class="text-amber-600">₹${o.total}</span>
           </div>
         </div>
@@ -1171,18 +1215,23 @@
       const masterPass = localStorage.getItem("rb_master_pass") || "9999";
       const adminPass = localStorage.getItem("rb_admin_pass") || "1234";
 
-      if (pass === masterPass || pass === adminPass) {
+      if (pass === masterPass) {
         document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("adminBox").classList.remove("hidden");
+        document.getElementById("adminBox").classList.add("hidden");
         document.getElementById("masterBox").classList.remove("hidden");
         document.getElementById("page-admin").classList.remove("hidden");
         switchMasterSubPage('qr');
+        showToast("Logged in as Master!");
+      } else if (pass === adminPass) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("masterBox").classList.add("hidden");
+        document.getElementById("adminBox").classList.remove("hidden");
+        document.getElementById("page-admin").classList.remove("hidden");
         switchAdminSubPage('orders');
         renderAdminOrders();
         renderSalesReport();
         renderAdminMenuList();
-        renderActiveTablesQrList();
-        showToast("Logged in successfully!");
+        showToast("Logged in as Staff Admin!");
       } else {
         document.getElementById("loginMsg").innerText = "Incorrect Passcode!";
       }
@@ -1234,6 +1283,8 @@
         else if (o.status === 'Completed') statusBg = 'bg-blue-100 text-blue-700';
         else if (o.status === 'Rejected') statusBg = 'bg-red-100 text-red-700';
 
+        const firebaseKeyId = o.firebaseKey || '';
+
         return `
           <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-2">
@@ -1241,7 +1292,9 @@
                 <span class="font-mono font-black text-blue-900 text-sm">${o.orderId}</span>
                 <span class="text-xs text-stone-500 ml-2">Table: <b>${o.table}</b> | Customer: <b>${o.name}</b> (${o.phone})</span>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBg}">${o.status}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBg}">
+                ${o.status}
+              </span>
             </div>
             <div class="space-y-1 text-xs">
               ${o.items.map(i => `<div class="flex justify-between text-stone-700"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
@@ -1250,14 +1303,15 @@
               <span class="font-black text-sm text-stone-900">Total: ₹${o.total} (${o.paymentMethod})</span>
               <div class="flex items-center gap-2 flex-wrap">
                 ${!isAcceptedOrCompleted && !isRejected ? `
-                  <button type="button" onclick="acceptAndSendWhatsAppInvoice('${o.orderId}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
+                  <button type="button" onclick="acceptAndSendWhatsAppInvoice('${o.orderId}', '${firebaseKeyId}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
                     <i class="fa-brands fa-whatsapp"></i> Accept & Invoice
                   </button>
-                  <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Rejected')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                  <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Rejected', '${firebaseKeyId}')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
                     Reject
                   </button>
                 ` : ''}
-                <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Completed')" ${!isAcceptedOrCompleted || isCompleted || isRejected ? 'disabled class="px-3.5 py-1.5 bg-stone-200 text-stone-400 font-bold text-xs rounded-xl cursor-not-allowed opacity-60"' : 'class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer"'}>
+                
+                <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Completed', '${firebaseKeyId}')" ${!isAcceptedOrCompleted || isCompleted || isRejected ? 'disabled class="px-3.5 py-1.5 bg-stone-200 text-stone-400 font-bold text-xs rounded-xl cursor-not-allowed opacity-60"' : 'class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer"'}>
                   Complete
                 </button>
               </div>
@@ -1267,51 +1321,74 @@
       }).join("");
     }
 
-    function updateOrderStatus(orderId, status) {
+    function updateOrderStatus(orderId, status, firebaseKey) {
       const o = orders.find(x => x.orderId === orderId);
       if (o) {
         o.status = status;
         localStorage.setItem("rb_orders", JSON.stringify(orders));
+
+        if (dbRef && firebaseKey) {
+          dbRef.child("orders").child(firebaseKey).update({ status });
+        }
+
         renderAdminOrders();
         renderSalesReport();
         showToast("Order status updated to " + status);
       }
     }
 
-    function acceptAndSendWhatsAppInvoice(orderId) {
+    function acceptAndSendWhatsAppInvoice(orderId, firebaseKey) {
       const o = orders.find(x => x.orderId === orderId);
       if (!o) return;
 
       o.status = "Accepted";
       localStorage.setItem("rb_orders", JSON.stringify(orders));
+
+      if (dbRef && firebaseKey) {
+        dbRef.child("orders").child(firebaseKey).update({ status: "Accepted" });
+      }
+
       renderAdminOrders();
       renderSalesReport();
 
-      let msg = `*${branding.waTitle || 'HOTEL ROYAL SPICE - INVOICE'}*\n`;
+      const title = branding.waTitle || "HOTEL ROYAL SPICE - TAX INVOICE";
+      let msg = `*${title}*\n`;
       msg += `--------------------------------\n`;
       msg += `Order ID: ${o.orderId}\n`;
+      msg += `Date: ${o.date}\n`;
       msg += `Customer: ${o.name}\n`;
       msg += `Table No: ${o.table}\n`;
       msg += `--------------------------------\n`;
-      o.items.forEach(i => { msg += `• ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`; });
+      msg += `ITEMS:\n`;
+      o.items.forEach(i => {
+        msg += `- ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`;
+      });
       msg += `--------------------------------\n`;
       msg += `Sub-Total: ₹${o.subTotal}\n`;
-      msg += `Tax: ₹${o.taxAmount}\n`;
-      msg += `*GRAND TOTAL: ₹${o.total}*\n`;
+      msg += `${o.taxLabel || 'Tax'} (${o.taxRate || 5}%): ₹${o.taxAmount}\n`;
+      msg += `Grand Total: ₹${o.total}\n`;
+      msg += `Payment: ${o.paymentMethod}\n`;
       msg += `--------------------------------\n`;
       msg += `Thank you for dining with us!\n`;
 
-      window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+      const url = `https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
       showToast("Order Accepted & WhatsApp Invoice Triggered!");
     }
 
     function renderSalesReport() {
-      const filtered = orders.filter(o => o.status === "Accepted" || o.status === "Completed");
-      document.getElementById("reportTotalOrders").innerText = orders.length;
-      document.getElementById("reportAcceptedOrders").innerText = filtered.length;
-      document.getElementById("reportTotalRevenue").innerText = "₹" + filtered.reduce((sum, o) => sum + o.total, 0);
+      let filtered = orders.filter(o => o.status === "Accepted" || o.status === "Completed");
 
-      document.getElementById("salesReportTableBody").innerHTML = filtered.map(o => `
+      const totalOrdersCount = orders.length;
+      const acceptedCount = filtered.length;
+      const totalRev = filtered.reduce((sum, o) => sum + o.total, 0);
+
+      document.getElementById("reportTotalOrders").innerText = totalOrdersCount;
+      document.getElementById("reportAcceptedOrders").innerText = acceptedCount;
+      document.getElementById("reportTotalRevenue").innerText = "₹" + totalRev;
+
+      const tbody = document.getElementById("salesReportTableBody");
+      tbody.innerHTML = filtered.map(o => `
         <tr class="hover:bg-stone-50">
           <td class="p-3 text-stone-500">${o.date}</td>
           <td class="p-3 font-mono font-bold text-stone-900">${o.orderId}</td>
@@ -1324,10 +1401,13 @@
       `).join("");
     }
 
-    function printSalesReport() { window.print(); }
+    function printSalesReport() {
+      window.print();
+    }
 
     function renderAdminMenuList() {
-      document.getElementById("adminMenuList").innerHTML = foods.map(f => `
+      const list = document.getElementById("adminMenuList");
+      list.innerHTML = foods.map(f => `
         <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center justify-between gap-2">
           <div class="flex items-center gap-3">
             <img src="${f.image || ''}" class="w-10 h-10 rounded-lg object-cover bg-stone-200" onerror="this.src='https://placehold.co/100x100/faf9f6/78350f?text=Dish'">
@@ -1337,24 +1417,11 @@
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button type="button" onclick="toggleFoodAvailability(${f.id})" class="px-2 py-1.5 rounded-lg text-xs font-bold ${f.available === false ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'} cursor-pointer">
-              ${f.available === false ? 'Available' : 'Mark Stock Out'}
-            </button>
-            <button type="button" onclick="editFood(${f.id})" class="p-1.5 bg-stone-200 rounded-lg text-stone-700 text-xs cursor-pointer"><i class="fa-solid fa-pen"></i></button>
-            <button type="button" onclick="deleteFood(${f.id})" class="p-1.5 bg-red-100 rounded-lg text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+            <button type="button" onclick="editFood(${f.id})" class="p-1.5 bg-stone-200 hover:bg-stone-300 rounded-lg text-stone-700 text-xs cursor-pointer"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" onclick="deleteFood(${f.id})" class="p-1.5 bg-red-100 hover:bg-red-200 rounded-lg text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join("");
-    }
-
-    function toggleFoodAvailability(id) {
-      const f = foods.find(x => x.id === id);
-      if (f) {
-        f.available = f.available === false ? true : false;
-        localStorage.setItem("rb_foods", JSON.stringify(foods));
-        renderAdminMenuList();
-        renderFood();
-      }
     }
 
     function saveFoodItem() {
@@ -1372,17 +1439,23 @@
 
       if (id) {
         const f = foods.find(x => x.id == id);
-        if (f) { f.name = name; f.price = price; f.category = category; f.type = type; f.image = image; }
+        if (f) {
+          f.name = name;
+          f.price = price;
+          f.category = category;
+          f.type = type;
+          f.image = image;
+        }
+        showToast("Dish updated successfully!");
       } else {
         const newId = foods.length > 0 ? Math.max(...foods.map(x => x.id)) + 1 : 1;
         foods.push({ id: newId, name, price, category, type, image });
+        showToast("New dish added successfully!");
       }
 
       localStorage.setItem("rb_foods", JSON.stringify(foods));
       resetFoodForm();
       renderAdminMenuList();
-      renderFood();
-      showToast("Dish saved successfully!");
     }
 
     function editFood(id) {
@@ -1399,6 +1472,13 @@
       document.getElementById("cancelEditFoodBtn").classList.remove("hidden");
     }
 
+    function deleteFood(id) {
+      foods = foods.filter(x => x.id !== id);
+      localStorage.setItem("rb_foods", JSON.stringify(foods));
+      renderAdminMenuList();
+      showToast("Dish deleted successfully!");
+    }
+
     function resetFoodForm() {
       document.getElementById("editFoodId").value = "";
       document.getElementById("foodName").value = "";
@@ -1410,49 +1490,47 @@
       document.getElementById("cancelEditFoodBtn").classList.add("hidden");
     }
 
-    function deleteFood(id) {
-      foods = foods.filter(x => x.id !== id);
-      localStorage.setItem("rb_foods", JSON.stringify(foods));
-      renderAdminMenuList();
-      renderFood();
-      showToast("Dish deleted!");
-    }
-
     function generateTableQR() {
       const num = document.getElementById("tableGenNumber").value.trim();
-      const mins = parseInt(document.getElementById("sessionMinutesInput").value) || 45;
-      if (!num) { showToast("Please enter table number!"); return; }
+      if (!num) {
+        showToast("Please enter table number!");
+        return;
+      }
 
-      const expiryTime = Date.now() + (mins * 60 * 1000);
       const urlObj = new URL(window.location.href);
       urlObj.searchParams.set("table", num);
-      urlObj.searchParams.set("exp", expiryTime);
       const finalUrl = urlObj.toString();
 
       document.getElementById("tableQRTitle").innerText = "Table " + num + " QR Code";
       document.getElementById("tableQRUrl").innerText = finalUrl;
-      document.getElementById("tableQRImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
+      const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
+      document.getElementById("tableQRImg").src = qrImg;
       document.getElementById("tableQRResult").classList.remove("hidden");
 
       let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
-      activeQrs.push({ tableNum: num, url: finalUrl, expiry: expiryTime, occupied: false });
+      activeQrs.push({ tableNum: num, url: finalUrl });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
-      showToast("Table QR generated!");
+      showToast("QR generated for Table " + num);
     }
 
     function copyTableQRUrl() {
       const text = document.getElementById("tableQRUrl").innerText;
-      navigator.clipboard.writeText(text);
-      showToast("Table URL copied!");
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      showToast("Table URL copied to clipboard!");
     }
 
     function renderActiveTablesQrList() {
       const list = document.getElementById("activeTablesQrList");
       const activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       if (activeQrs.length === 0) {
-        list.innerHTML = `<p class="text-xs text-stone-400 italic">No tables created yet.</p>`;
+        list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet in this session.</p>`;
         return;
       }
 
@@ -1460,25 +1538,11 @@
         <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-2 text-xs">
           <div>
             <span class="font-bold text-stone-900">Table: ${q.tableNum}</span>
-            <span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold ${q.occupied ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${q.occupied ? 'Occupied' : 'Available'}</span>
-            <span class="text-[10px] text-stone-500 block font-mono truncate max-w-xs mt-0.5">${q.url}</span>
+            <span class="text-[10px] text-stone-500 block font-mono truncate max-w-xs">${q.url}</span>
           </div>
-          <div class="flex items-center gap-1.5">
-            <button type="button" onclick="toggleTableOccupied('${q.tableNum}')" class="px-2.5 py-1 bg-stone-200 font-bold rounded-lg cursor-pointer">Toggle Status</button>
-            <button type="button" onclick="removeTableQr('${q.tableNum}')" class="px-2.5 py-1 bg-red-100 text-red-600 font-bold rounded-lg cursor-pointer">Delete</button>
-          </div>
+          <button type="button" onclick="removeTableQr('${q.tableNum}')" class="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-600 font-bold rounded-lg cursor-pointer">Revoke</button>
         </div>
       `).join("");
-    }
-
-    function toggleTableOccupied(num) {
-      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
-      activeQrs = activeQrs.map(q => {
-        if (q.tableNum === num) q.occupied = !q.occupied;
-        return q;
-      });
-      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
-      renderActiveTablesQrList();
     }
 
     function removeTableQr(num) {
@@ -1486,44 +1550,19 @@
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
-      showToast("Table removed.");
+      showToast("Table QR revoked.");
     }
 
     function initTableSessionFromURL() {
       const params = new URLSearchParams(window.location.search);
       const table = params.get("table");
-      const exp = params.get("exp");
 
-      if (table && exp) {
-        const expiryTime = parseInt(exp);
-        if (Date.now() > expiryTime) {
-          document.getElementById("sessionExpiredModal").classList.remove("hidden");
-          return;
-        }
-
-        currentTableSession = { tableNum: table, expiry: expiryTime };
+      if (table) {
+        currentTableSession = { tableNum: table };
         document.getElementById("badgeTableNum").innerText = table;
         document.getElementById("tableSessionBadge").classList.remove("hidden");
         document.getElementById("tableSessionBadge").classList.add("flex");
-
-        startSessionCountdown(expiryTime);
       }
-    }
-
-    function startSessionCountdown(expiryTime) {
-      if (sessionTimerInterval) clearInterval(sessionTimerInterval);
-      sessionTimerInterval = setInterval(() => {
-        const diff = expiryTime - Date.now();
-        if (diff <= 0) {
-          clearInterval(sessionTimerInterval);
-          document.getElementById("sessionExpiredModal").classList.remove("hidden");
-          document.getElementById("sessionTimerDisplay").innerText = "00:00";
-          return;
-        }
-        const mins = Math.floor(diff / 60000);
-        const secs = Math.floor((diff % 60000) / 1000);
-        document.getElementById("sessionTimerDisplay").innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      }, 1000);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -1531,6 +1570,7 @@
       saveCart();
       renderActiveTablesQrList();
       initTableSessionFromURL();
+      initFirebaseListener();
       showPage('home');
     });
   </script>
