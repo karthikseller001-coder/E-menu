@@ -248,8 +248,11 @@
         <div class="p-6 space-y-6 text-center">
           <div class="space-y-2">
             <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Scan QR to Pay Exact Amount</p>
-            <div class="inline-block p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-sm">
+            <div class="inline-block p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-sm relative">
               <img id="dynamicUpiQr" class="w-48 h-48 mx-auto" alt="UPI Payment QR">
+              <a id="downloadQrBtn" href="#" download="QR_Payment.png" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-900 text-white text-[11px] font-bold rounded-lg hover:bg-stone-800 transition-colors">
+                <i class="fa-solid fa-download"></i> Download QR
+              </a>
             </div>
             <p class="text-xs font-bold text-stone-700 pt-1">Pay with UPI</p>
           </div>
@@ -383,11 +386,15 @@
         </div>
 
         <div id="masterSubPage-qr" class="master-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Generator</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Manager & Session Timer</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Table Number/Name</label>
               <input id="tableGenNumber" type="text" placeholder="e.g. 1 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Session Duration (Minutes)</label>
+              <input id="tableSessionDuration" type="number" value="60" placeholder="e.g. 60 mins" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div class="flex items-end">
               <button type="button" onclick="generateTableQR()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
@@ -398,8 +405,11 @@
 
           <div id="tableQRResult" class="hidden p-6 bg-blue-50 rounded-2xl border border-blue-200 text-center space-y-4">
             <h4 id="tableQRTitle" class="font-bold text-blue-900 text-base">Table QR</h4>
-            <div class="inline-block p-3 bg-white rounded-2xl shadow">
+            <div class="inline-block p-3 bg-white rounded-2xl shadow relative">
               <img id="tableQRImg" class="w-48 h-48 mx-auto" alt="Table QR">
+              <a id="downloadTableQrBtn" href="#" download="Table_QR.png" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-900 text-white text-[11px] font-bold rounded-lg hover:bg-stone-800 transition-colors">
+                <i class="fa-solid fa-download"></i> Download QR
+              </a>
             </div>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-2">
               <p id="tableQRUrl" class="text-xs text-blue-700 font-mono break-all select-all bg-white p-2.5 rounded-xl border border-blue-200 flex-1"></p>
@@ -409,7 +419,6 @@
             </div>
           </div>
 
-          <!-- Tax/GST Label and Percentage Settings -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Tax / GST Name & Percentage Settings</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -512,11 +521,27 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
+            <button type="button" onclick="switchAdminSubPage('tables')" id="adminTabBtn-tables" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Table Management</button>
             <button type="button" onclick="switchAdminSubPage('sales')" id="adminTabBtn-sales" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer">Sales Report</button>
             <button type="button" onclick="switchAdminSubPage('orders')" id="adminTabBtn-orders" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Live Orders</button>
             <button type="button" onclick="switchAdminSubPage('menu')" id="adminTabBtn-menu" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Manage Menu</button>
             <button type="button" onclick="logout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 cursor-pointer">Logout</button>
           </div>
+        </div>
+
+        <!-- TABLE MANAGEMENT SUB-PAGE -->
+        <div id="adminSubPage-tables" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4">
+            <div>
+              <h3 class="font-serif font-bold text-xl text-stone-900">Restaurant Table Management</h3>
+              <p class="text-xs text-stone-500">Track and toggle table occupancy status in real-time</p>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <input id="newTableNameInput" type="text" placeholder="Table Name (e.g. T4)" class="px-3.5 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none">
+              <button type="button" onclick="addNewTable()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer whitespace-nowrap">+ Add Table</button>
+            </div>
+          </div>
+          <div id="tableGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
         </div>
 
         <!-- SALES REPORT SUB-PAGE -->
@@ -678,6 +703,15 @@
     let cart = JSON.parse(localStorage.getItem("rb_cart")) || [];
     let orders = JSON.parse(localStorage.getItem("rb_orders")) || [];
     let currentActiveOrderId = localStorage.getItem("rb_active_order_id") || null;
+    let tables = JSON.parse(localStorage.getItem("rb_tables")) || [
+      { id: "T1", name: "T1", status: "Free" },
+      { id: "T2", name: "T2", status: "Free" },
+      { id: "T3", name: "T3", status: "Free" },
+      { id: "T4", name: "T4", status: "Free" },
+      { id: "T5", name: "T5", status: "Free" },
+      { id: "T6", name: "T6", status: "Free" }
+    ];
+
     let branding = JSON.parse(localStorage.getItem("rb_branding")) || {
       brandName: "Hotel Royal Spice",
       brandTagline: "Restaurant",
@@ -845,6 +879,8 @@
       } else if (pageName === "myorders") {
         renderCustomerMyOrders();
       } else if (pageName === "admin") {
+        renderAdminTables();
+        switchAdminSubPage('tables');
         renderAdminOrders();
         renderSalesReport();
         renderAdminMenuList();
@@ -1087,7 +1123,18 @@
 
       const upiUrl = `upi://pay?pa=${CONFIG.phonePeUpiId}&pn=${encodeURIComponent(CONFIG.payeeName)}&am=${totals.grandTotal}&cu=INR`;
       document.getElementById("directUpiAppLink").href = upiUrl;
-      document.getElementById("dynamicUpiQr").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+      document.getElementById("dynamicUpiQr").src = qrImageUrl;
+      
+      const downloadQrBtn = document.getElementById("downloadQrBtn");
+      fetch(qrImageUrl).then(res => res.blob()).then(blob => {
+        const objectUrl = URL.createObjectURL(blob);
+        downloadQrBtn.href = objectUrl;
+        downloadQrBtn.download = "UPI_QR_Table_" + table + ".png";
+      }).catch(e => {
+        downloadQrBtn.href = qrImageUrl;
+      });
     }
 
     function confirmOrderAfterPayment(payMethod) {
@@ -1196,10 +1243,6 @@
               ${o.items.map(i => `<div class="flex justify-between text-stone-600"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
             </div>
           </div>
-          <div class="pt-3 border-t flex justify-between items-center text-sm font-black">
-            <span>Total Amount (${o.taxLabel || 'Tax'} Included):</span>
-            <span class="text-amber-600">₹${o.total}</span>
-          </div>
         </div>
       `).join("");
     }
@@ -1222,7 +1265,8 @@
         document.getElementById("masterBox").classList.add("hidden");
         document.getElementById("adminBox").classList.remove("hidden");
         document.getElementById("page-admin").classList.remove("hidden");
-        switchAdminSubPage('orders');
+        renderAdminTables();
+        switchAdminSubPage('tables');
         renderAdminOrders();
         renderSalesReport();
         renderAdminMenuList();
@@ -1249,6 +1293,7 @@
       document.getElementById("adminSubPage-" + sub).classList.remove("hidden");
       const btn = document.getElementById("adminTabBtn-" + sub);
       if (btn) btn.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer";
+      if(sub === 'tables') renderAdminTables();
     }
 
     function switchMasterSubPage(sub) {
@@ -1260,6 +1305,76 @@
       const btn = document.getElementById("masterTabBtn-" + sub);
       if (btn) btn.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer";
       if (sub === 'qr') renderActiveTablesQrList();
+    }
+
+    // TABLE MANAGEMENT FUNCTIONS
+    function renderAdminTables() {
+      const grid = document.getElementById("tableGrid");
+      if (tables.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-stone-400 text-xs">No tables added yet.</div>`;
+        return;
+      }
+
+      grid.innerHTML = tables.map(t => {
+        const isOccupied = t.status === "Occupied";
+        return `
+          <div class="p-5 rounded-2xl border text-center space-y-3 transition-all flex flex-col justify-between ${isOccupied ? 'bg-red-50 border-red-200 shadow-sm' : 'bg-emerald-50 border-emerald-200 shadow-sm'}">
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${isOccupied ? 'bg-red-200 text-red-800' : 'bg-emerald-200 text-emerald-800'}">
+                ${t.status}
+              </span>
+              <h4 class="font-serif font-black text-2xl text-stone-900 mt-2">${t.name}</h4>
+            </div>
+            <div class="space-y-1.5 pt-2 border-t border-stone-200/40">
+              <button type="button" onclick="toggleTableStatus('${t.id}')" class="w-full py-2 px-3 rounded-xl font-bold text-xs shadow-sm transition-all cursor-pointer ${isOccupied ? 'bg-stone-950 text-white hover:bg-stone-800' : 'bg-red-600 text-white hover:bg-red-700'}">
+                ${isOccupied ? 'Make Free' : 'Mark Occupied'}
+              </button>
+              <button type="button" onclick="deleteTable('${t.id}')" class="w-full py-1 text-[11px] text-stone-400 hover:text-red-600 cursor-pointer">
+                Delete Table
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleTableStatus(tableId) {
+      const t = tables.find(x => x.id === tableId);
+      if(!t) return;
+      t.status = t.status === "Occupied" ? "Free" : "Occupied";
+      saveTables();
+      renderAdminTables();
+      showToast("Table " + t.name + " marked as " + t.status);
+    }
+
+    function addNewTable() {
+      const nameInput = document.getElementById("newTableNameInput");
+      const name = nameInput.value.trim().toUpperCase();
+      if (!name) {
+        showToast("Please enter a table name!");
+        return;
+      }
+      if (tables.some(t => t.name === name)) {
+        showToast("Table with this name already exists!");
+        return;
+      }
+      const newTable = { id: name, name, status: "Free" };
+      tables.push(newTable);
+      saveTables();
+      renderAdminTables();
+      nameInput.value = "";
+      showToast("Table " + name + " added!");
+    }
+
+    function deleteTable(tableId) {
+      tables = tables.filter(x => x.id !== tableId);
+      saveTables();
+      renderAdminTables();
+      showToast("Table removed.");
+    }
+
+    function saveTables() {
+      localStorage.setItem("rb_tables", JSON.stringify(tables));
     }
 
     function renderAdminOrders() {
@@ -1484,6 +1599,7 @@
 
     function generateTableQR() {
       const num = document.getElementById("tableGenNumber").value.trim();
+      const durationMins = parseInt(document.getElementById("tableSessionDuration").value) || 60;
       if (!num) {
         showToast("Please enter table number!");
         return;
@@ -1495,12 +1611,26 @@
 
       document.getElementById("tableQRTitle").innerText = "Table " + num + " QR Code";
       document.getElementById("tableQRUrl").innerText = finalUrl;
-      document.getElementById("tableQRImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
+      
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
+      const qrImageEl = document.getElementById("tableQRImg");
+      qrImageEl.src = qrImageUrl;
       document.getElementById("tableQRResult").classList.remove("hidden");
+
+      const downloadBtn = document.getElementById("downloadTableQrBtn");
+      fetch(qrImageUrl).then(res => res.blob()).then(blob => {
+        const objectUrl = URL.createObjectURL(blob);
+        downloadBtn.href = objectUrl;
+        downloadBtn.download = "Table_" + num + "_QR.png";
+      }).catch(e => {
+        downloadBtn.href = qrImageUrl;
+      });
 
       let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
-      activeQrs.push({ tableNum: num, url: finalUrl, status: 'Active' });
+      
+      const expireTime = new Date().getTime() + (durationMins * 60 * 1000);
+      activeQrs.push({ tableNum: num, url: finalUrl, durationMins, expireTime, status: 'Active' });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
       showToast("QR generated for Table " + num);
@@ -1516,19 +1646,23 @@
 
       list.innerHTML = activeQrs.map(q => {
         const isPaused = q.status === 'Paused';
+        const isExpired = q.expireTime && new Date().getTime() > q.expireTime;
+        const displayStatus = isPaused ? 'Paused' : (isExpired ? 'Expired' : 'Active');
+
         return `
           <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-bold text-stone-900 text-sm">Table: ${q.tableNum}</span>
-                <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${isPaused ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
-                  ${isPaused ? 'Paused' : 'Active'}
+                <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${displayStatus !== 'Active' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+                  ${displayStatus}
                 </span>
+                <span class="text-[11px] text-stone-500 font-medium">${q.durationMins || 60} Mins Session</span>
               </div>
               <span class="text-[10px] text-stone-500 font-mono truncate max-w-md block mt-0.5">${q.url}</span>
             </div>
             <div class="flex items-center gap-2">
-              ${isPaused ? 
+              ${displayStatus !== 'Active' ? 
                 `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Active')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg cursor-pointer">Activate</button>` : 
                 `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Paused')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold rounded-lg cursor-pointer">Expire</button>`
               }
@@ -1569,9 +1703,12 @@
         let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
         const found = activeQrs.find(x => x.tableNum === table);
 
-        if (found && found.status === 'Paused') {
-          showPage('expired');
-          return;
+        if (found) {
+          const isExpired = found.expireTime && new Date().getTime() > found.expireTime;
+          if (found.status === 'Paused' || isExpired) {
+            showPage('expired');
+            return;
+          }
         }
 
         currentTableSession = { tableNum: table };
