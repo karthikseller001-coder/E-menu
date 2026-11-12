@@ -341,7 +341,7 @@
     <!-- ADMIN & MASTER CONTROL PANEL -->
     <section id="page-admin" class="page-section hidden max-w-6xl mx-auto px-4 py-8 space-y-6">
       
-      <!-- Staff Login Box (Updated as requested) -->
+      <!-- Staff Login Box -->
       <div id="loginBox" class="bg-white p-8 rounded-3xl shadow-xl max-w-md mx-auto border border-stone-200 text-center space-y-4">
         <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
           <i class="fa-solid fa-shield-halved"></i>
@@ -383,15 +383,11 @@
         </div>
 
         <div id="masterSubPage-qr" class="master-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Generator & Session Timer</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Generator</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Table Number/Name</label>
               <input id="tableGenNumber" type="text" placeholder="e.g. 1 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Session Duration (Minutes)</label>
-              <input id="tableSessionDuration" type="number" value="60" placeholder="e.g. 60 mins" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div class="flex items-end">
               <button type="button" onclick="generateTableQR()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
@@ -431,7 +427,7 @@
             </div>
           </div>
 
-          <!-- Generated Tables QR List with Delete & Expire Actions -->
+          <!-- Generated Tables & Active Sessions -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Generated Tables & Active Sessions</h4>
             <div id="activeTablesQrList" class="space-y-2">
@@ -523,12 +519,16 @@
           </div>
         </div>
 
+        <!-- SALES REPORT SUB-PAGE -->
         <div id="adminSubPage-sales" class="admin-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 class="font-serif font-bold text-xl text-stone-900">Sales Analytics & Revenue</h3>
             <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
               <button type="button" onclick="printSalesReport()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
                 <i class="fa-solid fa-print"></i> Print / PDF
+              </button>
+              <button type="button" onclick="resetSalesReport()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                Reset Report
               </button>
               <select id="reportFilterType" onchange="renderSalesReport()" class="px-4 py-2 rounded-xl border border-stone-300 text-xs font-bold bg-stone-50 outline-none">
                 <option value="all">All-Time Sales</option>
@@ -569,10 +569,14 @@
           </div>
         </div>
 
+        <!-- LIVE ORDERS SUB-PAGE -->
         <div id="adminSubPage-orders" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-4">
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center flex-wrap gap-2">
             <h3 class="font-serif font-bold text-xl text-stone-900">Live Customer Orders</h3>
-            <button type="button" onclick="renderAdminOrders()" class="px-3 py-1.5 bg-stone-100 text-xs font-bold rounded-xl hover:bg-stone-200 cursor-pointer"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="resetLiveOrders()" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Reset All Orders</button>
+              <button type="button" onclick="renderAdminOrders()" class="px-3 py-1.5 bg-stone-100 text-xs font-bold rounded-xl hover:bg-stone-200 cursor-pointer"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button>
+            </div>
           </div>
           <div id="ordersList" class="space-y-3"></div>
         </div>
@@ -702,9 +706,10 @@
           });
           orders = loadedOrders.reverse();
           localStorage.setItem("rb_orders", JSON.stringify(orders));
-          renderAdminOrders();
-          renderSalesReport();
-          renderCustomerMyOrders();
+          if(document.getElementById("page-admin").classList.contains("hidden") === false) {
+            renderAdminOrders();
+            renderSalesReport();
+          }
         }
       });
     }
@@ -1312,6 +1317,18 @@
       }).join("");
     }
 
+    function resetLiveOrders() {
+      if(confirm("Are you sure you want to clear all live orders?")) {
+        orders = [];
+        localStorage.setItem("rb_orders", JSON.stringify(orders));
+        if (dbRef) {
+          dbRef.child("orders").set(null);
+        }
+        renderAdminOrders();
+        showToast("All live orders reset.");
+      }
+    }
+
     function updateOrderStatus(orderId, status, firebaseKey) {
       const o = orders.find(x => x.orderId === orderId);
       if (o) {
@@ -1372,6 +1389,17 @@
           <td class="p-3 text-right font-black text-amber-600">₹${o.total}</td>
         </tr>
       `).join("");
+    }
+
+    function resetSalesReport() {
+      if(confirm("Are you sure you want to reset the sales report?")) {
+        orders = [];
+        localStorage.setItem("rb_orders", JSON.stringify(orders));
+        if (dbRef) dbRef.child("orders").set(null);
+        renderSalesReport();
+        renderAdminOrders();
+        showToast("Sales report reset.");
+      }
     }
 
     function printSalesReport() { window.print(); }
@@ -1456,7 +1484,6 @@
 
     function generateTableQR() {
       const num = document.getElementById("tableGenNumber").value.trim();
-      const durationMins = parseInt(document.getElementById("tableSessionDuration").value) || 60;
       if (!num) {
         showToast("Please enter table number!");
         return;
@@ -1473,9 +1500,7 @@
 
       let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
-      
-      const expireTime = new Date().getTime() + (durationMins * 60 * 1000);
-      activeQrs.push({ tableNum: num, url: finalUrl, durationMins, expireTime, status: 'Active' });
+      activeQrs.push({ tableNum: num, url: finalUrl, status: 'Active' });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
       showToast("QR generated for Table " + num);
@@ -1490,20 +1515,23 @@
       }
 
       list.innerHTML = activeQrs.map(q => {
-        const isExpired = q.status === 'Expired' || (q.expireTime && new Date().getTime() > q.expireTime);
+        const isPaused = q.status === 'Paused';
         return `
           <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-bold text-stone-900 text-sm">Table: ${q.tableNum}</span>
-                <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${isExpired ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
-                  ${isExpired ? 'Expired' : 'Active Session'}
+                <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${isPaused ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">
+                  ${isPaused ? 'Paused' : 'Active'}
                 </span>
               </div>
               <span class="text-[10px] text-stone-500 font-mono truncate max-w-md block mt-0.5">${q.url}</span>
             </div>
             <div class="flex items-center gap-2">
-              ${!isExpired ? `<button type="button" onclick="expireTableSession('${q.tableNum}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold rounded-lg cursor-pointer">Expire Now</button>` : ''}
+              ${isPaused ? 
+                `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Active')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg cursor-pointer">Activate</button>` : 
+                `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Paused')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold rounded-lg cursor-pointer">Expire</button>`
+              }
               <button type="button" onclick="deleteTableQr('${q.tableNum}')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg cursor-pointer">Delete</button>
             </div>
           </div>
@@ -1511,12 +1539,12 @@
       }).join("");
     }
 
-    function expireTableSession(num) {
+    function toggleTableQrStatus(num, newStatus) {
       let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
-      activeQrs = activeQrs.forEach(q => { if (q.tableNum === num) q.expireTime = new Date().getTime() - 1000; });
+      activeQrs.forEach(q => { if (q.tableNum === num) q.status = newStatus; });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       renderActiveTablesQrList();
-      showToast("Table " + num + " session expired.");
+      showToast("Table " + num + " status changed to " + newStatus);
     }
 
     function deleteTableQr(num) {
@@ -1541,7 +1569,7 @@
         let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
         const found = activeQrs.find(x => x.tableNum === table);
 
-        if (found && found.expireTime && new Date().getTime() > found.expireTime) {
+        if (found && found.status === 'Paused') {
           showPage('expired');
           return;
         }
