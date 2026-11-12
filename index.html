@@ -767,18 +767,18 @@
 
     // REAL-TIME FIREBASE SYNC LISTENERS FOR ALL MODULES
     function initFirebaseRealtimeSync() {
-      if (!dbRef) {
-        foods = JSON.parse(localStorage.getItem("rb_foods")) || defaultFoods;
-        tables = JSON.parse(localStorage.getItem("rb_tables")) || defaultTables;
-        activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
-        orders = JSON.parse(localStorage.getItem("rb_orders")) || [];
-        const savedBranding = JSON.parse(localStorage.getItem("rb_branding"));
-        if (savedBranding) branding = savedBranding;
-        applyBranding();
-        renderCategories();
-        renderFood();
-        return;
-      }
+      // Always load local defaults first for instant display
+      foods = JSON.parse(localStorage.getItem("rb_foods")) || defaultFoods;
+      tables = JSON.parse(localStorage.getItem("rb_tables")) || defaultTables;
+      activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      orders = JSON.parse(localStorage.getItem("rb_orders")) || [];
+      const savedBranding = JSON.parse(localStorage.getItem("rb_branding"));
+      if (savedBranding) branding = savedBranding;
+      applyBranding();
+      renderCategories();
+      renderFood();
+
+      if (!dbRef) return;
 
       // 1. Foods Sync
       dbRef.child("foods").on("value", (snapshot) => {
