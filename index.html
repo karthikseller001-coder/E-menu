@@ -1,642 +1,1538 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Restaurant QR Ordering & Admin System</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <style>
-    @keyframes pulse-red {
-      0%, 100% { background-color: rgb(220 38 38); }
-      50% { background-color: rgb(153 27 27); }
-    }
-    .animate-alert {
-      animation: pulse-red 1.2s infinite;
-    }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  </style>
-</head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased pb-20 md:pb-6">
-
-  <script>
-    const CONFIG = {
-      RESTAURANT_NAME: "YOUR_RESTAURANT_NAME",
-      UPI_ID: "yourbusiness@upi",
-      PHONE_NUMBER: "919999999999",
-      TOTAL_TABLES: 8,
-      STAFF_PASSCODE: "1234",
-      MASTER_PASSCODE: "9999",
-      FIREBASE_CONFIG: {
-        apiKey: "YOUR_FIREBASE_API_KEY",
-        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hotel Royal Spice - Digital Menu & Ordering</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          serif: ['Playfair Display', 'serif'],
+        },
+        colors: {
+          brand: {
+            50: '#fffbeb',
+            100: '#fef3c7',
+            500: '#f59e0b',
+            600: '#d97706',
+            800: '#92400e',
+            900: '#78350f',
+          }
+        }
       }
-    };
-  </script>
+    }
+  }
+</script>
+<style>
+  body { background-color: #faf9f6; color: #1c1917; overflow-x: hidden; width: 100%; max-width: 100vw; }
+  .gold-gradient { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+  .dark-header { background: linear-gradient(180deg, #16110c 0%, #241b13 100%); }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  * { box-sizing: border-box; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#faf9f6] text-stone-900 overflow-x-hidden">
 
-  <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span id="header-brand" class="font-bold text-lg tracking-tight text-slate-900">Restaurant</span>
-        <span id="active-table-badge" class="hidden px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-          Table T1
-        </span>
+  <!-- Session Expired Modal -->
+  <div id="sessionExpiredModal" class="hidden fixed inset-0 z-[100] bg-stone-950/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full rounded-3xl p-8 text-center shadow-2xl border-2 border-amber-500 space-y-4">
+      <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </div>
+      <h2 class="text-2xl font-serif font-bold text-stone-900">Session Expired</h2>
+      <p class="text-sm text-stone-600">Your table ordering session time has ended. Please scan your table's QR code again to start a fresh session.</p>
+      <div class="pt-2">
+        <span class="inline-block text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-4 py-2 rounded-full">Scan Table QR Code to Continue</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed bottom-20 sm:bottom-6 right-4 z-[200] pointer-events-none transform translate-y-24 opacity-0 transition-all duration-300">
+    <div class="bg-stone-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-amber-500/40 flex items-center gap-3 text-sm font-medium">
+      <i class="fa-solid fa-circle-check text-amber-400"></i>
+      <span id="toastText">Notification</span>
+    </div>
+  </div>
+
+  <!-- Top Navigation Header -->
+  <header class="dark-header text-white sticky top-0 z-40 shadow-lg border-b border-amber-500/20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div onclick="showPage('home')" class="flex items-center gap-3 cursor-pointer group justify-start">
+        <div id="brandLogoContainer" class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 overflow-hidden">
+          <img id="headerLogoImg" src="" alt="Logo" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden')">
+          <svg id="headerLogoSvg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
+            <line x1="6" y1="17" x2="18" y2="17"/>
+          </svg>
+        </div>
+        <div class="flex flex-col text-left">
+          <h1 id="headerBrandName" class="font-serif font-extrabold text-xl sm:text-2xl text-white tracking-wide leading-tight">Hotel Royal Spice</h1>
+          <span id="headerBrandTagline" class="text-[11px] text-amber-400 font-semibold tracking-wider uppercase leading-none mt-0.5">Restaurant</span>
+        </div>
       </div>
 
-      <nav id="desktop-nav" class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-        <button onclick="switchCustomerTab('home')" class="hover:text-slate-900 transition">Home</button>
-        <button onclick="switchCustomerTab('menu')" class="hover:text-slate-900 transition">Explore Menu</button>
-        <button onclick="switchCustomerTab('orders')" class="hover:text-slate-900 transition">My Orders</button>
-        <button onclick="switchCustomerTab('cart')" class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition">
-          Order Now (<span id="desktop-cart-count">0</span>)
-        </button>
-        <button onclick="toggleAdminView()" class="text-xs text-slate-400 hover:text-slate-700 underline ml-2">
-          Staff
-        </button>
+      <!-- Desktop Header Links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-stone-300">
+        <button type="button" onclick="showPage('home')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">Home</button>
+        <button type="button" onclick="showPage('menu')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">Explore Menu</button>
+        <button type="button" onclick="showPage('myorders')" class="hover:text-amber-400 transition-colors bg-transparent border-none cursor-pointer">My Orders</button>
       </nav>
 
-      <div class="flex md:hidden items-center gap-2">
-        <button id="mobile-enquiry-btn" onclick="triggerEnquiry()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 border border-red-200 active:scale-95 transition">
-          Enquiry
+      <div class="hidden md:flex items-center gap-3">
+        <button type="button" onclick="showPage('menu')" class="gold-gradient text-stone-950 font-extrabold px-5 py-2.5 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
+          Order Now
         </button>
-        <button onclick="toggleAdminView()" class="p-2 text-xs text-slate-500 border border-slate-200 rounded-lg">
-          Staff
-        </button>
+      </div>
+
+      <div id="tableSessionBadge" class="hidden items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 px-3 py-1 rounded-full text-xs">
+        <span class="font-bold text-amber-300"><i class="fa-solid fa-chair mr-1"></i>Table <span id="badgeTableNum">-</span></span>
+        <span class="text-stone-400">|</span>
+        <span id="sessionTimerDisplay" class="font-mono font-bold text-white">45:00</span>
       </div>
     </div>
   </header>
 
-  <main id="customer-view" class="max-w-6xl mx-auto px-4 pt-4">
-    <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm mb-5 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h1 class="font-bold text-base sm:text-lg" id="welcome-title">Welcome!</h1>
-        <p class="text-xs text-slate-500" id="table-status-msg">Scan table QR code or select items below to order.</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <button id="enquiry-btn" onclick="triggerEnquiry()" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold shadow-sm active:scale-95 transition">
-          🔔 Enquiry / Call Waiter
+  <!-- Clean White Navigation Sub-Bar -->
+  <div id="whiteNavBarContainer" class="hidden bg-white border-b border-stone-200 shadow-sm sticky top-[73px] sm:top-[81px] z-30">
+    <div class="max-w-7xl mx-auto px-2 sm:px-6 py-2 flex items-center justify-between">
+      <nav id="mainNavBar" class="flex items-center gap-1 sm:gap-2 w-full justify-around sm:justify-start">
+        <button type="button" onclick="showPage('home')" id="nav-home" class="nav-btn px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-stone-800 bg-stone-100 hover:bg-stone-200 transition-all flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-house text-amber-600"></i> Home
         </button>
-      </div>
-    </div>
-
-    <section id="tab-home" class="customer-section mb-6">
-      <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <span class="text-xs uppercase tracking-wider text-amber-400 font-semibold">Fresh & Fast</span>
-          <h2 class="text-2xl font-bold mt-1">Order directly from your table</h2>
-          <p class="text-sm text-slate-300 mt-1">Browse menu, customize items, and track live kitchen status.</p>
-        </div>
-        <button onclick="switchCustomerTab('menu')" class="px-5 py-2.5 bg-amber-400 text-slate-950 font-bold text-sm rounded-xl hover:bg-amber-300 transition">
-          Explore Menu
+        <button type="button" onclick="showPage('menu')" id="nav-menu" class="nav-btn px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-stone-600 hover:bg-stone-100 transition-all flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-utensils text-amber-600"></i> Menu
         </button>
-      </div>
-    </section>
-
-    <section id="tab-menu" class="customer-section">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-bold text-lg">Menu</h2>
-        <div id="category-filters" class="flex gap-2 overflow-x-auto no-scrollbar text-xs">
-          <button onclick="filterCategory('All')" class="px-3 py-1.5 rounded-full bg-slate-900 text-white font-medium">All</button>
-          <button onclick="filterCategory('Starters')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700">Starters</button>
-          <button onclick="filterCategory('Mains')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700">Mains</button>
-          <button onclick="filterCategory('Beverages')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700">Beverages</button>
-        </div>
-      </div>
-      <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </section>
-
-    <section id="tab-cart" class="customer-section hidden">
-      <h2 class="font-bold text-lg mb-3">Your Order Cart</h2>
-      <div class="bg-white rounded-xl border border-slate-200 p-4">
-        <div id="cart-items" class="divide-y divide-slate-100"></div>
-        <div id="cart-empty" class="py-8 text-center text-sm text-slate-400">Your cart is empty.</div>
-        <div id="cart-footer" class="hidden pt-4 mt-4 border-t border-slate-200">
-          <div class="flex justify-between font-bold text-base mb-4">
-            <span>Total</span>
-            <span id="cart-total">₹0</span>
-          </div>
-          <button onclick="placeOrder()" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition">
-            Confirm & Send Order to Kitchen
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section id="tab-orders" class="customer-section hidden">
-      <h2 class="font-bold text-lg mb-3">My Table Orders</h2>
-      <div id="my-orders-list" class="space-y-3"></div>
-    </section>
-  </main>
-  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 flex justify-around items-center h-16 text-xs font-medium text-slate-600">
-    <button onclick="switchCustomerTab('home')" class="flex flex-col items-center gap-1 py-1 px-3 hover:text-slate-900">
-      <span>🏠</span><span>Home</span>
-    </button>
-    <button onclick="switchCustomerTab('menu')" class="flex flex-col items-center gap-1 py-1 px-3 hover:text-slate-900">
-      <span>🍽️</span><span>Menu</span>
-    </button>
-    <button onclick="switchCustomerTab('orders')" class="flex flex-col items-center gap-1 py-1 px-3 hover:text-slate-900">
-      <span>🧾</span><span>My Orders</span>
-    </button>
-    <button onclick="switchCustomerTab('cart')" class="relative flex flex-col items-center gap-1 py-1 px-3 text-slate-900 font-bold">
-      <span>🛒</span><span>Order (<span id="mobile-cart-count">0</span>)</span>
-    </button>
-  </nav>
-
-  <section id="admin-view" class="hidden max-w-6xl mx-auto px-4 pt-6 pb-24">
-    <div id="staff-login-box" class="max-w-sm mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-8">
-      <h2 class="text-xl font-bold text-center text-slate-900">Staff Login</h2>
-      <p class="text-xs text-slate-500 text-center mt-1">Enter passcode to enter</p>
-      <form onsubmit="handleStaffLogin(event)" class="mt-5 space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Enter Passcode</label>
-          <input
-            id="staff-passcode-input"
-            type="password"
-            inputmode="numeric"
-            placeholder="••••"
-            required
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-center tracking-widest text-lg focus:outline-none focus:border-slate-900"
-          />
-        </div>
-        <p id="login-error" class="hidden text-xs text-red-600 text-center font-medium">Invalid passcode. Try again.</p>
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition">
-          Enter
+        <button type="button" onclick="showPage('cart')" id="nav-cart" class="nav-btn relative px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-stone-600 hover:bg-stone-100 transition-all flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-bag-shopping text-amber-600"></i> Cart
+          <span id="cartCountBadge" class="ml-0.5 bg-amber-500 text-stone-950 font-extrabold text-[9px] px-1 py-0.2 rounded-full">0</span>
         </button>
-        <button type="button" onclick="toggleAdminView()" class="w-full py-2 text-xs text-slate-500 hover:text-slate-800">
-          Back to Customer View
+        <button type="button" onclick="showPage('myorders')" id="nav-myorders" class="nav-btn px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-stone-600 hover:bg-stone-100 transition-all flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-receipt text-amber-600"></i> My Orders
         </button>
-      </form>
+      </nav>
+      <button type="button" onclick="showPage('admin')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-stone-950 shadow cursor-pointer flex items-center gap-1 shrink-0">
+        <i class="fa-solid fa-user-lock"></i> Staff
+      </button>
     </div>
+  </div>
 
-    <div id="staff-dashboard" class="hidden space-y-6">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 class="text-xl font-bold">Staff Dashboard</h2>
-          <p class="text-xs text-slate-500">Live Orders, Waiter Calls & Table Occupancy</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="logoutStaff()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 hover:bg-slate-100">
-            Logout
-          </button>
-          <button onclick="toggleAdminView()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white">
-            Exit Staff View
-          </button>
-        </div>
-      </div>
+  <!-- Main Content Area -->
+  <main class="flex-1">
 
-      <div id="enquiry-alerts-container" class="space-y-2"></div>
+    <!-- HOME PAGE -->
+    <section id="page-home" class="page-section">
+      <div id="homeHeroBgContainer" class="relative min-h-[82vh] flex items-start pt-10 sm:pt-14 pb-20 px-4 sm:px-8 overflow-hidden bg-stone-950">
+        <img id="homeHeroBgImg" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80" alt="Restaurant" onerror="this.src='https://placehold.co/1600x900/1c1917/f59e0b?text=Royal+Bites'" class="absolute inset-0 w-full h-full object-cover opacity-40">
+        <div class="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/80 to-transparent"></div>
 
-      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="font-bold text-base">Active Kitchen Orders</h3>
-          <span id="sync-indicator" class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-            Live Sync
-          </span>
-        </div>
-        <div id="admin-orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-      </div>
-    </div>
-    <div id="live-table-bar" class="hidden fixed bottom-0 inset-x-0 z-50 bg-slate-900 text-white border-t border-slate-700 px-4 py-2.5 shadow-lg">
-      <div class="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div class="flex items-center gap-3 text-xs">
-          <span class="font-bold uppercase tracking-wider text-slate-300">Tables:</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Free</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Occupied</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span> Enquiry</span>
-        </div>
-        <div id="table-pills-container" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5"></div>
-      </div>
-    </div>
-  </section>
-
-  <script>
-    const MENU_ITEMS = [
-      { id: "m1", name: "Paneer Tikka", category: "Starters", price: 220, desc: "Chargrilled cottage cheese with spices" },
-      { id: "m2", name: "Crispy Corn", category: "Starters", price: 160, desc: "Golden fried sweet corn tossed with herbs" },
-      { id: "m3", name: "Butter Naan & Paneer Butter Masala", category: "Mains", price: 280, desc: "Rich tomato gravy with 2 butter naans" },
-      { id: "m4", name: "Veg Dum Biryani", category: "Mains", price: 240, desc: "Aromatic basmati rice with raita" },
-      { id: "m5", name: "Chicken Dum Biryani", category: "Mains", price: 310, desc: "Hyderabadi style spiced chicken biryani" },
-      { id: "m6", name: "Fresh Lime Soda", category: "Beverages", price: 80, desc: "Sweet & salted refreshing cooler" }
-    ];
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentTable = (urlParams.get("table") || "T1").toUpperCase();
-    let cart = [];
-    let selectedCategory = "All";
-    let isStaffAuthenticated = false;
-    let db = null;
-    let useLocalFallback = false;
-
-    let localState = {
-      tables: {},
-      orders: {}
-    };
-
-    function initApp() {
-      document.getElementById("header-brand").textContent = CONFIG.RESTAURANT_NAME;
-      document.getElementById("welcome-title").textContent = `Welcome to ${CONFIG.RESTAURANT_NAME}`;
-
-      const badge = document.getElementById("active-table-badge");
-      badge.textContent = `Table ${currentTable}`;
-      badge.classList.remove("hidden");
-
-      initDatabase();
-      renderMenu();
-      markTableOccupiedOnScan(currentTable);
-    }
-
-    function initDatabase() {
-      const isConfigured = CONFIG.FIREBASE_CONFIG.databaseURL && !CONFIG.FIREBASE_CONFIG.databaseURL.includes("YOUR_PROJECT_ID");
-      if (isConfigured && typeof firebase !== "undefined") {
-        try {
-          firebase.initializeApp(CONFIG.FIREBASE_CONFIG);
-          db = firebase.database();
-          attachFirebaseListeners();
-          return;
-        } catch (err) {
-          console.warn("Firebase init error, using local sync fallback:", err);
-        }
-      }
-      useLocalFallback = true;
-      document.getElementById("sync-indicator").textContent = "Local Demo Sync (Add Firebase URL for Multi-Device)";
-      const saved = localStorage.getItem("qr_restaurant_state");
-      if (saved) localState = JSON.parse(saved);
-      ensureDefaultTables();
-      window.addEventListener("storage", (e) => {
-        if (e.key === "qr_restaurant_state" && e.newValue) {
-          localState = JSON.parse(e.newValue);
-          refreshAllUI();
-        }
-      });
-      refreshAllUI();
-    }
-
-    function ensureDefaultTables() {
-      for (let i = 1; i <= CONFIG.TOTAL_TABLES; i++) {
-        const tKey = `T${i}`;
-        if (!localState.tables[tKey]) {
-          localState.tables[tKey] = { status: "free", enquiry: false, updatedAt: Date.now() };
-        }
-      }
-      saveLocalState();
-    }
-
-    function saveLocalState() {
-      localStorage.setItem("qr_restaurant_state", JSON.stringify(localState));
-      refreshAllUI();
-    }
-
-    function attachFirebaseListeners() {
-      for (let i = 1; i <= CONFIG.TOTAL_TABLES; i++) {
-        const tKey = `T${i}`;
-        db.ref(`tables/${tKey}`).once("value", (snap) => {
-          if (!snap.exists()) {
-            db.ref(`tables/${tKey}`).set({ status: "free", enquiry: false, updatedAt: Date.now() });
-          }
-        });
-      }
-
-      db.ref("tables").on("value", (snap) => {
-        localState.tables = snap.val() || {};
-        refreshAllUI();
-      });
-
-      db.ref("orders").on("value", (snap) => {
-        localState.orders = snap.val() || {};
-        refreshAllUI();
-      });
-    }
-
-    function markTableOccupiedOnScan(tableId) {
-      if (!urlParams.get("table")) return;
-      const existing = localState.tables[tableId];
-      if (existing && existing.status === "occupied") {
-        document.getElementById("table-status-msg").textContent = `Connected to ${tableId} (Active Group Session)`;
-        return;
-      }
-      document.getElementById("table-status-msg").textContent = `Connected to ${tableId} • Occupied`;
-      updateTableData(tableId, { status: "occupied", updatedAt: Date.now() });
-    }
-
-    function updateTableData(tableId, patch) {
-      if (!useLocalFallback && db) {
-        db.ref(`tables/${tableId}`).update(patch);
-      } else {
-        localState.tables[tableId] = { ...(localState.tables[tableId] || { status: "free", enquiry: false }), ...patch };
-        saveLocalState();
-      }
-    }
-
-    function triggerEnquiry() {
-      updateTableData(currentTable, { status: "occupied", enquiry: true, enquiryTime: Date.now() });
-      const btn = document.getElementById("enquiry-btn");
-      btn.textContent = "✓ Waiter Notified!";
-      setTimeout(() => { btn.textContent = "🔔 Enquiry / Call Waiter"; }, 3000);
-    }
-
-    function resolveEnquiry(tableId) {
-      updateTableData(tableId, { enquiry: false });
-    }
-
-    function resetTableStatus(tableId) {
-      updateTableData(tableId, { status: "free", enquiry: false, updatedAt: Date.now() });
-    }
-
-    function switchCustomerTab(tabName) {
-      document.querySelectorAll(".customer-section").forEach((el) => el.classList.add("hidden"));
-      document.getElementById(`tab-${tabName}`).classList.remove("hidden");
-      if (tabName === "orders") renderCustomerOrders();
-      if (tabName === "cart") renderCart();
-    }
-
-    function filterCategory(cat) {
-      selectedCategory = cat;
-      renderMenu();
-    }
-
-    function renderMenu() {
-      const grid = document.getElementById("menu-grid");
-      const items = selectedCategory === "All" ? MENU_ITEMS : MENU_ITEMS.filter((i) => i.category === selectedCategory);
-      grid.innerHTML = items.map((item) => `
-        <div class="bg-white rounded-xl border border-slate-200 p-4 flex flex-col justify-between shadow-sm">
-          <div>
-            <div class="flex justify-between items-start gap-2">
-              <h3 class="font-bold text-slate-900 text-sm">${item.name}</h3>
-              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${item.category}</span>
+        <div class="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div class="space-y-4">
+            <span id="homeWelcomeBadge" class="inline-block px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold uppercase tracking-widest">
+              Welcome to Royal Dining
+            </span>
+            <h2 class="font-serif font-extrabold text-4xl sm:text-6xl text-white leading-tight">
+              <span id="homeHeroTitle1">Good Food</span><br>
+              <span id="homeHeroTitle2" class="text-amber-400 italic">Good Mood</span>
+            </h2>
+            <p id="homeHeroDesc" class="text-stone-300 text-base sm:text-lg max-w-lg leading-relaxed">
+              Delicious food, great ambiance and unforgettable moments! Order fresh dishes directly from your table.
+            </p>
+            <div class="pt-3 flex flex-wrap gap-4">
+              <button type="button" onclick="showPage('menu')" class="gold-gradient text-stone-950 font-extrabold px-7 py-3.5 rounded-full text-sm sm:text-base shadow-lg shadow-amber-500/30 hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer z-20 relative">
+                <span>View Menu</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
             </div>
-            <p class="text-xs text-slate-500 mt-1">${item.desc}</p>
           </div>
-          <div class="mt-4 flex items-center justify-between">
-            <span class="font-bold text-sm">₹${item.price}</span>
-            <button onclick="addToCart('${item.id}')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold active:scale-95 transition">
-              + Add
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU PAGE -->
+    <section id="page-menu" class="page-section hidden max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-24 space-y-6 relative">
+      <div class="text-center space-y-2">
+        <div class="flex items-center justify-center gap-3">
+          <span class="h-0.5 w-10 bg-amber-500"></span>
+          <h2 class="font-serif font-bold text-3xl sm:text-4xl text-stone-900">Our Menu</h2>
+          <span class="h-0.5 w-10 bg-amber-500"></span>
+        </div>
+        <p class="text-sm text-stone-500">Freshly prepared dishes served hot to your table</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 justify-between items-center bg-white p-3 rounded-2xl shadow-sm border border-stone-200">
+        <div class="relative w-full sm:w-80">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-stone-400 text-sm"></i>
+          <input id="searchInput" oninput="renderFood()" type="text" placeholder="Search dishes..." class="w-full pl-10 pr-4 py-2 rounded-xl bg-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button type="button" onclick="setTypeFilter('All')" id="typeBtn-All" class="type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-900 text-white cursor-pointer">All</button>
+          <button type="button" onclick="setTypeFilter('Veg')" id="typeBtn-Veg" class="type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-100 text-emerald-700 border border-emerald-200 cursor-pointer">Veg</button>
+          <button type="button" onclick="setTypeFilter('Non-Veg')" id="typeBtn-Non-Veg" class="type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-100 text-red-700 border border-red-200 cursor-pointer">Non-Veg</button>
+        </div>
+      </div>
+
+      <div id="categoryBar" class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1"></div>
+
+      <div id="foodGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+
+      <div id="stickyCartBar" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 w-11/12 max-w-md bg-stone-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-amber-500/40 items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-stone-950 font-black flex items-center justify-center text-sm shadow">
+            <span id="stickyCartCount">0</span>
+          </div>
+          <div>
+            <span class="text-xs text-stone-400 block">Items Selected</span>
+            <span id="stickyCartTotal" class="text-base font-black text-amber-400">₹0</span>
+          </div>
+        </div>
+        <button type="button" onclick="showPage('cart')" class="gold-gradient text-stone-950 font-extrabold px-6 py-2.5 rounded-xl text-xs shadow hover:opacity-95 transition-all flex items-center gap-2 cursor-pointer">
+          <span>Go to Cart</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- CART PAGE -->
+    <section id="page-cart" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <h2 class="font-serif font-bold text-2xl sm:text-3xl text-stone-900">Your Order Cart</h2>
+        <button type="button" onclick="showPage('menu')" class="text-xs font-bold text-brand-800 hover:underline cursor-pointer">+ Add More Items</button>
+      </div>
+
+      <div id="cartItemsContainer" class="space-y-3"></div>
+
+      <div id="checkoutDetailsBox" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-stone-200 space-y-4">
+        <h3 class="font-bold text-stone-800 text-base border-b pb-2">Customer & Table Details</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-stone-600 mb-1">Customer Name *</label>
+            <input id="custName" type="text" placeholder="Enter your name" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Mobile Number *</label>
+            <input id="custPhone" type="tel" maxlength="10" placeholder="10-digit mobile number" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-600 mb-1">
+              Table Number * <span id="tableLockedLabel" class="hidden text-[10px] text-emerald-700 font-bold">(Fixed via QR)</span>
+            </label>
+            <input id="custTable" type="text" placeholder="Table No." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          </div>
+        </div>
+
+        <!-- Sub-Total, Tax and Grand Total Display -->
+        <div class="pt-4 border-t border-stone-200 space-y-2 text-sm">
+          <div class="flex justify-between text-stone-600">
+            <span>Sub-Total:</span>
+            <span id="cartSubTotalAmount" class="font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-stone-600">
+            <span id="cartTaxLabel">Tax (5%):</span>
+            <span id="cartTaxAmount" class="font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-base font-black text-stone-900 pt-2 border-t border-dashed">
+            <span>Grand Total Payable:</span>
+            <span id="cartTotalAmount" class="text-amber-600">₹0</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-end items-center pt-2">
+          <button type="button" onclick="proceedToPayment()" class="w-full sm:w-auto gold-gradient text-stone-950 font-extrabold px-8 py-3.5 rounded-xl text-sm shadow-lg hover:opacity-95 transition-all cursor-pointer">
+            Proceed to Payment <i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAYMENT PAGE -->
+    <section id="page-payment" class="page-section hidden max-w-lg mx-auto px-4 py-8">
+      <div class="bg-white rounded-3xl shadow-xl border border-stone-200 overflow-hidden">
+        <div class="dark-header text-white p-6 text-center space-y-1">
+          <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Secure Checkout</span>
+          <h2 class="text-3xl font-black" id="payScreenAmount">₹0</h2>
+          <p class="text-xs text-stone-300" id="payScreenSummary">Table - • Customer</p>
+        </div>
+
+        <div class="p-6 space-y-6 text-center">
+          <div class="space-y-2">
+            <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Scan QR to Pay Exact Amount</p>
+            <div class="inline-block p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-sm">
+              <img id="dynamicUpiQr" class="w-48 h-48 mx-auto" alt="UPI Payment QR">
+            </div>
+            <p class="text-xs font-bold text-stone-700 pt-1">Pay with UPI</p>
+          </div>
+
+          <div class="space-y-2">
+            <a id="directUpiAppLink" href="#" class="w-full py-3.5 px-5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span id="upiBtnLabel">Pay ₹0 with PhonePe / Any UPI App</span>
+            </a>
+            <p class="text-[11px] text-stone-400">Opens PhonePe, GPay, or Paytm with fixed cart amount</p>
+          </div>
+
+          <div class="border-t border-stone-200 pt-4 space-y-3">
+            <button type="button" onclick="confirmOrderAfterPayment('UPI')" class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer">
+              <i class="fa-solid fa-check-circle mr-1"></i> I Have Paid - Place Order
+            </button>
+            <button type="button" onclick="confirmOrderAfterPayment('Cash at Counter')" class="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition-all cursor-pointer">
+              Pay Cash at Counter Instead
+            </button>
+            <button type="button" onclick="showPage('cart')" class="text-xs text-stone-400 hover:text-stone-600 underline cursor-pointer">Back to Cart</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDER STATUS TRACKER -->
+    <section id="page-status" class="page-section hidden max-w-lg mx-auto px-4 py-12">
+      <div class="bg-white rounded-3xl shadow-xl border border-stone-200 p-8 text-center space-y-6">
+        <div id="statusIconBox" class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-pulse">
+          <i id="statusIcon" class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <div class="space-y-2">
+          <h2 id="statusTitle" class="font-serif font-bold text-2xl text-stone-900">Pending Approval</h2>
+          <p id="statusDesc" class="text-sm text-stone-600">Your payment has been submitted. Waiting for restaurant staff to review and accept your order...</p>
+        </div>
+        <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 text-left space-y-2 text-xs">
+          <div class="flex justify-between font-bold">
+            <span class="text-stone-500">Order ID:</span>
+            <span id="trackOrderId" class="text-stone-900">#ORD0000</span>
+          </div>
+          <div class="flex justify-between font-bold">
+            <span class="text-stone-500">Table Number:</span>
+            <span id="trackTableNum" class="text-stone-900">-</span>
+          </div>
+          <div class="flex justify-between font-bold">
+            <span class="text-stone-500">Total Amount:</span>
+            <span id="trackTotal" class="text-stone-900">₹0</span>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="showPage('myorders')" class="flex-1 py-3 rounded-xl bg-amber-500 text-stone-950 font-bold text-xs hover:opacity-90 transition-all cursor-pointer">
+            View My Orders
+          </button>
+          <button type="button" onclick="showPage('menu')" class="flex-1 py-3 rounded-xl bg-stone-900 text-white font-bold text-xs hover:bg-stone-800 transition-all cursor-pointer">
+            Back to Menu
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOMER MY ORDERS -->
+    <section id="page-myorders" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <div>
+          <h2 class="font-serif font-bold text-2xl sm:text-3xl text-stone-900">My Orders History</h2>
+          <p class="text-xs text-stone-500">Track all your food orders placed from this device/table</p>
+        </div>
+        <button type="button" onclick="showPage('menu')" class="text-xs font-bold text-brand-800 hover:underline cursor-pointer">+ Order More</button>
+      </div>
+      <div id="customerMyOrdersList" class="space-y-4"></div>
+    </section>
+
+    <!-- ADMIN & MASTER CONTROL PANEL -->
+    <section id="page-admin" class="page-section hidden max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <div id="loginBox" class="bg-white p-8 rounded-3xl shadow-xl max-w-md mx-auto border border-stone-200 text-center space-y-4">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="space-y-1">
+          <h2 class="font-serif font-bold text-2xl text-stone-900" id="loginTitleText">Staff Login</h2>
+          <p class="text-xs text-stone-500" id="loginDescText">Enter Passcode</p>
+        </div>
+        <div class="space-y-3 pt-2">
+          <input id="passcodeInput" type="password" placeholder="Enter Passcode" class="w-full px-4 py-3 rounded-xl border border-stone-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none">
+          <button type="button" onclick="login()" class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-lg transition-all cursor-pointer">
+            Login
+          </button>
+          <p id="loginMsg" class="text-xs font-bold text-red-600"></p>
+        </div>
+        <div class="pt-4 border-t">
+          <button type="button" onclick="showPage('home')" class="text-xs text-stone-500 hover:underline cursor-pointer">← Back to Home</button>
+        </div>
+      </div>
+
+      <!-- Master Control Box -->
+      <div id="masterBox" class="hidden space-y-6">
+        <div class="bg-blue-900 text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-blue-300 text-xl font-bold">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <div>
+              <h2 class="font-serif font-bold text-2xl">Master Panel Dashboard</h2>
+              <p class="text-xs text-blue-200">Full system owner controls & Table QR generator</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="switchMasterSubPage('qr')" id="masterTabBtn-qr" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer">Tables & QR</button>
+            <button type="button" onclick="switchMasterSubPage('passcodes')" id="masterTabBtn-passcodes" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Passcodes</button>
+            <button type="button" onclick="switchMasterSubPage('branding')" id="masterTabBtn-branding" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Branding</button>
+            <button type="button" onclick="logout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 cursor-pointer">Logout</button>
+          </div>
+        </div>
+
+        <div id="masterSubPage-qr" class="master-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Tables & Session QR Generator</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Table Number/Name</label>
+              <input id="tableGenNumber" type="text" placeholder="e.g. 1 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Session Duration (Minutes)</label>
+              <input id="sessionMinutesInput" type="number" value="45" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div class="flex items-end">
+              <button type="button" onclick="generateTableQR()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                Generate Table QR
+              </button>
+            </div>
+          </div>
+          <div id="tableQRResult" class="hidden p-6 bg-blue-50 rounded-2xl border border-blue-200 text-center space-y-4">
+            <h4 id="tableQRTitle" class="font-bold text-blue-900 text-base">Table QR</h4>
+            <div class="inline-block p-3 bg-white rounded-2xl shadow">
+              <img id="tableQRImg" class="w-48 h-48 mx-auto" alt="Table QR">
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-2">
+              <p id="tableQRUrl" class="text-xs text-blue-700 font-mono break-all select-all bg-white p-2.5 rounded-xl border border-blue-200 flex-1"></p>
+              <button type="button" onclick="copyTableQRUrl()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shrink-0 cursor-pointer">
+                <i class="fa-solid fa-copy mr-1"></i> Copy URL
+              </button>
+            </div>
+          </div>
+
+          <!-- Tax/GST Label and Percentage Settings -->
+          <div class="pt-6 border-t border-stone-200 space-y-4">
+            <h4 class="font-bold text-stone-800 text-sm">Tax / GST Name & Percentage Settings</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-stone-600 mb-1">Tax / GST Label Name</label>
+                <input id="masterTaxLabelInput" type="text" value="Tax" placeholder="e.g. GST" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-stone-600 mb-1">Tax Percentage (%)</label>
+                <input id="masterTaxRateInput" type="number" step="0.1" value="5" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+              </div>
+              <div class="flex items-end">
+                <button type="button" onclick="saveMasterTaxSettings()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Save Tax Settings</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Tables Status Management Section -->
+          <div class="pt-6 border-t border-stone-200 space-y-4">
+            <h4 class="font-bold text-stone-800 text-sm">Active Tables & Occupancy Status</h4>
+            <div id="activeTablesQrList" class="space-y-2">
+              <p class="text-xs text-stone-400 italic">No tables created yet.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="masterSubPage-passcodes" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings</h3>
+          <div class="max-w-md space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Master Passcode</label>
+              <input id="masterNewMasterPassInput" type="text" placeholder="Enter new master passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Passcode</label>
+              <input id="masterNewPasscodeInput" type="text" placeholder="Enter new staff passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <button type="button" onclick="saveNewPasscodes()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Passcodes</button>
+          </div>
+        </div>
+
+        <div id="masterSubPage-branding" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
+          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding & Content Customization</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Brand Name</label>
+              <input id="editBrandName" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Tagline</label>
+              <input id="editBrandTagline" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Header Logo Image URL</label>
+              <input id="editHeaderLogoUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Title</label>
+              <input id="editWaTitle" type="text" placeholder="Invoice Title" class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Hero Background Image URL</label>
+              <input id="editHeroBgUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Home Badge</label>
+              <input id="editHomeBadge" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Home Title 1</label>
+              <input id="editHomeTitle1" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Home Title 2</label>
+              <input id="editHomeTitle2" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-stone-600 mb-1">Hero Description</label>
+              <textarea id="editHomeDesc" rows="2" class="w-full px-3 py-2 rounded-xl border text-sm"></textarea>
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-stone-600 mb-1">Footer Text</label>
+              <input id="editFooterText" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
+            </div>
+          </div>
+          <button type="button" onclick="saveBrandingSettings()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Save Branding Settings</button>
+        </div>
+      </div>
+
+      <!-- Admin Box -->
+      <div id="adminBox" class="hidden space-y-6">
+        <div class="bg-blue-900 text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-white/10 text-blue-300 rounded-xl flex items-center justify-center text-xl font-bold">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <div>
+              <h2 class="font-serif font-bold text-2xl">Staff Kitchen & Orders Panel</h2>
+              <p class="text-xs text-blue-200">Manage live orders, dishes & sales reports</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="switchAdminSubPage('sales')" id="adminTabBtn-sales" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer">Sales Report</button>
+            <button type="button" onclick="switchAdminSubPage('orders')" id="adminTabBtn-orders" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Live Orders</button>
+            <button type="button" onclick="switchAdminSubPage('menu')" id="adminTabBtn-menu" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Manage Menu</button>
+            <button type="button" onclick="logout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 cursor-pointer">Logout</button>
+          </div>
+        </div>
+
+        <div id="adminSubPage-sales" class="admin-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h3 class="font-serif font-bold text-xl text-stone-900">Sales Analytics & Revenue</h3>
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button type="button" onclick="printSalesReport()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-print"></i> Print / PDF
+              </button>
+              <select id="reportFilterType" onchange="renderSalesReport()" class="px-4 py-2 rounded-xl border border-stone-300 text-xs font-bold bg-stone-50 outline-none">
+                <option value="all">All-Time Sales</option>
+                <option value="daily">Today's Sales</option>
+                <option value="monthly">This Month's Sales</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="p-5 bg-stone-50 rounded-2xl border border-stone-200">
+              <span class="text-xs text-stone-500 font-bold uppercase tracking-wider block">Total Orders</span>
+              <span id="reportTotalOrders" class="text-2xl font-black text-stone-900 mt-1 block">0</span>
+            </div>
+            <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-200">
+              <span class="text-xs text-emerald-700 font-bold uppercase tracking-wider block">Accepted Orders</span>
+              <span id="reportAcceptedOrders" class="text-2xl font-black text-emerald-900 mt-1 block">0</span>
+            </div>
+            <div class="p-5 bg-blue-50 rounded-2xl border border-blue-200">
+              <span class="text-xs text-blue-800 font-bold uppercase tracking-wider block">Total Revenue</span>
+              <span id="reportTotalRevenue" class="text-2xl font-black text-blue-950 mt-1 block">₹0</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-stone-100 text-stone-600 font-bold uppercase">
+                <tr>
+                  <th class="p-3">Date</th>
+                  <th class="p-3">Order ID</th>
+                  <th class="p-3">Customer</th>
+                  <th class="p-3">Table</th>
+                  <th class="p-3">Phone</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="salesReportTableBody" class="divide-y divide-stone-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="adminSubPage-orders" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-serif font-bold text-xl text-stone-900">Live Customer Orders</h3>
+            <button type="button" onclick="renderAdminOrders()" class="px-3 py-1.5 bg-stone-100 text-xs font-bold rounded-xl hover:bg-stone-200 cursor-pointer"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button>
+          </div>
+          <div id="ordersList" class="space-y-3"></div>
+        </div>
+
+        <!-- Manage Menu Sub-Page in Admin Panel -->
+        <div id="adminSubPage-menu" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
+          <h3 id="menuFormTitle" class="font-serif font-bold text-xl text-stone-900">Add New Dish to Menu</h3>
+          <input type="hidden" id="editFoodId" value="">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Dish Name *</label>
+              <input id="foodName" type="text" placeholder="e.g. Chicken Biryani" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Price (₹) *</label>
+              <input id="foodPrice" type="number" placeholder="250" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Category *</label>
+              <input id="foodCategory" type="text" placeholder="Starters / Biryani" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Type *</label>
+              <select id="foodType" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm bg-white outline-none">
+                <option value="Non-Veg">Non-Veg</option>
+                <option value="Veg">Veg</option>
+              </select>
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-stone-600 mb-1">Dish Image URL</label>
+              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border border-stone-300 text-sm outline-none">
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" id="saveFoodBtn" onclick="saveFoodItem()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-6 py-3 rounded-xl text-xs shadow cursor-pointer">
+              + Add Dish to Digital Menu
+            </button>
+            <button type="button" id="cancelEditFoodBtn" onclick="resetFoodForm()" class="hidden bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold px-4 py-3 rounded-xl text-xs cursor-pointer">
+              Cancel Edit
             </button>
           </div>
+
+          <!-- Existing Menu Management List -->
+          <div class="pt-6 border-t border-stone-200 space-y-4">
+            <h4 class="font-bold text-stone-800 text-sm">Manage Existing Menu Items</h4>
+            <div id="adminMenuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-2"></div>
+          </div>
         </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-center text-xs mt-auto">
+    <div class="max-w-7xl mx-auto px-4">
+      <p id="footerDisplayText">© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love.</p>
+    </div>
+  </footer>
+
+  <!-- Application Script -->
+  <script>
+    const _SYS_CFG = {
+      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20=",
+      upi: "OTM5MDE0MTY3MUB5Ymw=",
+      payee: "Um95YWwgQml0ZXMgUmVzdGF1cmFudA=="
+    };
+
+    const CONFIG = {
+      databaseURL: atob(_SYS_CFG.db),
+      phonePeUpiId: atob(_SYS_CFG.upi),
+      payeeName: atob(_SYS_CFG.payee)
+    };
+
+    let dbRef = null;
+    try {
+      const firebaseConfig = { databaseURL: CONFIG.databaseURL };
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      dbRef = firebase.database().ref("royal_bites_restaurant");
+    } catch (e) {
+      console.log("Offline mode active");
+    }
+
+    let foods = JSON.parse(localStorage.getItem("rb_foods")) || [
+      { id: 1, name: "Hyderabadi Chicken Dum Biryani", price: 280, category: "Biryani", type: "Non-Veg", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+      { id: 2, name: "Mutton Rara Masala", price: 380, category: "Main Course", type: "Non-Veg", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+      { id: 3, name: "Paneer Butter Masala", price: 240, category: "Main Course", type: "Veg", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+      { id: 4, name: "Crispy Veg Manchuria", price: 180, category: "Starters", type: "Veg", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+      { id: 5, name: "Tandoori Chicken Platter", price: 420, category: "Starters", type: "Non-Veg", image: "https://images.unsplash.com/photo-1599487488170-d3319028646b?auto=format&fit=crop&w=600&q=80" },
+      { id: 6, name: "Fresh Fresh Lime Soda", price: 80, category: "Beverages", type: "Veg", image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80" }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem("rb_cart")) || [];
+    let orders = JSON.parse(localStorage.getItem("rb_orders")) || [];
+    let currentActiveOrderId = localStorage.getItem("rb_active_order_id") || null;
+    let branding = JSON.parse(localStorage.getItem("rb_branding")) || {
+      brandName: "Hotel Royal Spice",
+      brandTagline: "Restaurant",
+      headerLogoUrl: "",
+      waLogoUrl: "",
+      waTitle: "Hotel Royal Spice - INVOICE",
+      heroBgUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
+      homeBadge: "Welcome to Royal Dining",
+      homeTitle1: "Good Food",
+      homeTitle2: "Good Mood",
+      homeDesc: "Delicious food, great ambiance and unforgettable moments! Order fresh dishes directly from your table.",
+      footerText: "© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love."
+    };
+
+    let selectedCategory = "All";
+    let selectedTypeFilter = "All";
+    let currentTableSession = null;
+    let sessionTimerInterval = null;
+
+    function applyBranding() {
+      document.getElementById("headerBrandName").innerText = branding.brandName;
+      document.getElementById("headerBrandTagline").innerText = branding.brandTagline;
+      document.getElementById("homeWelcomeBadge").innerText = branding.homeBadge;
+      document.getElementById("homeHeroTitle1").innerText = branding.homeTitle1;
+      document.getElementById("homeHeroTitle2").innerText = branding.homeTitle2;
+      document.getElementById("homeHeroDesc").innerText = branding.homeDesc;
+      document.getElementById("footerDisplayText").innerText = branding.footerText;
+
+      const logoImg = document.getElementById("headerLogoImg");
+      const logoSvg = document.getElementById("headerLogoSvg");
+      if (branding.headerLogoUrl) {
+        logoImg.src = branding.headerLogoUrl;
+        logoImg.classList.remove("hidden");
+        logoSvg.classList.add("hidden");
+      } else {
+        logoImg.classList.add("hidden");
+        logoSvg.classList.remove("hidden");
+      }
+
+      const heroImg = document.getElementById("homeHeroBgImg");
+      if (branding.heroBgUrl) heroImg.src = branding.heroBgUrl;
+
+      document.getElementById("editBrandName").value = branding.brandName;
+      document.getElementById("editBrandTagline").value = branding.brandTagline;
+      document.getElementById("editHeaderLogoUrl").value = branding.headerLogoUrl || "";
+      document.getElementById("editWaTitle").value = branding.waTitle || "HOTEL ROYAL SPICE - INVOICE";
+      document.getElementById("editHeroBgUrl").value = branding.heroBgUrl || "";
+      document.getElementById("editHomeBadge").value = branding.homeBadge;
+      document.getElementById("editHomeTitle1").value = branding.homeTitle1;
+      document.getElementById("editHomeTitle2").value = branding.homeTitle2;
+      document.getElementById("editHomeDesc").value = branding.homeDesc;
+      document.getElementById("editFooterText").value = branding.footerText;
+
+      const savedTaxLabel = localStorage.getItem("rb_tax_label") || "Tax";
+      const savedTaxRate = localStorage.getItem("rb_tax_rate") || "5";
+      if (document.getElementById("masterTaxLabelInput")) document.getElementById("masterTaxLabelInput").value = savedTaxLabel;
+      if (document.getElementById("masterTaxRateInput")) document.getElementById("masterTaxRateInput").value = savedTaxRate;
+    }
+
+    function saveBrandingSettings() {
+      branding = {
+        brandName: document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice",
+        brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
+        headerLogoUrl: document.getElementById("editHeaderLogoUrl").value.trim(),
+        waTitle: document.getElementById("editWaTitle").value.trim() || "Hotel Royal Spice - INVOICE",
+        heroBgUrl: document.getElementById("editHeroBgUrl").value.trim() || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
+        homeBadge: document.getElementById("editHomeBadge").value.trim() || "Welcome",
+        homeTitle1: document.getElementById("editHomeTitle1").value.trim() || "Good Food",
+        homeTitle2: document.getElementById("editHomeTitle2").value.trim() || "Good Mood",
+        homeDesc: document.getElementById("editHomeDesc").value.trim(),
+        footerText: document.getElementById("editFooterText").value.trim()
+      };
+      localStorage.setItem("rb_branding", JSON.stringify(branding));
+      applyBranding();
+      showToast("Website branding updated!");
+    }
+
+    function saveMasterTaxSettings() {
+      const label = document.getElementById("masterTaxLabelInput").value.trim() || "Tax";
+      const rate = parseFloat(document.getElementById("masterTaxRateInput").value) || 0;
+      localStorage.setItem("rb_tax_label", label);
+      localStorage.setItem("rb_tax_rate", rate);
+      showToast("Tax settings updated successfully!");
+      renderCart();
+    }
+
+    function saveNewPasscodes() {
+      const newMasterPass = document.getElementById("masterNewMasterPassInput").value.trim();
+      const newAdminPass = document.getElementById("masterNewPasscodeInput").value.trim();
+      if (newMasterPass) localStorage.setItem("rb_master_pass", newMasterPass);
+      if (newAdminPass) localStorage.setItem("rb_admin_pass", newAdminPass);
+      document.getElementById("masterNewMasterPassInput").value = "";
+      document.getElementById("masterNewPasscodeInput").value = "";
+      showToast("Passcodes updated successfully!");
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById("toastBox");
+      document.getElementById("toastText").innerText = msg;
+      box.classList.remove("translate-y-24", "opacity-0");
+      setTimeout(() => box.classList.add("translate-y-24", "opacity-0"), 2800);
+    }
+
+    function showPage(pageName) {
+      document.querySelectorAll(".page-section").forEach(sec => sec.classList.add("hidden"));
+      const target = document.getElementById("page-" + pageName);
+      if (target) target.classList.remove("hidden");
+
+      const whiteNavBar = document.getElementById("whiteNavBarContainer");
+      if (whiteNavBar) {
+        if (pageName === "home") whiteNavBar.classList.add("hidden");
+        else whiteNavBar.classList.remove("hidden");
+      }
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("text-amber-600", "bg-stone-100");
+        btn.classList.add("text-stone-600");
+      });
+      const activeNav = document.getElementById("nav-" + pageName);
+      if (activeNav) {
+        activeNav.classList.remove("text-stone-600");
+        activeNav.classList.add("text-amber-600", "bg-stone-100");
+      }
+
+      if (pageName === "menu") {
+        renderCategories();
+        renderFood();
+      } else if (pageName === "cart") {
+        renderCart();
+        applyFixedTableNumber();
+      } else if (pageName === "payment") {
+        updatePaymentScreen();
+      } else if (pageName === "status") {
+        renderOrderStatusTracker();
+      } else if (pageName === "myorders") {
+        renderCustomerMyOrders();
+      } else if (pageName === "admin") {
+        renderAdminOrders();
+        renderSalesReport();
+        renderAdminMenuList();
+        renderActiveTablesQrList();
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderCategories() {
+      const cats = ["All", ...new Set(foods.map(f => f.category))];
+      const bar = document.getElementById("categoryBar");
+      bar.innerHTML = cats.map(c => `
+        <button type="button" onclick="selectCategory('${c}')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${selectedCategory === c ? 'bg-amber-500 text-stone-950 shadow' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'}">
+          ${c}
+        </button>
       `).join("");
     }
 
-    function addToCart(itemId) {
-      const found = cart.find((c) => c.id === itemId);
-      if (found) {
-        found.qty += 1;
-      } else {
-        const item = MENU_ITEMS.find((m) => m.id === itemId);
-        cart.push({ ...item, qty: 1 });
+    function selectCategory(cat) {
+      selectedCategory = cat;
+      renderCategories();
+      renderFood();
+    }
+
+    function setTypeFilter(type) {
+      selectedTypeFilter = type;
+      document.querySelectorAll(".type-filter-btn").forEach(btn => {
+        btn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-100 text-stone-600 border border-stone-200 cursor-pointer";
+      });
+      const activeBtn = document.getElementById("typeBtn-" + type);
+      if (activeBtn) {
+        if (type === 'Veg') activeBtn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white cursor-pointer";
+        else if (type === 'Non-Veg') activeBtn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-red-600 text-white cursor-pointer";
+        else activeBtn.className = "type-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-stone-900 text-white cursor-pointer";
       }
-      updateCartCounts();
-      renderCart();
+      renderFood();
     }
 
-    function changeCartQty(itemId, delta) {
-      const idx = cart.findIndex((c) => c.id === itemId);
-      if (idx === -1) return;
-      cart[idx].qty += delta;
-      if (cart[idx].qty <= 0) cart.splice(idx, 1);
-      updateCartCounts();
-      renderCart();
-    }
+    function renderFood() {
+      const query = (document.getElementById("searchInput").value || "").toLowerCase();
+      const filtered = foods.filter(f => {
+        const matchesCat = selectedCategory === "All" || f.category === selectedCategory;
+        const matchesType = selectedTypeFilter === "All" || f.type === selectedTypeFilter;
+        const matchesSearch = f.name.toLowerCase().includes(query) || f.category.toLowerCase().includes(query);
+        return matchesCat && matchesType && matchesSearch;
+      });
 
-    function updateCartCounts() {
-      const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
-      document.getElementById("desktop-cart-count").textContent = totalQty;
-      document.getElementById("mobile-cart-count").textContent = totalQty;
-    }
-
-    function renderCart() {
-      const list = document.getElementById("cart-items");
-      const empty = document.getElementById("cart-empty");
-      const footer = document.getElementById("cart-footer");
-
-      if (cart.length === 0) {
-        list.innerHTML = "";
-        empty.classList.remove("hidden");
-        footer.classList.add("hidden");
+      const grid = document.getElementById("foodGrid");
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-stone-400 text-sm">No dishes found.</div>`;
         return;
       }
 
-      empty.classList.add("hidden");
-      footer.classList.remove("hidden");
-      let total = 0;
-      list.innerHTML = cart.map((item) => {
-        total += item.price * item.qty;
+      grid.innerHTML = filtered.map(f => {
+        const isAvailable = f.available !== false;
+        const inCart = cart.find(item => item.id === f.id);
+        const qty = inCart ? inCart.qty : 0;
         return `
-          <div class="py-3 flex items-center justify-between gap-3">
-            <div>
-              <p class="font-semibold text-sm">${item.name}</p>
-              <p class="text-xs text-slate-500">₹${item.price} × ${item.qty}</p>
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow relative">
+            ${!isAvailable ? `<div class="absolute inset-0 bg-stone-950/60 backdrop-blur-[1px] z-10 flex items-center justify-center"><span class="bg-red-600 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-lg uppercase tracking-wider">Not Available</span></div>` : ''}
+            <div class="relative h-44 bg-stone-100 overflow-hidden">
+              <img src="${f.image || 'https://placehold.co/600x400/faf9f6/78350f?text=Dish'}" alt="${f.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/faf9f6/78350f?text=Dish'">
+              <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${f.type === 'Veg' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} shadow">
+                ${f.type}
+              </span>
             </div>
-            <div class="flex items-center gap-2">
-              <button onclick="changeCartQty('${item.id}', -1)" class="w-7 h-7 rounded-lg border border-slate-300 font-bold">-</button>
-              <span class="text-sm font-semibold w-5 text-center">${item.qty}</span>
-              <button onclick="changeCartQty('${item.id}', 1)" class="w-7 h-7 rounded-lg border border-slate-300 font-bold">+</button>
+            <div class="p-4 space-y-2 flex-1 flex flex-col justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">${f.category}</span>
+                <h3 class="font-serif font-bold text-base text-stone-900 line-clamp-1">${f.name}</h3>
+              </div>
+              <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                <span class="font-black text-lg text-stone-900">₹${f.price}</span>
+                ${isAvailable ? (
+                  qty === 0 ? `
+                    <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
+                      + Add
+                    </button>
+                  ` : `
+                    <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
+                      <button type="button" onclick="updateQty(${f.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+                      <span class="font-bold text-xs px-1">${qty}</span>
+                      <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+                    </div>
+                  `
+                ) : `<span class="text-xs font-bold text-red-600">Not Available</span>`}
+              </div>
             </div>
           </div>
         `;
       }).join("");
-      document.getElementById("cart-total").textContent = `₹${total}`;
+
+      updateStickyCartBar();
     }
 
-    function placeOrder() {
-      if (cart.length === 0) return;
-      const orderId = "ORD-" + Date.now().toString().slice(-5);
-      const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
-      const orderPayload = {
-        id: orderId,
-        table: currentTable,
-        items: cart,
-        total,
-        status: "Preparing",
-        createdAt: Date.now()
+    function addToCart(foodId) {
+      const f = foods.find(x => x.id === foodId);
+      if (!f) return;
+      const existing = cart.find(x => x.id === foodId);
+      if (existing) existing.qty += 1;
+      else cart.push({ id: f.id, name: f.name, price: f.price, type: f.type, qty: 1 });
+      saveCart();
+      renderFood();
+      showToast(f.name + " added to cart!");
+    }
+
+    function updateQty(foodId, change) {
+      const idx = cart.findIndex(x => x.id === foodId);
+      if (idx !== -1) {
+        cart[idx].qty += change;
+        if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      }
+      saveCart();
+      renderFood();
+    }
+
+    function saveCart() {
+      localStorage.setItem("rb_cart", JSON.stringify(cart));
+      updateStickyCartBar();
+    }
+
+    function updateStickyCartBar() {
+      const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const bar = document.getElementById("stickyCartBar");
+      const badge = document.getElementById("cartCountBadge");
+      if (badge) badge.innerText = totalCount;
+
+      if (totalCount > 0) {
+        if (bar) bar.classList.remove("hidden");
+        if (bar) bar.classList.add("flex");
+        if (document.getElementById("stickyCartCount")) document.getElementById("stickyCartCount").innerText = totalCount;
+        if (document.getElementById("stickyCartTotal")) document.getElementById("stickyCartTotal").innerText = "₹" + subTotal;
+      } else {
+        if (bar) bar.classList.add("hidden");
+        if (bar) bar.classList.remove("flex");
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById("cartItemsContainer");
+      const detailsBox = document.getElementById("checkoutDetailsBox");
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="py-16 text-center space-y-3 bg-white rounded-3xl border border-stone-200">
+            <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+              <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <h3 class="font-serif font-bold text-xl text-stone-900">Your cart is empty</h3>
+            <p class="text-xs text-stone-500">Add dishes from our menu to place an order.</p>
+            <button type="button" onclick="showPage('menu')" class="gold-gradient text-stone-950 font-extrabold px-6 py-2.5 rounded-xl text-xs shadow cursor-pointer">Explore Menu</button>
+          </div>
+        `;
+        detailsBox.classList.add("hidden");
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-200 flex items-center justify-between gap-4">
+          <div class="flex-1">
+            <h4 class="font-bold text-stone-900 text-sm">${item.name}</h4>
+            <span class="text-xs text-stone-500">₹${item.price} each</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
+              <button type="button" onclick="updateCartItemQty(${item.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+              <span class="font-bold text-xs px-1">${item.qty}</span>
+              <button type="button" onclick="updateCartItemQty(${item.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+            </div>
+            <span class="font-black text-sm text-stone-900 w-16 text-right">₹${item.price * item.qty}</span>
+            <button type="button" onclick="removeFromCart(${item.id})" class="text-stone-400 hover:text-red-600 p-2 cursor-pointer"><i class="fa-solid fa-trash text-xs"></i></button>
+          </div>
+        </div>
+      `).join("");
+
+      detailsBox.classList.remove("hidden");
+      calculateCartTotals();
+    }
+
+    function updateCartItemQty(id, change) {
+      const idx = cart.findIndex(x => x.id === id);
+      if (idx !== -1) {
+        cart[idx].qty += change;
+        if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      }
+      saveCart();
+      renderCart();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(x => x.id !== id);
+      saveCart();
+      renderCart();
+    }
+
+    function calculateCartTotals() {
+      const subTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const taxLabel = localStorage.getItem("rb_tax_label") || "Tax";
+      const taxRate = parseFloat(localStorage.getItem("rb_tax_rate")) || 5;
+      const taxAmount = Math.round((subTotal * taxRate) / 100);
+      const grandTotal = subTotal + taxAmount;
+
+      document.getElementById("cartSubTotalAmount").innerText = "₹" + subTotal;
+      document.getElementById("cartTaxLabel").innerText = `${taxLabel} (${taxRate}%):`;
+      document.getElementById("cartTaxAmount").innerText = "₹" + taxAmount;
+      document.getElementById("cartTotalAmount").innerText = "₹" + grandTotal;
+
+      return { subTotal, taxLabel, taxRate, taxAmount, grandTotal };
+    }
+
+    function applyFixedTableNumber() {
+      if (currentTableSession && currentTableSession.tableNum) {
+        const tInput = document.getElementById("custTable");
+        tInput.value = currentTableSession.tableNum;
+        tInput.readOnly = true;
+        document.getElementById("tableLockedLabel").classList.remove("hidden");
+      }
+    }
+
+    function proceedToPayment() {
+      const name = document.getElementById("custName").value.trim();
+      const phone = document.getElementById("custPhone").value.trim();
+      const table = document.getElementById("custTable").value.trim();
+
+      if (!name || !phone || !table) {
+        showToast("Please fill in Name, Phone & Table Number!");
+        return;
+      }
+      if (phone.length !== 10 || isNaN(phone)) {
+        showToast("Please enter a valid 10-digit mobile number!");
+        return;
+      }
+      showPage('payment');
+    }
+
+    function updatePaymentScreen() {
+      const totals = calculateCartTotals();
+      const name = document.getElementById("custName").value.trim();
+      const table = document.getElementById("custTable").value.trim();
+
+      document.getElementById("payScreenAmount").innerText = "₹" + totals.grandTotal;
+      document.getElementById("payScreenSummary").innerText = `Table ${table} • ${name}`;
+      document.getElementById("upiBtnLabel").innerText = `Pay ₹${totals.grandTotal} with PhonePe / Any UPI App`;
+
+      const upiUrl = `upi://pay?pa=${CONFIG.phonePeUpiId}&pn=${encodeURIComponent(CONFIG.payeeName)}&am=${totals.grandTotal}&cu=INR`;
+      document.getElementById("directUpiAppLink").href = upiUrl;
+      document.getElementById("dynamicUpiQr").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
+    }
+
+    function confirmOrderAfterPayment(payMethod) {
+      const name = document.getElementById("custName").value.trim();
+      const phone = document.getElementById("custPhone").value.trim();
+      const table = document.getElementById("custTable").value.trim();
+      const totals = calculateCartTotals();
+
+      const orderId = "#ORD" + Math.floor(1000 + Math.random() * 9000);
+      const newOrder = {
+        orderId,
+        date: new Date().toLocaleString(),
+        name,
+        phone,
+        table,
+        items: [...cart],
+        subTotal: totals.subTotal,
+        taxLabel: totals.taxLabel,
+        taxRate: totals.taxRate,
+        taxAmount: totals.taxAmount,
+        total: totals.grandTotal,
+        paymentMethod: payMethod,
+        status: "Pending"
       };
 
-      updateTableData(currentTable, { status: "occupied", updatedAt: Date.now() });
+      orders.unshift(newOrder);
+      localStorage.setItem("rb_orders", JSON.stringify(orders));
+      currentActiveOrderId = orderId;
+      localStorage.setItem("rb_active_order_id", orderId);
 
-      if (!useLocalFallback && db) {
-        db.ref(`orders/${orderId}`).set(orderPayload);
-      } else {
-        localState.orders[orderId] = orderPayload;
-        saveLocalState();
+      // Mark Table Occupied in Active QRs
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      activeQrs = activeQrs.map(q => {
+        if (q.tableNum === table) q.occupied = true;
+        return q;
+      });
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+
+      if (dbRef) {
+        dbRef.child("orders").push(newOrder);
+        dbRef.child("tables").set(activeQrs);
       }
 
       cart = [];
-      updateCartCounts();
-      renderCart();
-      switchCustomerTab("orders");
+      saveCart();
+      showPage('status');
+      showToast("Order placed successfully!");
     }
 
-    function renderCustomerOrders() {
-      const container = document.getElementById("my-orders-list");
-      const orders = Object.values(localState.orders || {})
-        .filter((o) => o.table === currentTable)
-        .sort((a, b) => b.createdAt - a.createdAt);
+    function renderOrderStatusTracker() {
+      const order = orders.find(x => x.orderId === currentActiveOrderId) || orders[0];
+      if (!order) return;
 
+      document.getElementById("trackOrderId").innerText = order.orderId;
+      document.getElementById("trackTableNum").innerText = order.table;
+      document.getElementById("trackTotal").innerText = "₹" + order.total;
+
+      const title = document.getElementById("statusTitle");
+      const desc = document.getElementById("statusDesc");
+      const icon = document.getElementById("statusIcon");
+      const iconBox = document.getElementById("statusIconBox");
+
+      if (order.status === "Accepted") {
+        title.innerText = "Order Accepted & Preparing!";
+        desc.innerText = "Your order has been accepted by the kitchen.";
+        icon.className = "fa-solid fa-utensils";
+        iconBox.className = "w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-bounce";
+      } else if (order.status === "Completed") {
+        title.innerText = "Order Served & Completed";
+        desc.innerText = "Thank you for dining with us!";
+        icon.className = "fa-solid fa-circle-check";
+        iconBox.className = "w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-4xl";
+      } else {
+        title.innerText = "Pending Approval";
+        desc.innerText = "Waiting for restaurant staff to review and accept your order...";
+        icon.className = "fa-solid fa-clock-rotate-left";
+        iconBox.className = "w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-pulse";
+      }
+    }
+
+    function renderCustomerMyOrders() {
+      const list = document.getElementById("customerMyOrdersList");
       if (orders.length === 0) {
-        container.innerHTML = `<div class="bg-white rounded-xl border border-slate-200 p-6 text-center text-sm text-slate-400">No orders placed for ${currentTable} yet.</div>`;
+        list.innerHTML = `<div class="py-12 text-center text-stone-400 text-sm bg-white rounded-3xl border border-stone-200">No order history found.</div>`;
         return;
       }
 
-      container.innerHTML = orders.map((o) => `
-        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <div class="flex justify-between items-center mb-2">
-            <span class="font-bold text-sm">${o.id} • Table ${o.table}</span>
-            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${o.status === 'Served' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+      list.innerHTML = orders.map(o => `
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+            <div>
+              <span class="font-mono font-black text-amber-600 text-sm">${o.orderId}</span>
+              <span class="text-xs text-stone-400 block">${o.date}</span>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${o.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : o.status === 'Completed' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">
               ${o.status}
             </span>
           </div>
-          <ul class="text-xs text-slate-600 space-y-1 mb-2">
-            ${o.items.map((i) => `<li>${i.qty}× ${i.name} — ₹${i.price * i.qty}</li>`).join("")}
-          </ul>
-          <div class="text-right font-bold text-sm border-t border-slate-100 pt-2">Total: ₹${o.total}</div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between font-bold text-stone-700">
+              <span>Table: ${o.table}</span>
+              <span>Customer: ${o.name}</span>
+            </div>
+            <div class="border-t pt-2 space-y-1">
+              ${o.items.map(i => `<div class="flex justify-between text-stone-600"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
+            </div>
+          </div>
+          <div class="pt-3 border-t flex justify-between items-center text-sm font-black">
+            <span>Total Amount:</span>
+            <span class="text-amber-600">₹${o.total}</span>
+          </div>
         </div>
       `).join("");
     }
 
-    function toggleAdminView() {
-      const customerView = document.getElementById("customer-view");
-      const mobileNav = document.getElementById("mobile-bottom-nav");
-      const adminView = document.getElementById("admin-view");
+    function login() {
+      const pass = document.getElementById("passcodeInput").value.trim();
+      const masterPass = localStorage.getItem("rb_master_pass") || "9999";
+      const adminPass = localStorage.getItem("rb_admin_pass") || "1234";
 
-      const openingAdmin = adminView.classList.contains("hidden");
-      if (openingAdmin) {
-        customerView.classList.add("hidden");
-        mobileNav.classList.add("hidden");
-        adminView.classList.remove("hidden");
-        updateStaffAuthUI();
+      if (pass === masterPass || pass === adminPass) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("adminBox").classList.remove("hidden");
+        document.getElementById("masterBox").classList.remove("hidden");
+        document.getElementById("page-admin").classList.remove("hidden");
+        switchMasterSubPage('qr');
+        switchAdminSubPage('orders');
+        renderAdminOrders();
+        renderSalesReport();
+        renderAdminMenuList();
+        renderActiveTablesQrList();
+        showToast("Logged in successfully!");
       } else {
-        adminView.classList.add("hidden");
-        customerView.classList.remove("hidden");
-        mobileNav.classList.remove("hidden");
+        document.getElementById("loginMsg").innerText = "Incorrect Passcode!";
       }
     }
 
-    function handleStaffLogin(e) {
-      e.preventDefault();
-      const code = document.getElementById("staff-passcode-input").value.trim();
-      const errEl = document.getElementById("login-error");
-
-      if (code === CONFIG.STAFF_PASSCODE || code === CONFIG.MASTER_PASSCODE) {
-        isStaffAuthenticated = true;
-        errEl.classList.add("hidden");
-        document.getElementById("staff-passcode-input").value = "";
-        updateStaffAuthUI();
-      } else {
-        errEl.classList.remove("hidden");
-      }
+    function logout() {
+      document.getElementById("loginBox").classList.remove("hidden");
+      document.getElementById("adminBox").classList.add("hidden");
+      document.getElementById("masterBox").classList.add("hidden");
+      document.getElementById("passcodeInput").value = "";
+      document.getElementById("loginMsg").innerText = "";
+      showPage('menu');
     }
 
-    function logoutStaff() {
-      isStaffAuthenticated = false;
-      updateStaffAuthUI();
+    function switchAdminSubPage(sub) {
+      document.querySelectorAll(".admin-sub-page").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".admin-sub-btn").forEach(b => {
+        b.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
+      });
+      document.getElementById("adminSubPage-" + sub).classList.remove("hidden");
+      const btn = document.getElementById("adminTabBtn-" + sub);
+      if (btn) btn.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer";
     }
 
-    function updateStaffAuthUI() {
-      const loginBox = document.getElementById("staff-login-box");
-      const dashboard = document.getElementById("staff-dashboard");
-      const bottomBar = document.getElementById("live-table-bar");
-
-      if (isStaffAuthenticated) {
-        loginBox.classList.add("hidden");
-        dashboard.classList.remove("hidden");
-        bottomBar.classList.remove("hidden");
-        refreshAllUI();
-      } else {
-        loginBox.classList.remove("hidden");
-        dashboard.classList.add("hidden");
-        bottomBar.classList.add("hidden");
-      }
+    function switchMasterSubPage(sub) {
+      document.querySelectorAll(".master-sub-page").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".master-sub-btn").forEach(b => {
+        b.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
+      });
+      document.getElementById("masterSubPage-" + sub).classList.remove("hidden");
+      const btn = document.getElementById("masterTabBtn-" + sub);
+      if (btn) btn.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer";
     }
 
-    function updateOrderStatus(orderId, newStatus) {
-      if (!useLocalFallback && db) {
-        db.ref(`orders/${orderId}/status`).set(newStatus);
-      } else if (localState.orders[orderId]) {
-        localState.orders[orderId].status = newStatus;
-        saveLocalState();
-      }
-    }
-
-    function refreshAllUI() {
-      renderCustomerOrders();
-      if (!isStaffAuthenticated) return;
-
-      const alertsBox = document.getElementById("enquiry-alerts-container");
-      const activeEnquiries = Object.entries(localState.tables || {}).filter(([, val]) => val && val.enquiry);
-      alertsBox.innerHTML = activeEnquiries.map(([tId]) => `
-        <div class="animate-alert text-white rounded-xl px-4 py-3 flex items-center justify-between shadow-md">
-          <div class="flex items-center gap-2 font-bold text-sm">
-            <span>🚨</span>
-            <span>Table ${tId} is calling for Enquiry / Waiter assistance!</span>
-          </div>
-          <button onclick="resolveEnquiry('${tId}')" class="px-3 py-1 rounded-lg bg-white text-red-700 font-bold text-xs hover:bg-red-50">
-            Acknowledge
-          </button>
-        </div>
-      `).join("");
-
-      const pillsContainer = document.getElementById("table-pills-container");
-      let pillsHTML = "";
-      for (let i = 1; i <= CONFIG.TOTAL_TABLES; i++) {
-        const tId = `T${i}`;
-        const tData = (localState.tables && localState.tables[tId]) || { status: "free", enquiry: false };
-        let badgeClass = "bg-emerald-600 text-white border-emerald-400";
-        let label = "Free";
-
-        if (tData.enquiry) {
-          badgeClass = "animate-alert text-white border-red-300 font-extrabold";
-          label = "Enquiry!";
-        } else if (tData.status === "occupied") {
-          badgeClass = "bg-amber-400 text-slate-950 border-amber-200 font-bold";
-          label = "Occupied";
-        }
-
-        pillsHTML += `
-          <div class="flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs whitespace-nowrap ${badgeClass}">
-            <span>${tId}: ${label}</span>
-            ${tData.status === "occupied" ? `<button onclick="resetTableStatus('${tId}')" title="Mark Table Free" class="ml-1 px-1.5 py-0.2 bg-black/20 hover:bg-black/40 rounded text-[10px]">✕</button>` : ""}
-          </div>
-        `;
-      }
-      pillsContainer.innerHTML = pillsHTML;
-
-      const adminOrdersEl = document.getElementById("admin-orders-list");
-      const allOrders = Object.values(localState.orders || {}).sort((a, b) => b.createdAt - a.createdAt);
-      if (allOrders.length === 0) {
-        adminOrdersEl.innerHTML = `<p class="text-xs text-slate-400 col-span-full py-4 text-center">No active orders yet.</p>`;
+    function renderAdminOrders() {
+      const list = document.getElementById("ordersList");
+      if (orders.length === 0) {
+        list.innerHTML = `<div class="py-12 text-center text-stone-400 text-sm">No live orders.</div>`;
         return;
       }
 
-      adminOrdersEl.innerHTML = allOrders.map((o) => `
-        <div class="border border-slate-200 rounded-xl p-3.5 flex flex-col justify-between">
-          <div>
-            <div class="flex justify-between items-center mb-2">
-              <span class="font-bold text-sm bg-slate-900 text-white px-2 py-0.5 rounded">Table ${o.table}</span>
-              <span class="text-xs text-slate-500">${o.id}</span>
+      list.innerHTML = orders.map(o => {
+        const isAcceptedOrCompleted = o.status === 'Accepted' || o.status === 'Completed';
+        const isCompleted = o.status === 'Completed';
+        const isRejected = o.status === 'Rejected';
+
+        let statusBg = 'bg-amber-100 text-amber-700';
+        if (o.status === 'Accepted') statusBg = 'bg-emerald-100 text-emerald-700';
+        else if (o.status === 'Completed') statusBg = 'bg-blue-100 text-blue-700';
+        else if (o.status === 'Rejected') statusBg = 'bg-red-100 text-red-700';
+
+        return `
+          <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-2">
+              <div>
+                <span class="font-mono font-black text-blue-900 text-sm">${o.orderId}</span>
+                <span class="text-xs text-stone-500 ml-2">Table: <b>${o.table}</b> | Customer: <b>${o.name}</b> (${o.phone})</span>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBg}">${o.status}</span>
             </div>
-            <ul class="text-xs text-slate-700 space-y-1 mb-3">
-              ${o.items.map((i) => `<li>• <strong>${i.qty}×</strong> ${i.name}</li>`).join("")}
-            </ul>
+            <div class="space-y-1 text-xs">
+              ${o.items.map(i => `<div class="flex justify-between text-stone-700"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
+            </div>
+            <div class="pt-2 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
+              <span class="font-black text-sm text-stone-900">Total: ₹${o.total} (${o.paymentMethod})</span>
+              <div class="flex items-center gap-2 flex-wrap">
+                ${!isAcceptedOrCompleted && !isRejected ? `
+                  <button type="button" onclick="acceptAndSendWhatsAppInvoice('${o.orderId}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
+                    <i class="fa-brands fa-whatsapp"></i> Accept & Invoice
+                  </button>
+                  <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Rejected')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                    Reject
+                  </button>
+                ` : ''}
+                <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Completed')" ${!isAcceptedOrCompleted || isCompleted || isRejected ? 'disabled class="px-3.5 py-1.5 bg-stone-200 text-stone-400 font-bold text-xs rounded-xl cursor-not-allowed opacity-60"' : 'class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer"'}>
+                  Complete
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-            <span class="font-bold text-sm">₹${o.total}</span>
-            <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-xs border border-slate-300 rounded-lg px-2 py-1 bg-white font-semibold">
-              <option value="Preparing" ${o.status === "Preparing" ? "selected" : ""}>Preparing</option>
-              <option value="Ready" ${o.status === "Ready" ? "selected" : ""}>Ready</option>
-              <option value="Served" ${o.status === "Served" ? "selected" : ""}>Served</option>
-            </select>
+        `;
+      }).join("");
+    }
+
+    function updateOrderStatus(orderId, status) {
+      const o = orders.find(x => x.orderId === orderId);
+      if (o) {
+        o.status = status;
+        localStorage.setItem("rb_orders", JSON.stringify(orders));
+        renderAdminOrders();
+        renderSalesReport();
+        showToast("Order status updated to " + status);
+      }
+    }
+
+    function acceptAndSendWhatsAppInvoice(orderId) {
+      const o = orders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      o.status = "Accepted";
+      localStorage.setItem("rb_orders", JSON.stringify(orders));
+      renderAdminOrders();
+      renderSalesReport();
+
+      let msg = `*${branding.waTitle || 'HOTEL ROYAL SPICE - INVOICE'}*\n`;
+      msg += `--------------------------------\n`;
+      msg += `Order ID: ${o.orderId}\n`;
+      msg += `Customer: ${o.name}\n`;
+      msg += `Table No: ${o.table}\n`;
+      msg += `--------------------------------\n`;
+      o.items.forEach(i => { msg += `• ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`; });
+      msg += `--------------------------------\n`;
+      msg += `Sub-Total: ₹${o.subTotal}\n`;
+      msg += `Tax: ₹${o.taxAmount}\n`;
+      msg += `*GRAND TOTAL: ₹${o.total}*\n`;
+      msg += `--------------------------------\n`;
+      msg += `Thank you for dining with us!\n`;
+
+      window.open(`https://wa.me/91${o.phone}?text=${encodeURIComponent(msg)}`, '_blank');
+      showToast("Order Accepted & WhatsApp Invoice Triggered!");
+    }
+
+    function renderSalesReport() {
+      const filtered = orders.filter(o => o.status === "Accepted" || o.status === "Completed");
+      document.getElementById("reportTotalOrders").innerText = orders.length;
+      document.getElementById("reportAcceptedOrders").innerText = filtered.length;
+      document.getElementById("reportTotalRevenue").innerText = "₹" + filtered.reduce((sum, o) => sum + o.total, 0);
+
+      document.getElementById("salesReportTableBody").innerHTML = filtered.map(o => `
+        <tr class="hover:bg-stone-50">
+          <td class="p-3 text-stone-500">${o.date}</td>
+          <td class="p-3 font-mono font-bold text-stone-900">${o.orderId}</td>
+          <td class="p-3 font-bold">${o.name}</td>
+          <td class="p-3">${o.table}</td>
+          <td class="p-3">${o.phone}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">${o.status}</span></td>
+          <td class="p-3 text-right font-black text-amber-600">₹${o.total}</td>
+        </tr>
+      `).join("");
+    }
+
+    function printSalesReport() { window.print(); }
+
+    function renderAdminMenuList() {
+      document.getElementById("adminMenuList").innerHTML = foods.map(f => `
+        <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <img src="${f.image || ''}" class="w-10 h-10 rounded-lg object-cover bg-stone-200" onerror="this.src='https://placehold.co/100x100/faf9f6/78350f?text=Dish'">
+            <div>
+              <h5 class="font-bold text-xs text-stone-900 line-clamp-1">${f.name}</h5>
+              <span class="text-[10px] text-amber-600 font-bold">₹${f.price} • ${f.type}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="toggleFoodAvailability(${f.id})" class="px-2 py-1.5 rounded-lg text-xs font-bold ${f.available === false ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'} cursor-pointer">
+              ${f.available === false ? 'Available' : 'Mark Stock Out'}
+            </button>
+            <button type="button" onclick="editFood(${f.id})" class="p-1.5 bg-stone-200 rounded-lg text-stone-700 text-xs cursor-pointer"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" onclick="deleteFood(${f.id})" class="p-1.5 bg-red-100 rounded-lg text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join("");
     }
 
-    window.addEventListener("DOMContentLoaded", initApp);
+    function toggleFoodAvailability(id) {
+      const f = foods.find(x => x.id === id);
+      if (f) {
+        f.available = f.available === false ? true : false;
+        localStorage.setItem("rb_foods", JSON.stringify(foods));
+        renderAdminMenuList();
+        renderFood();
+      }
+    }
+
+    function saveFoodItem() {
+      const id = document.getElementById("editFoodId").value;
+      const name = document.getElementById("foodName").value.trim();
+      const price = parseFloat(document.getElementById("foodPrice").value);
+      const category = document.getElementById("foodCategory").value.trim() || "Main Course";
+      const type = document.getElementById("foodType").value;
+      const image = document.getElementById("foodImage").value.trim();
+
+      if (!name || isNaN(price)) {
+        showToast("Please enter valid Dish Name and Price!");
+        return;
+      }
+
+      if (id) {
+        const f = foods.find(x => x.id == id);
+        if (f) { f.name = name; f.price = price; f.category = category; f.type = type; f.image = image; }
+      } else {
+        const newId = foods.length > 0 ? Math.max(...foods.map(x => x.id)) + 1 : 1;
+        foods.push({ id: newId, name, price, category, type, image });
+      }
+
+      localStorage.setItem("rb_foods", JSON.stringify(foods));
+      resetFoodForm();
+      renderAdminMenuList();
+      renderFood();
+      showToast("Dish saved successfully!");
+    }
+
+    function editFood(id) {
+      const f = foods.find(x => x.id === id);
+      if (!f) return;
+      document.getElementById("editFoodId").value = f.id;
+      document.getElementById("foodName").value = f.name;
+      document.getElementById("foodPrice").value = f.price;
+      document.getElementById("foodCategory").value = f.category;
+      document.getElementById("foodType").value = f.type;
+      document.getElementById("foodImage").value = f.image || "";
+      document.getElementById("menuFormTitle").innerText = "Edit Dish: " + f.name;
+      document.getElementById("saveFoodBtn").innerText = "Update Dish";
+      document.getElementById("cancelEditFoodBtn").classList.remove("hidden");
+    }
+
+    function resetFoodForm() {
+      document.getElementById("editFoodId").value = "";
+      document.getElementById("foodName").value = "";
+      document.getElementById("foodPrice").value = "";
+      document.getElementById("foodCategory").value = "";
+      document.getElementById("foodImage").value = "";
+      document.getElementById("menuFormTitle").innerText = "Add New Dish to Menu";
+      document.getElementById("saveFoodBtn").innerText = "+ Add Dish to Digital Menu";
+      document.getElementById("cancelEditFoodBtn").classList.add("hidden");
+    }
+
+    function deleteFood(id) {
+      foods = foods.filter(x => x.id !== id);
+      localStorage.setItem("rb_foods", JSON.stringify(foods));
+      renderAdminMenuList();
+      renderFood();
+      showToast("Dish deleted!");
+    }
+
+    function generateTableQR() {
+      const num = document.getElementById("tableGenNumber").value.trim();
+      const mins = parseInt(document.getElementById("sessionMinutesInput").value) || 45;
+      if (!num) { showToast("Please enter table number!"); return; }
+
+      const expiryTime = Date.now() + (mins * 60 * 1000);
+      const urlObj = new URL(window.location.href);
+      urlObj.searchParams.set("table", num);
+      urlObj.searchParams.set("exp", expiryTime);
+      const finalUrl = urlObj.toString();
+
+      document.getElementById("tableQRTitle").innerText = "Table " + num + " QR Code";
+      document.getElementById("tableQRUrl").innerText = finalUrl;
+      document.getElementById("tableQRImg").src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(finalUrl)}`;
+      document.getElementById("tableQRResult").classList.remove("hidden");
+
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      activeQrs = activeQrs.filter(x => x.tableNum !== num);
+      activeQrs.push({ tableNum: num, url: finalUrl, expiry: expiryTime, occupied: false });
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      renderActiveTablesQrList();
+      showToast("Table QR generated!");
+    }
+
+    function copyTableQRUrl() {
+      const text = document.getElementById("tableQRUrl").innerText;
+      navigator.clipboard.writeText(text);
+      showToast("Table URL copied!");
+    }
+
+    function renderActiveTablesQrList() {
+      const list = document.getElementById("activeTablesQrList");
+      const activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      if (activeQrs.length === 0) {
+        list.innerHTML = `<p class="text-xs text-stone-400 italic">No tables created yet.</p>`;
+        return;
+      }
+
+      list.innerHTML = activeQrs.map(q => `
+        <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex items-center justify-between gap-2 text-xs">
+          <div>
+            <span class="font-bold text-stone-900">Table: ${q.tableNum}</span>
+            <span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold ${q.occupied ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${q.occupied ? 'Occupied' : 'Available'}</span>
+            <span class="text-[10px] text-stone-500 block font-mono truncate max-w-xs mt-0.5">${q.url}</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="toggleTableOccupied('${q.tableNum}')" class="px-2.5 py-1 bg-stone-200 font-bold rounded-lg cursor-pointer">Toggle Status</button>
+            <button type="button" onclick="removeTableQr('${q.tableNum}')" class="px-2.5 py-1 bg-red-100 text-red-600 font-bold rounded-lg cursor-pointer">Delete</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleTableOccupied(num) {
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      activeQrs = activeQrs.map(q => {
+        if (q.tableNum === num) q.occupied = !q.occupied;
+        return q;
+      });
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      renderActiveTablesQrList();
+    }
+
+    function removeTableQr(num) {
+      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+      activeQrs = activeQrs.filter(x => x.tableNum !== num);
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      renderActiveTablesQrList();
+      showToast("Table removed.");
+    }
+
+    function initTableSessionFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const table = params.get("table");
+      const exp = params.get("exp");
+
+      if (table && exp) {
+        const expiryTime = parseInt(exp);
+        if (Date.now() > expiryTime) {
+          document.getElementById("sessionExpiredModal").classList.remove("hidden");
+          return;
+        }
+
+        currentTableSession = { tableNum: table, expiry: expiryTime };
+        document.getElementById("badgeTableNum").innerText = table;
+        document.getElementById("tableSessionBadge").classList.remove("hidden");
+        document.getElementById("tableSessionBadge").classList.add("flex");
+
+        startSessionCountdown(expiryTime);
+      }
+    }
+
+    function startSessionCountdown(expiryTime) {
+      if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+      sessionTimerInterval = setInterval(() => {
+        const diff = expiryTime - Date.now();
+        if (diff <= 0) {
+          clearInterval(sessionTimerInterval);
+          document.getElementById("sessionExpiredModal").classList.remove("hidden");
+          document.getElementById("sessionTimerDisplay").innerText = "00:00";
+          return;
+        }
+        const mins = Math.floor(diff / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        document.getElementById("sessionTimerDisplay").innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      applyBranding();
+      saveCart();
+      renderActiveTablesQrList();
+      initTableSessionFromURL();
+      showPage('home');
+    });
   </script>
 </body>
 </html>
