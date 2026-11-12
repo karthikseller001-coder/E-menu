@@ -38,6 +38,11 @@
   .hide-scrollbar::-webkit-scrollbar { display: none; }
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   * { box-sizing: border-box; }
+  @media print {
+    body * { visibility: hidden; }
+    #printableInvoiceArea, #printableInvoiceArea * { visibility: visible; }
+    #printableInvoiceArea { position: absolute; left: 0; top: 0; width: 100%; }
+  }
 </style>
 </head>
 <body class="min-h-screen flex flex-col bg-[#faf9f6] text-stone-900 overflow-x-hidden">
@@ -436,7 +441,7 @@
             </div>
           </div>
 
-          <!-- Generated Tables & Active Sessions -->
+          <!-- Generated Tables & Active Sessions (Synced via Firebase) -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Generated Tables & Active Sessions</h4>
             <div id="activeTablesQrList" class="space-y-2">
@@ -661,6 +666,34 @@
     </section>
   </main>
 
+  <!-- Hidden Printable Invoice Template for Kitchen/Counter Printing -->
+  <div id="printableInvoiceArea" class="hidden p-8 bg-white text-stone-900 max-w-md mx-auto">
+    <div class="text-center space-y-1 border-b pb-4">
+      <h2 id="printBrandName" class="font-serif font-bold text-xl">Hotel Royal Spice</h2>
+      <p class="text-xs text-stone-500">Kitchen & Counter Order Bill</p>
+    </div>
+    <div class="py-4 space-y-1 text-xs">
+      <div class="flex justify-between"><span>Order ID:</span><span id="printOrderId" class="font-bold"></span></div>
+      <div class="flex justify-between"><span>Date/Time:</span><span id="printDate"></span></div>
+      <div class="flex justify-between"><span>Table No:</span><span id="printTable" class="font-bold"></span></div>
+      <div class="flex justify-between"><span>Customer:</span><span id="printCustomer"></span></div>
+      <div class="flex justify-between"><span>Phone:</span><span id="printPhone"></span></div>
+    </div>
+    <div class="border-t border-b py-3 space-y-2 text-xs">
+      <div class="font-bold flex justify-between"><span>Item</span><span>Qty × Price</span></div>
+      <div id="printItemsList" class="space-y-1"></div>
+    </div>
+    <div class="py-3 space-y-1 text-xs border-b">
+      <div class="flex justify-between"><span>Subtotal:</span><span id="printSubTotal"></span></div>
+      <div class="flex justify-between"><span id="printTaxLabel">Tax:</span><span id="printTaxAmount"></span></div>
+      <div class="flex justify-between font-bold text-sm pt-1"><span>Grand Total:</span><span id="printTotal"></span></div>
+    </div>
+    <div class="text-center pt-4 text-[10px] text-stone-500">
+      <p>Payment: <span id="printPaymentMethod" class="font-bold"></span></p>
+      <p class="mt-1">*** Thank You! Please Prepare Fresh ***</p>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-center text-xs mt-auto">
     <div class="max-w-7xl mx-auto px-4">
@@ -668,18 +701,18 @@
     </div>
   </footer>
 
-  <!-- Application Script -->
+  <!-- Application Script with FULL Firebase Live Sync -->
   <script>
     const _SYS_CFG = {
-      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20=",
+      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZault-cnRkYi5maXJlYmFzZWlvLmNvbQ==",
       upi: "OTM5MDE0MTY3MUB5Ymw=",
       payee: "Um95YWwgQml0ZXMgUmVzdGF1cmFudA=="
     };
 
     const CONFIG = {
-      databaseURL: "https://smart-menu-d180a-default-rtdb.firebaseio.com",
-      phonePeUpiId: "9985656800-2@ybl",
-      payeeName: "KARTHIK"
+      databaseURL: atob(_SYS_CFG.db),
+      phonePeUpiId: atob(_SYS_CFG.upi),
+      payeeName: atob(_SYS_CFG.payee)
     };
 
     let dbRef = null;
@@ -688,31 +721,16 @@
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
       dbRef = firebase.database().ref("royal_bites_restaurant");
     } catch (e) {
-      console.log("Offline mode active");
+      console.log("Firebase offline connection mode active");
     }
 
-    let foods = JSON.parse(localStorage.getItem("rb_foods")) || [
-      { id: 1, name: "Hyderabadi Chicken Dum Biryani", price: 280, category: "Biryani", type: "Non-Veg", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
-      { id: 2, name: "Mutton Rara Masala", price: 380, category: "Main Course", type: "Non-Veg", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-      { id: 3, name: "Paneer Butter Masala", price: 240, category: "Main Course", type: "Veg", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
-      { id: 4, name: "Crispy Veg Manchuria", price: 180, category: "Starters", type: "Veg", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
-      { id: 5, name: "Tandoori Chicken Platter", price: 420, category: "Starters", type: "Non-Veg", image: "https://images.unsplash.com/photo-1599487488170-d3319028646b?auto=format&fit=crop&w=600&q=80" },
-      { id: 6, name: "Fresh Fresh Lime Soda", price: 80, category: "Beverages", type: "Veg", image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80" }
-    ];
-
+    let foods = [];
     let cart = JSON.parse(localStorage.getItem("rb_cart")) || [];
-    let orders = JSON.parse(localStorage.getItem("rb_orders")) || [];
+    let orders = [];
     let currentActiveOrderId = localStorage.getItem("rb_active_order_id") || null;
-    let tables = JSON.parse(localStorage.getItem("rb_tables")) || [
-      { id: "T1", name: "T1", status: "Free" },
-      { id: "T2", name: "T2", status: "Free" },
-      { id: "T3", name: "T3", status: "Free" },
-      { id: "T4", name: "T4", status: "Free" },
-      { id: "T5", name: "T5", status: "Free" },
-      { id: "T6", name: "T6", status: "Free" }
-    ];
-
-    let branding = JSON.parse(localStorage.getItem("rb_branding")) || {
+    let tables = [];
+    let activeQrs = [];
+    let branding = {
       brandName: "Hotel Royal Spice",
       brandTagline: "Restaurant",
       headerLogoUrl: "",
@@ -729,8 +747,86 @@
     let selectedTypeFilter = "All";
     let currentTableSession = null;
 
-    function initFirebaseListener() {
-      if (!dbRef) return;
+    const defaultFoods = [
+      { id: 1, name: "Hyderabadi Chicken Dum Biryani", price: 280, category: "Biryani", type: "Non-Veg", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+      { id: 2, name: "Mutton Rara Masala", price: 380, category: "Main Course", type: "Non-Veg", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
+      { id: 3, name: "Paneer Butter Masala", price: 240, category: "Main Course", type: "Veg", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
+      { id: 4, name: "Crispy Veg Manchuria", price: 180, category: "Starters", type: "Veg", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
+      { id: 5, name: "Tandoori Chicken Platter", price: 420, category: "Starters", type: "Non-Veg", image: "https://images.unsplash.com/photo-1599487488170-d3319028646b?auto=format&fit=crop&w=600&q=80" },
+      { id: 6, name: "Fresh Lime Soda", price: 80, category: "Beverages", type: "Veg", image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80" }
+    ];
+
+    const defaultTables = [
+      { id: "T1", name: "T1", status: "Free" },
+      { id: "T2", name: "T2", status: "Free" },
+      { id: "T3", name: "T3", status: "Free" },
+      { id: "T4", name: "T4", status: "Free" },
+      { id: "T5", name: "T5", status: "Free" },
+      { id: "T6", name: "T6", status: "Free" }
+    ];
+
+    // REAL-TIME FIREBASE SYNC LISTENERS FOR ALL MODULES
+    function initFirebaseRealtimeSync() {
+      if (!dbRef) {
+        foods = JSON.parse(localStorage.getItem("rb_foods")) || defaultFoods;
+        tables = JSON.parse(localStorage.getItem("rb_tables")) || defaultTables;
+        activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+        orders = JSON.parse(localStorage.getItem("rb_orders")) || [];
+        const savedBranding = JSON.parse(localStorage.getItem("rb_branding"));
+        if (savedBranding) branding = savedBranding;
+        applyBranding();
+        renderCategories();
+        renderFood();
+        return;
+      }
+
+      // 1. Foods Sync
+      dbRef.child("foods").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          foods = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+        } else {
+          foods = defaultFoods;
+          dbRef.child("foods").set(defaultFoods);
+        }
+        localStorage.setItem("rb_foods", JSON.stringify(foods));
+        renderCategories();
+        renderFood();
+        if(!document.getElementById("page-admin").classList.contains("hidden")) {
+          renderAdminMenuList();
+        }
+      });
+
+      // 2. Tables Sync
+      dbRef.child("tables").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          tables = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+        } else {
+          tables = defaultTables;
+          dbRef.child("tables").set(defaultTables);
+        }
+        localStorage.setItem("rb_tables", JSON.stringify(tables));
+        if(!document.getElementById("page-admin").classList.contains("hidden")) {
+          renderAdminTables();
+        }
+      });
+
+      // 3. Active Table QRs Sync
+      dbRef.child("activeQrs").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          activeQrs = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+        } else {
+          activeQrs = [];
+        }
+        localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+        if(!document.getElementById("page-admin").classList.contains("hidden")) {
+          renderActiveTablesQrList();
+        }
+      });
+
+      // 4. Orders Sync
       dbRef.child("orders").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -739,11 +835,31 @@
             loadedOrders.push({ firebaseKey: key, ...data[key] });
           });
           orders = loadedOrders.reverse();
-          localStorage.setItem("rb_orders", JSON.stringify(orders));
-          if(document.getElementById("page-admin").classList.contains("hidden") === false) {
-            renderAdminOrders();
-            renderSalesReport();
-          }
+        } else {
+          orders = [];
+        }
+        localStorage.setItem("rb_orders", JSON.stringify(orders));
+        if(!document.getElementById("page-admin").classList.contains("hidden")) {
+          renderAdminOrders();
+          renderSalesReport();
+        }
+        if(!document.getElementById("page-status").classList.contains("hidden")) {
+          renderOrderStatusTracker();
+        }
+        if(!document.getElementById("page-myorders").classList.contains("hidden")) {
+          renderCustomerMyOrders();
+        }
+      });
+
+      // 5. Branding Sync
+      dbRef.child("branding").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          branding = data;
+          localStorage.setItem("rb_branding", JSON.stringify(branding));
+          applyBranding();
+        } else {
+          dbRef.child("branding").set(branding);
         }
       });
     }
@@ -756,6 +872,7 @@
       document.getElementById("homeHeroTitle2").innerText = branding.homeTitle2;
       document.getElementById("homeHeroDesc").innerText = branding.homeDesc;
       document.getElementById("footerDisplayText").innerText = branding.footerText;
+      document.getElementById("printBrandName").innerText = branding.brandName;
 
       const logoImg = document.getElementById("headerLogoImg");
       const logoSvg = document.getElementById("headerLogoSvg");
@@ -804,8 +921,9 @@
         footerText: document.getElementById("editFooterText").value.trim()
       };
       localStorage.setItem("rb_branding", JSON.stringify(branding));
+      if (dbRef) dbRef.child("branding").set(branding);
       applyBranding();
-      showToast("Website branding settings updated!");
+      showToast("Website branding settings saved & synced!");
     }
 
     function saveMasterTaxSettings() {
@@ -1165,7 +1283,7 @@
 
       if (dbRef) {
         dbRef.child("orders").push(newOrder).then(() => {
-          showToast("Order placed & sent to kitchen successfully!");
+          showToast("Order placed & sent live to kitchen!");
         }).catch(err => {
           orders.unshift(newOrder);
           localStorage.setItem("rb_orders", JSON.stringify(orders));
@@ -1307,7 +1425,7 @@
       if (sub === 'qr') renderActiveTablesQrList();
     }
 
-    // TABLE MANAGEMENT FUNCTIONS
+    // TABLE MANAGEMENT (FIREBASE SYNC)
     function renderAdminTables() {
       const grid = document.getElementById("tableGrid");
       if (tables.length === 0) {
@@ -1343,7 +1461,6 @@
       if(!t) return;
       t.status = t.status === "Occupied" ? "Free" : "Occupied";
       saveTables();
-      renderAdminTables();
       showToast("Table " + t.name + " marked as " + t.status);
     }
 
@@ -1361,7 +1478,6 @@
       const newTable = { id: name, name, status: "Free" };
       tables.push(newTable);
       saveTables();
-      renderAdminTables();
       nameInput.value = "";
       showToast("Table " + name + " added!");
     }
@@ -1369,12 +1485,13 @@
     function deleteTable(tableId) {
       tables = tables.filter(x => x.id !== tableId);
       saveTables();
-      renderAdminTables();
       showToast("Table removed.");
     }
 
     function saveTables() {
       localStorage.setItem("rb_tables", JSON.stringify(tables));
+      if (dbRef) dbRef.child("tables").set(tables);
+      renderAdminTables();
     }
 
     function renderAdminOrders() {
@@ -1413,6 +1530,9 @@
             <div class="pt-2 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
               <span class="font-black text-sm text-stone-900">Total: ₹${o.total} (${o.paymentMethod})</span>
               <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="printKitchenOrderBill('${o.orderId}')" class="px-3.5 py-1.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-print"></i> Print Bill
+                </button>
                 ${!isAcceptedOrCompleted && !isRejected ? `
                   <button type="button" onclick="acceptAndSendWhatsAppInvoice('${o.orderId}', '${firebaseKeyId}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
                     <i class="fa-brands fa-whatsapp"></i> Accept & Invoice
@@ -1432,13 +1552,37 @@
       }).join("");
     }
 
+    // PRINT KITCHEN OR COUNTER BILL
+    function printKitchenOrderBill(orderId) {
+      const o = orders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      document.getElementById("printOrderId").innerText = o.orderId;
+      document.getElementById("printDate").innerText = o.date;
+      document.getElementById("printTable").innerText = o.table;
+      document.getElementById("printCustomer").innerText = o.name;
+      document.getElementById("printPhone").innerText = o.phone;
+      document.getElementById("printSubTotal").innerText = "₹" + o.subTotal;
+      document.getElementById("printTaxLabel").innerText = `${o.taxLabel || 'Tax'} (${o.taxRate || 5}%):`;
+      document.getElementById("printTaxAmount").innerText = "₹" + o.taxAmount;
+      document.getElementById("printTotal").innerText = "₹" + o.total;
+      document.getElementById("printPaymentMethod").innerText = o.paymentMethod;
+
+      document.getElementById("printItemsList").innerHTML = o.items.map(i => `
+        <div class="flex justify-between">
+          <span>${i.name}</span>
+          <span>${i.qty} × ₹${i.price} = ₹${i.qty * i.price}</span>
+        </div>
+      `).join("");
+
+      window.print();
+    }
+
     function resetLiveOrders() {
       if(confirm("Are you sure you want to clear all live orders?")) {
         orders = [];
         localStorage.setItem("rb_orders", JSON.stringify(orders));
-        if (dbRef) {
-          dbRef.child("orders").set(null);
-        }
+        if (dbRef) dbRef.child("orders").set(null);
         renderAdminOrders();
         showToast("All live orders reset.");
       }
@@ -1449,7 +1593,9 @@
       if (o) {
         o.status = status;
         localStorage.setItem("rb_orders", JSON.stringify(orders));
-        if (dbRef && firebaseKey) dbRef.child("orders").child(firebaseKey).update({ status });
+        if (dbRef && firebaseKey) {
+          dbRef.child("orders").child(firebaseKey).update({ status });
+        }
         renderAdminOrders();
         renderSalesReport();
         showToast("Order status updated to " + status);
@@ -1461,7 +1607,9 @@
       if (!o) return;
       o.status = "Accepted";
       localStorage.setItem("rb_orders", JSON.stringify(orders));
-      if (dbRef && firebaseKey) dbRef.child("orders").child(firebaseKey).update({ status: "Accepted" });
+      if (dbRef && firebaseKey) {
+        dbRef.child("orders").child(firebaseKey).update({ status: "Accepted" });
+      }
       renderAdminOrders();
       renderSalesReport();
 
@@ -1561,8 +1709,10 @@
       }
 
       localStorage.setItem("rb_foods", JSON.stringify(foods));
+      if (dbRef) dbRef.child("foods").set(foods);
       resetFoodForm();
       renderAdminMenuList();
+      renderFood();
     }
 
     function editFood(id) {
@@ -1582,7 +1732,9 @@
     function deleteFood(id) {
       foods = foods.filter(x => x.id !== id);
       localStorage.setItem("rb_foods", JSON.stringify(foods));
+      if (dbRef) dbRef.child("foods").set(foods);
       renderAdminMenuList();
+      renderFood();
       showToast("Dish deleted successfully!");
     }
 
@@ -1597,6 +1749,7 @@
       document.getElementById("cancelEditFoodBtn").classList.add("hidden");
     }
 
+    // TABLE QR MANAGER (FIREBASE CLOUD SYNCED)
     function generateTableQR() {
       const num = document.getElementById("tableGenNumber").value.trim();
       const durationMins = parseInt(document.getElementById("tableSessionDuration").value) || 60;
@@ -1626,19 +1779,19 @@
         downloadBtn.href = qrImageUrl;
       });
 
-      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
-      
       const expireTime = new Date().getTime() + (durationMins * 60 * 1000);
       activeQrs.push({ tableNum: num, url: finalUrl, durationMins, expireTime, status: 'Active' });
+      
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      if (dbRef) dbRef.child("activeQrs").set(activeQrs);
+
       renderActiveTablesQrList();
-      showToast("QR generated for Table " + num);
+      showToast("QR generated & synced for Table " + num);
     }
 
     function renderActiveTablesQrList() {
       const list = document.getElementById("activeTablesQrList");
-      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       if (activeQrs.length === 0) {
         list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet.</p>`;
         return;
@@ -1674,7 +1827,6 @@
     }
 
     function toggleTableQrStatus(num, newStatus) {
-      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs.forEach(q => { 
         if (q.tableNum === num) {
           q.status = newStatus;
@@ -1684,14 +1836,15 @@
         }
       });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      if (dbRef) dbRef.child("activeQrs").set(activeQrs);
       renderActiveTablesQrList();
       showToast("Table " + num + " status changed to " + newStatus);
     }
 
     function deleteTableQr(num) {
-      let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      if (dbRef) dbRef.child("activeQrs").set(activeQrs);
       renderActiveTablesQrList();
       showToast("Table QR removed.");
     }
@@ -1707,7 +1860,6 @@
       const table = params.get("table");
 
       if (table) {
-        let activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
         const found = activeQrs.find(x => x.tableNum === table);
 
         if (found) {
@@ -1726,10 +1878,11 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      applyBranding();
       saveCart();
-      initTableSessionFromURL();
-      initFirebaseListener();
+      initFirebaseRealtimeSync();
+      setTimeout(() => {
+        initTableSessionFromURL();
+      }, 500);
       if (!currentTableSession || document.getElementById("page-expired").classList.contains("hidden")) {
         showPage('home');
       }
