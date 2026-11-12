@@ -455,7 +455,7 @@
         </div>
 
         <div id="masterSubPage-branding" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding & Content Customization</h3>
+          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding & Content Customization (Image URLs)</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Brand Name</label>
@@ -467,11 +467,11 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Header Logo Image URL</label>
-              <input id="editHeaderLogoUrl" type="text" placeholder="https://... (leave empty for default icon)" class="w-full px-3 py-2 rounded-xl border text-sm">
+              <input id="editHeaderLogoUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Logo URL / Icon</label>
-              <input id="editWaLogoUrl" type="text" placeholder="https://... (Logo for WhatsApp Invoice)" class="w-full px-3 py-2 rounded-xl border text-sm">
+              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Logo Image URL</label>
+              <input id="editWaLogoUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Header Title</label>
@@ -605,8 +605,8 @@
               </select>
             </div>
             <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-stone-600 mb-1">Image URL</label>
-              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+              <label class="block text-xs font-bold text-stone-600 mb-1">Dish Image URL</label>
+              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
             </div>
           </div>
           <div class="flex items-center gap-3">
@@ -641,7 +641,7 @@
   <!-- Footer -->
   <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-center text-xs mt-auto">
     <div class="max-w-7xl mx-auto px-4">
-      <p id="footerDisplayText">© 2026 Royal Bites Restaurant. Freshly Served with Love.</p>
+      <p id="footerDisplayText">© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love.</p>
     </div>
   </footer>
 
@@ -685,7 +685,7 @@
       brandTagline: "Restaurant",
       headerLogoUrl: "",
       waLogoUrl: "",
-      waTitle: "HOTEL ROYAL SPICE - TAX INVOICE",
+      waTitle: "Hotel Royal Spice - INVOICE",
       heroBgUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
       homeBadge: "Welcome to Royal Dining",
       homeTitle1: "Good Food",
@@ -750,7 +750,7 @@
         brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
         headerLogoUrl: document.getElementById("editHeaderLogoUrl").value.trim(),
         waLogoUrl: document.getElementById("editWaLogoUrl").value.trim(),
-        waTitle: document.getElementById("editWaTitle").value.trim() || "HOTEL ROYAL SPICE - TAX INVOICE",
+        waTitle: document.getElementById("editWaTitle").value.trim() || "Hotel Royal Spice - INVOICE",
         heroBgUrl: document.getElementById("editHeroBgUrl").value.trim() || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
         homeBadge: document.getElementById("editHomeBadge").value.trim() || "Welcome",
         homeTitle1: document.getElementById("editHomeTitle1").value.trim() || "Good Food",
@@ -896,10 +896,12 @@
       }
 
       grid.innerHTML = filtered.map(f => {
+        const isAvailable = f.available !== false;
         const inCart = cart.find(item => item.id === f.id);
         const qty = inCart ? inCart.qty : 0;
         return `
-          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow relative">
+            ${!isAvailable ? `<div class="absolute inset-0 bg-stone-950/60 backdrop-blur-[1px] z-10 flex items-center justify-center"><span class="bg-red-600 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-lg uppercase tracking-wider">Not Available</span></div>` : ''}
             <div class="relative h-44 bg-stone-100 overflow-hidden">
               <img src="${f.image || 'https://placehold.co/600x400/faf9f6/78350f?text=Dish'}" alt="${f.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/faf9f6/78350f?text=Dish'">
               <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${f.type === 'Veg' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} shadow">
@@ -913,17 +915,19 @@
               </div>
               <div class="flex items-center justify-between pt-2 border-t border-stone-100">
                 <span class="font-black text-lg text-stone-900">₹${f.price}</span>
-                ${qty === 0 ? `
-                  <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
-                    + Add
-                  </button>
-                ` : `
-                  <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
-                    <button type="button" onclick="updateQty(${f.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
-                    <span class="font-bold text-xs px-1">${qty}</span>
-                    <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
-                  </div>
-                `}
+                ${isAvailable ? (
+                  qty === 0 ? `
+                    <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
+                      + Add
+                    </button>
+                  ` : `
+                    <div class="flex items-center gap-2 bg-stone-100 p-1 rounded-xl">
+                      <button type="button" onclick="updateQty(${f.id}, -1)" class="w-7 h-7 bg-white rounded-lg shadow text-stone-800 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+                      <span class="font-bold text-xs px-1">${qty}</span>
+                      <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+                    </div>
+                  `
+                ) : `<span class="text-xs font-bold text-red-600">Not Available</span>`}
               </div>
             </div>
           </div>
@@ -1093,7 +1097,7 @@
       document.getElementById("payScreenSummary").innerText = `Table ${table} • ${name}`;
       document.getElementById("upiBtnLabel").innerText = `Pay ₹${totals.grandTotal} with PhonePe / Any UPI App`;
 
-      const upiUrl = `upi://pay?pa=${upi}&pn=${encodeURIComponent(payee)}&am=${totals.grandTotal}&cu=INR`;
+      const upiUrl = `upi://pay?pa=${CONFIG.phonePeUpiId}&pn=${encodeURIComponent(CONFIG.payeeName)}&am=${totals.grandTotal}&cu=INR`;
       document.getElementById("directUpiAppLink").href = upiUrl;
 
       const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
@@ -1333,22 +1337,26 @@
       renderAdminOrders();
       renderSalesReport();
 
-      const title = branding.waTitle || "HOTEL ROYAL SPICE - TAX INVOICE";
-      let msg = `*${title}*\n`;
+      const brandTitle = branding.brandName || "Hotel Royal Spice";
+      const customWaTitle = branding.waTitle || (brandTitle + " - INVOICE");
+      let msg = `*${customWaTitle}*\n`;
       msg += `--------------------------------\n`;
       msg += `Order ID: ${o.orderId}\n`;
       msg += `Date: ${o.date}\n`;
       msg += `Customer: ${o.name}\n`;
       msg += `Table No: ${o.table}\n`;
       msg += `--------------------------------\n`;
-      msg += `ITEMS:\n`;
-      o.items.forEach(i => {
-        msg += `- ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`;
+      msg += `ORDERED ITEMS:\n`;
+      o.items.forEach((i) => {
+        msg += `• ${i.name} x ${i.qty} : ₹${i.price * i.qty}\n`;
       });
       msg += `--------------------------------\n`;
       msg += `Sub-Total: ₹${o.subTotal}\n`;
-      msg += `${o.taxLabel || 'Tax'} (${o.taxRate || 5}%): ₹${o.taxAmount}\n`;
-      msg += `Grand Total: ₹${o.total}\n`;
+      msg += `Tax (${o.taxRate || 5}%): ₹${o.taxAmount}\n`;
+      msg += `--------------------------------\n`;
+      msg += `┌──────────────────────────────┐\n`;
+      msg += `⭐ *GRAND TOTAL: ₹${o.total}* ⭐\n`;
+      msg += `└──────────────────────────────┘\n`;
       msg += `Payment: ${o.paymentMethod}\n`;
       msg += `--------------------------------\n`;
       msg += `Thank you for dining with us!\n`;
@@ -1397,14 +1405,29 @@
             <div>
               <h5 class="font-bold text-xs text-stone-900 line-clamp-1">${f.name}</h5>
               <span class="text-[10px] text-amber-600 font-bold">₹${f.price} • ${f.type}</span>
+              <span class="text-[9px] font-bold block ${f.available === false ? 'text-red-600' : 'text-emerald-600'}">${f.available === false ? 'Not Available' : 'Available'}</span>
             </div>
           </div>
           <div class="flex items-center gap-1">
+            <button type="button" onclick="toggleFoodAvailability(${f.id})" class="px-2 py-1.5 rounded-lg text-xs font-bold ${f.available === false ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'} cursor-pointer" title="Toggle Stock">
+              ${f.available === false ? 'Make Available' : 'Mark Not Available'}
+            </button>
             <button type="button" onclick="editFood(${f.id})" class="p-1.5 bg-stone-200 hover:bg-stone-300 rounded-lg text-stone-700 text-xs cursor-pointer"><i class="fa-solid fa-pen"></i></button>
             <button type="button" onclick="deleteFood(${f.id})" class="p-1.5 bg-red-100 hover:bg-red-200 rounded-lg text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join("");
+    }
+
+    function toggleFoodAvailability(id) {
+      const f = foods.find(x => x.id === id);
+      if (f) {
+        f.available = f.available === false ? true : false;
+        localStorage.setItem("rb_foods", JSON.stringify(foods));
+        renderAdminMenuList();
+        renderFood();
+        showToast(f.name + " status updated!");
+      }
     }
 
     function saveFoodItem() {
@@ -1439,6 +1462,7 @@
       localStorage.setItem("rb_foods", JSON.stringify(foods));
       resetFoodForm();
       renderAdminMenuList();
+      renderFood();
     }
 
     function editFood(id) {
@@ -1455,13 +1479,6 @@
       document.getElementById("cancelEditFoodBtn").classList.remove("hidden");
     }
 
-    function deleteFood(id) {
-      foods = foods.filter(x => x.id !== id);
-      localStorage.setItem("rb_foods", JSON.stringify(foods));
-      renderAdminMenuList();
-      showToast("Dish deleted successfully!");
-    }
-
     function resetFoodForm() {
       document.getElementById("editFoodId").value = "";
       document.getElementById("foodName").value = "";
@@ -1471,6 +1488,14 @@
       document.getElementById("menuFormTitle").innerText = "Add New Dish to Menu";
       document.getElementById("saveFoodBtn").innerText = "+ Add Dish to Digital Menu";
       document.getElementById("cancelEditFoodBtn").classList.add("hidden");
+    }
+
+    function deleteFood(id) {
+      foods = foods.filter(x => x.id !== id);
+      localStorage.setItem("rb_foods", JSON.stringify(foods));
+      renderAdminMenuList();
+      renderFood();
+      showToast("Dish deleted successfully!");
     }
 
     function generateTableQR() {
