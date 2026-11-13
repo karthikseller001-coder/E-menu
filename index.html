@@ -1029,10 +1029,25 @@
           document.getElementById("loginBox").classList.add("hidden");
           document.getElementById("masterBox").classList.add("hidden");
           document.getElementById("adminBox").classList.remove("hidden");
+          document.getElementById("masterSwitchBackBtn").classList.add("hidden");
           switchAdminSubPage('tables');
         }
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function mergeCustomerDeviceOrders() {
+      const localDevOrders = JSON.parse(localStorage.getItem("rb_cust_device_orders")) || [];
+      const globalOrders = JSON.parse(localStorage.getItem("rb_orders")) || [];
+      
+      const mergedMap = new Map();
+      [...globalOrders, ...localDevOrders].forEach(o => {
+        if (o && o.orderId) {
+          mergedMap.set(o.orderId, o);
+        }
+      });
+      customerDeviceOrders = Array.from(mergedMap.values());
+      localStorage.setItem("rb_cust_device_orders", JSON.stringify(customerDeviceOrders));
     }
 
     // LOGIN & ROLE SWITCHING LOGIC
@@ -1421,18 +1436,6 @@
       renderOrderStatusTracker();
     }
 
-    function mergeCustomerDeviceOrders() {
-      customerDeviceOrders.forEach(devOrd => {
-        const exists = orders.find(o => o.orderId === devOrd.orderId);
-        if (!exists) {
-          orders.push(devOrd);
-        } else {
-          devOrd.status = exists.status;
-        }
-      });
-      localStorage.setItem("rb_cust_device_orders", JSON.stringify(customerDeviceOrders));
-    }
-
     function renderOrderStatusTracker() {
       mergeCustomerDeviceOrders();
       const order = orders.find(x => x.orderId === currentActiveOrderId) || customerDeviceOrders[0] || orders[0];
@@ -1464,7 +1467,11 @@
         iconBox.className = "w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-4xl";
       } else {
         title.innerText = "Pending Approval";
-        desc.innerText = "Your payment has been submitted. Waiting for restaurant staff to review and accept your order...";
+        if (order.paymentMethod === "Cash at Counter") {
+          desc.innerText = "Please proceed to the counter to pay cash. Staff will accept your order.";
+        } else {
+          desc.innerText = "Your payment has been submitted. Waiting for restaurant staff to review and accept your order...";
+        }
         icon.className = "fa-solid fa-clock-rotate-left";
         iconBox.className = "w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-pulse";
       }
