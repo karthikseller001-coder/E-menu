@@ -50,12 +50,12 @@
     </div>
   </div>
 
-  <!-- 404 NOT FOUND SCREEN (Shown when accessing direct root URL without query params) -->
+  <!-- 404 NOT FOUND / SESSION EXPIRED SCREEN -->
   <div id="page-404" class="hidden min-h-screen flex flex-col items-center justify-center bg-white px-4 text-center">
     <div class="max-w-md space-y-4">
       <h1 class="text-7xl font-black text-stone-900 tracking-tight">404</h1>
-      <h2 class="text-xl font-bold text-stone-700">Page Not Found</h2>
-      <p class="text-sm text-stone-500">The requested URL was not found on this server. Please scan a valid table QR code to access the digital menu.</p>
+      <h2 class="text-xl font-bold text-stone-700">Session Expired / Cannot Find This Website</h2>
+      <p class="text-sm text-stone-500">The requested URL requires an active table QR code or authorized access. Please scan your table QR code.</p>
     </div>
   </div>
 
@@ -256,7 +256,7 @@
             <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Choose how you would like to pay</p>
             <button type="button" onclick="handlePaymentChoice('UPI')" class="w-full py-4 px-5 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-3 transition-all cursor-pointer">
               <i class="fa-solid fa-qrcode text-lg"></i>
-              <span>Pay with UPI App</span>
+              <span id="upiBtnLabel">Pay with PhonePe / Any UPI App</span>
             </button>
 
             <div class="flex items-center gap-3 text-xs text-stone-400 font-bold">
@@ -309,19 +309,6 @@
           <button type="button" onclick="showPage('menu')" class="flex-1 py-3 rounded-xl bg-stone-900 text-white font-bold text-xs hover:bg-stone-800 transition-all cursor-pointer">
             Back to Menu
           </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SESSION EXPIRED PAGE -->
-    <section id="page-expired" class="page-section hidden max-w-md mx-auto px-4 py-20">
-      <div class="bg-white rounded-3xl shadow-xl border border-stone-200 p-8 text-center space-y-6">
-        <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-4xl">
-          <i class="fa-solid fa-hourglass-end"></i>
-        </div>
-        <div class="space-y-2">
-          <h2 class="font-serif font-bold text-2xl text-stone-900">Session Expired</h2>
-          <p class="text-sm text-stone-600">Your dining table session has expired or been ended. Please scan the QR code at your table again or contact staff.</p>
         </div>
       </div>
     </section>
@@ -456,7 +443,8 @@
         </div>
 
         <div id="masterSubPage-branding" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding & Content Customization</h3>
+          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding, URLs & Content Master Editor</h3>
+          <p class="text-xs text-stone-500">Edit all website branding titles, logos, background image URLs, and initial menu items in one place.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1">Brand Name</label>
@@ -479,7 +467,7 @@
               <input id="editHeroBgUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Home Badge</label>
+              <label class="block text-xs font-bold text-stone-600 mb-1">Home Badge Text</label>
               <input id="editHomeBadge" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
             <div>
@@ -499,7 +487,11 @@
               <input id="editFooterText" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
             </div>
           </div>
-          <button type="button" onclick="saveBrandingSettings()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Save Branding Settings</button>
+          <div class="pt-4 border-t border-stone-200">
+            <h4 class="font-bold text-stone-800 text-sm mb-2">Quick Menu JSON / Items Overview</h4>
+            <p class="text-xs text-stone-500 mb-2">You can also manage individual dishes under the Admin Menu tab, or update default items here.</p>
+          </div>
+          <button type="button" onclick="saveBrandingSettings()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Save All Branding & URLs</button>
         </div>
       </div>
 
@@ -676,16 +668,11 @@
 
   <!-- Application Script -->
   <script>
-    const _SYS_CFG = {
-      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20=",
-      upi: "OTM5MDE0MTY3MUB5Ymw=",
-      payee: "Um95YWwgQml0ZXMgUmVzdGF1cmFudA=="
-    };
-
+    
     const CONFIG = {
-      databaseURL: atob(_SYS_CFG.db),
-      phonePeUpiId: atob(_SYS_CFG.upi),
-      payeeName: atob(_SYS_CFG.payee)
+      databaseURL: "https://smart-menu-d180a-default-rtdb.firebaseio.com/",
+      phonePeUpiId: "9985656800-2@ybl",
+      payeeName: "Karthik"
     };
 
     let dbRef = null;
@@ -1173,11 +1160,9 @@
       if (q) {
         const isExp = Date.now() > q.expiresAt;
         if (isExp) {
-          // Make active by pushing expiry time into future (e.g. 60 mins from now)
           q.expiresAt = Date.now() + (q.duration * 60 * 1000);
           showToast(`Table ${q.table} QR session is now Active!`);
         } else {
-          // Expire immediately
           q.expiresAt = Date.now() - 1000;
           showToast(`Table ${q.table} QR session expired.`);
         }
@@ -1288,11 +1273,11 @@
 
     function renderFood() {
       const searchEl = document.getElementById("searchInput");
-      const query = searchEl ? (searchEl.value || "").toLowerCase() : "";
+      const query = searchEl ? (searchEl.value || "").toLowerCase().trim() : "";
       const filtered = foods.filter(f => {
-        const matchesCat = selectedCategory === "All" || f.category === selectedCategory;
-        const matchesType = selectedTypeFilter === "All" || f.type === selectedTypeFilter;
-        const matchesSearch = f.name.toLowerCase().includes(query) || f.category.toLowerCase().includes(query);
+        const matchesCat = selectedCategory === "All" || f.category.toLowerCase() === selectedCategory.toLowerCase();
+        const matchesType = selectedTypeFilter === "All" || f.type.toLowerCase() === selectedTypeFilter.toLowerCase();
+        const matchesSearch = query === "" || f.name.toLowerCase().includes(query) || f.category.toLowerCase().includes(query);
         return matchesCat && matchesType && matchesSearch;
       });
 
@@ -1499,18 +1484,9 @@
       const name = document.getElementById("custName").value.trim();
       const table = document.getElementById("custTable").value.trim();
 
-      document.getElementById("paymentChoiceStep").classList.remove("hidden");
-      document.getElementById("upiPaymentDetailsStep").classList.add("hidden");
-
       document.getElementById("payScreenAmount").innerText = "₹" + totals.grandTotal;
       document.getElementById("payScreenSummary").innerText = `Table ${table} • ${name}`;
       document.getElementById("upiBtnLabel").innerText = `Pay ₹${totals.grandTotal} with PhonePe / Any UPI App`;
-
-      const upiUrl = `upi://pay?pa=${CONFIG.phonePeUpiId}&pn=${encodeURIComponent(CONFIG.payeeName)}&am=${totals.grandTotal}&cu=INR`;
-      document.getElementById("directUpiAppLink").href = upiUrl;
-
-      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
-      document.getElementById("dynamicUpiQr").src = qrImageUrl;
     }
 
     function handlePaymentChoice(payMethod) {
@@ -1713,7 +1689,7 @@
       showToast("Table deleted.");
     }
 
-    // LIVE ORDERS, WHATSAPP INVOICE, THERMAL BILL PRINT & WORD DOC DOWNLOAD
+    // LIVE ORDERS & WHATSAPP
     function renderAdminOrders() {
       const list = document.getElementById("ordersList");
       if (orders.length === 0) {
@@ -1811,7 +1787,6 @@
       window.open(waUrl, "_blank");
     }
 
-    // 80mm THERMAL PRINTER BILL FORMAT
     function printKitchenOrderBill(orderId) {
       const o = orders.find(x => x.orderId === orderId);
       if (!o) return;
@@ -1832,28 +1807,12 @@
           <title>Bill_${o.orderId}</title>
           <style>
             @page { size: 80mm auto; margin: 2mm; }
-            body {
-              font-family: 'Courier New', monospace;
-              font-size: 11px;
-              color: #000;
-              background: #fff;
-              width: 76mm;
-              margin: 0 auto;
-              padding: 4px;
-            }
+            body { font-family: 'Courier New', monospace; font-size: 11px; color: #000; background: #fff; width: 76mm; margin: 0 auto; padding: 4px; }
             .center { text-align: center; }
             .bold { font-weight: bold; }
             .divider { border-top: 1px dashed #000; margin: 6px 0; }
             .row { display: flex; justify-content: space-between; margin: 2px 0; }
-            .total-box {
-              border: 1.5px solid #000;
-              padding: 5px 6px;
-              margin-top: 6px;
-              display: flex;
-              justify-content: space-between;
-              font-weight: bold;
-              font-size: 13px;
-            }
+            .total-box { border: 1.5px solid #000; padding: 5px 6px; margin-top: 6px; display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; }
           </style>
         </head>
         <body>
@@ -1882,13 +1841,7 @@
             <div>Payment: <span class="bold">${o.paymentMethod}</span></div>
             <div style="margin-top:5px;" class="bold">*** THANK YOU! VISIT AGAIN ***</div>
           </div>
-          <script>
-            window.onload = function() {
-              setTimeout(function() {
-                window.print();
-              }, 200);
-            };
-          <\/script>
+          <script>window.onload = function() { setTimeout(function() { window.print(); }, 200); };<\/script>
         </body>
         </html>
       `;
@@ -1903,68 +1856,6 @@
       }
     }
 
-    // WORD DOCUMENT (.DOC) DOWNLOAD FOR INDIVIDUAL ORDER INVOICE
-    function downloadOrderDoc(orderId) {
-      const o = orders.find(x => x.orderId === orderId);
-      if (!o) return;
-
-      const brand = branding.brandName || "HOTEL ROYAL SPICE";
-      const rowsHtml = o.items.map(i => `
-        <tr>
-          <td style="border:1px solid #333; padding:6px;">${i.name}</td>
-          <td style="border:1px solid #333; padding:6px; text-align:center;">${i.qty}</td>
-          <td style="border:1px solid #333; padding:6px; text-align:right;">₹${i.price}</td>
-          <td style="border:1px solid #333; padding:6px; text-align:right;">₹${i.qty * i.price}</td>
-        </tr>
-      `).join("");
-
-      const docContent = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset='utf-8'><title>Invoice ${o.orderId}</title></head>
-        <body style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="text-align:center; margin-bottom:4px;">${brand.toUpperCase()}</h2>
-          <p style="text-align:center; font-size:12px; color:#555; margin-top:0;">TAX INVOICE / RECEIPT</p>
-          <hr>
-          <p><strong>Order ID:</strong> ${o.orderId}<br>
-          <strong>Date:</strong> ${o.date}<br>
-          <strong>Customer:</strong> ${o.name} (${o.phone})<br>
-          <strong>Table No:</strong> ${o.table}<br>
-          <strong>Payment Method:</strong> ${o.paymentMethod}</p>
-          <table style="width:100%; border-collapse:collapse; margin-top:10px;">
-            <thead>
-              <tr style="background:#f3f4f6;">
-                <th style="border:1px solid #333; padding:6px; text-align:left;">Item</th>
-                <th style="border:1px solid #333; padding:6px; text-align:center;">Qty</th>
-                <th style="border:1px solid #333; padding:6px; text-align:right;">Price</th>
-                <th style="border:1px solid #333; padding:6px; text-align:right;">Total</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
-          <div style="margin-top:15px; text-align:right;">
-            <p>Subtotal: <strong>₹${o.subTotal}</strong><br>
-            ${o.taxLabel || 'Tax'} (${o.taxRate || 5}%): <strong>₹${o.taxAmount}</strong></p>
-            <div style="display:inline-block; border:2px solid #000; padding:8px 16px; font-size:16px; font-weight:bold;">
-              GRAND TOTAL: ₹${o.total}
-            </div>
-          </div>
-          <p style="text-align:center; margin-top:30px; font-size:12px;">Thank you for dining with us! Please visit again.</p>
-        </body>
-        </html>
-      `;
-
-      const blob = new Blob(['\ufeff', docContent], { type: 'application/msword' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Invoice_${o.orderId.replace('#', '')}.doc`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast(`Invoice ${o.orderId} downloaded as Word (.doc)!`);
-    }
-
     function resetLiveOrders() {
       orders = [];
       localStorage.setItem("rb_orders", JSON.stringify([]));
@@ -1974,7 +1865,7 @@
       showToast("All live orders cleared.");
     }
 
-    // SALES ANALYTICS, PDF PRINT & WORD DOC EXPORT
+    // SALES REPORT
     function getFilteredSalesOrders() {
       const filterType = document.getElementById("reportFilterType").value;
       const now = new Date();
@@ -1982,12 +1873,8 @@
         if (filterType === "all") return true;
         const d = new Date(o.date);
         if (isNaN(d.getTime())) return true;
-        if (filterType === "daily") {
-          return d.toDateString() === now.toDateString();
-        }
-        if (filterType === "monthly") {
-          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-        }
+        if (filterType === "daily") return d.toDateString() === now.toDateString();
+        if (filterType === "monthly") return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
         return true;
       });
     }
@@ -2019,81 +1906,6 @@
           <td class="p-2 border border-stone-300 text-right font-bold">₹${o.total}</td>
         </tr>
       `).join("");
-    }
-
-    function exportSalesToPdf() {
-      const filtered = getFilteredSalesOrders();
-      const accepted = filtered.filter(o => o.status === "Accepted" || o.status === "Completed");
-      const revenue = accepted.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
-      const brand = branding.brandName || "HOTEL ROYAL SPICE";
-
-      const rowsHtml = filtered.map(o => `
-        <tr>
-          <td style="border:1px solid #333; padding:6px;">${o.date}</td>
-          <td style="border:1px solid #333; padding:6px; font-weight:bold;">${o.orderId}</td>
-          <td style="border:1px solid #333; padding:6px;">${o.name}</td>
-          <td style="border:1px solid #333; padding:6px;">${o.table}</td>
-          <td style="border:1px solid #333; padding:6px;">${o.phone}</td>
-          <td style="border:1px solid #333; padding:6px;">${o.status}</td>
-          <td style="border:1px solid #333; padding:6px; text-align:right; font-weight:bold;">₹${o.total}</td>
-        </tr>
-      `).join("");
-
-      const reportHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Sales_Report_${brand}</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 24px; color: #000; background: #fff; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-            th { background: #e5e7eb; border: 1px solid #333; padding: 8px; text-align: left; }
-            .summary { display: flex; justify-content: space-between; border: 1.5px solid #333; padding: 12px; margin-top: 12px; font-size: 13px; }
-          </style>
-        </head>
-        <body>
-          <div style="text-align:center;">
-            <h2 style="margin:0;">${brand.toUpperCase()}</h2>
-            <p style="margin:4px 0; font-size:13px; font-weight:bold;">SALES & REVENUE ANALYTICS REPORT</p>
-            <p style="margin:0; font-size:11px; color:#555;">Generated on: ${new Date().toLocaleString()}</p>
-          </div>
-          <div class="summary">
-            <div><strong>Total Orders:</strong> ${filtered.length}</div>
-            <div><strong>Accepted Orders:</strong> ${accepted.length}</div>
-            <div><strong>Total Revenue:</strong> ₹${revenue}</div>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Table</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th style="text-align:right;">Amount</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHtml}</tbody>
-          </table>
-          <script>
-            window.onload = function() {
-              setTimeout(function() { window.print(); }, 250);
-            };
-          <\/script>
-        </body>
-        </html>
-      `;
-
-      const win = window.open("", "_blank", "width=850,height=700");
-      if (win) {
-        win.document.open();
-        win.document.write(reportHtml);
-        win.document.close();
-      } else {
-        showToast("Please allow pop-ups to print or save report as PDF!");
-      }
     }
 
     function downloadSalesDoc() {
