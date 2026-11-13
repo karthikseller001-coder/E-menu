@@ -41,7 +41,7 @@
   @media print {
     body * { visibility: hidden; }
     #printableInvoiceArea, #printableInvoiceArea * { visibility: visible; }
-    #printableInvoiceArea { position: absolute; left: 0; top: 0; width: 100%; }
+    #printableInvoiceArea { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; font-size: 12px; color: #000; }
   }
 </style>
 </head>
@@ -90,7 +90,7 @@
     </div>
   </header>
 
-  <!-- Clean White Navigation Sub-Bar -->
+  <!-- Clean White Navigation Sub-Bar (Hidden on Home Page) -->
   <div id="whiteNavBarContainer" class="hidden bg-white border-b border-stone-200 shadow-sm sticky top-[73px] sm:top-[81px] z-30">
     <div class="max-w-7xl mx-auto px-2 sm:px-6 py-2 flex items-center justify-between">
       <nav id="mainNavBar" class="flex items-center gap-1 sm:gap-2 w-full justify-around sm:justify-start">
@@ -108,8 +108,8 @@
           <i class="fa-solid fa-receipt text-amber-600"></i> My Orders
         </button>
       </nav>
-      <button type="button" onclick="showPage('admin')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-stone-950 shadow cursor-pointer flex items-center gap-1 shrink-0">
-        <i class="fa-solid fa-user-lock"></i> Staff
+      <button type="button" onclick="showPage('admin')" class="w-10 h-10 rounded-xl bg-amber-500 text-stone-950 shadow cursor-pointer flex items-center justify-center shrink-0 hover:opacity-90 transition-opacity" title="Staff Login">
+        <i class="fa-solid fa-user-shield text-sm"></i>
       </button>
     </div>
   </div>
@@ -255,9 +255,6 @@
             <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Scan QR to Pay Exact Amount</p>
             <div class="inline-block p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-sm relative">
               <img id="dynamicUpiQr" class="w-48 h-48 mx-auto" alt="UPI Payment QR">
-              <a id="downloadQrBtn" href="#" download="QR_Payment.png" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-900 text-white text-[11px] font-bold rounded-lg hover:bg-stone-800 transition-colors">
-                <i class="fa-solid fa-download"></i> Download QR
-              </a>
             </div>
             <p class="text-xs font-bold text-stone-700 pt-1">Pay with UPI</p>
           </div>
@@ -346,7 +343,7 @@
       <div id="customerMyOrdersList" class="space-y-4"></div>
     </section>
 
-    <!-- ADMIN & MASTER CONTROL PANEL -->
+    <!-- STAFF / MASTER CONTROL LOGIN & PANELS -->
     <section id="page-admin" class="page-section hidden max-w-6xl mx-auto px-4 py-8 space-y-6">
       
       <!-- Staff Login Box -->
@@ -382,7 +379,7 @@
               <p class="text-xs text-blue-200">Full system owner controls & QR code generator</p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <button type="button" onclick="switchMasterSubPage('qr')" id="masterTabBtn-qr" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer">Table QR</button>
             <button type="button" onclick="switchMasterSubPage('passcodes')" id="masterTabBtn-passcodes" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Passcodes</button>
             <button type="button" onclick="switchMasterSubPage('branding')" id="masterTabBtn-branding" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Branding</button>
@@ -410,13 +407,15 @@
 
           <div id="tableQRResult" class="hidden p-6 bg-blue-50 rounded-2xl border border-blue-200 text-center space-y-4">
             <h4 id="tableQRTitle" class="font-bold text-blue-900 text-base">Table QR</h4>
-            <div class="inline-block p-3 bg-white rounded-2xl shadow relative">
-              <img id="tableQRImg" class="w-48 h-48 mx-auto" alt="Table QR">
-              <a id="downloadTableQrBtn" href="#" download="Table_QR.png" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-900 text-white text-[11px] font-bold rounded-lg hover:bg-stone-800 transition-colors">
-                <i class="fa-solid fa-download"></i> Download QR
+            <div class="inline-block p-4 bg-white rounded-2xl shadow border border-stone-200">
+              <img id="tableQRImg" class="w-48 h-48 mx-auto object-contain bg-white" alt="Table QR" src="">
+            </div>
+            <div>
+              <a id="downloadTableQrBtn" href="#" download="Table_QR.png" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 transition-colors shadow cursor-pointer">
+                <i class="fa-solid fa-download"></i> Download QR Code
               </a>
             </div>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-2">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
               <p id="tableQRUrl" class="text-xs text-blue-700 font-mono break-all select-all bg-white p-2.5 rounded-xl border border-blue-200 flex-1"></p>
               <button type="button" onclick="copyTableQRUrl()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shrink-0 cursor-pointer">
                 <i class="fa-solid fa-copy mr-1"></i> Copy URL
@@ -441,7 +440,6 @@
             </div>
           </div>
 
-          <!-- Generated Tables & Active Sessions (Synced via Firebase) -->
           <div class="pt-6 border-t border-stone-200 space-y-4">
             <h4 class="font-bold text-stone-800 text-sm">Generated Tables & Active Sessions</h4>
             <div id="activeTablesQrList" class="space-y-2">
@@ -513,7 +511,7 @@
         </div>
       </div>
 
-      <!-- Admin Box -->
+      <!-- Admin Box (Kitchen / Orders / Menu) -->
       <div id="adminBox" class="hidden space-y-6">
         <div class="bg-blue-900 text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
           <div class="flex items-center gap-3">
@@ -525,11 +523,12 @@
               <p class="text-xs text-blue-200">Manage live orders, dishes & sales reports</p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="switchAdminSubPage('tables')" id="adminTabBtn-tables" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Table Management</button>
-            <button type="button" onclick="switchAdminSubPage('sales')" id="adminTabBtn-sales" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer">Sales Report</button>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button type="button" onclick="switchAdminSubPage('tables')" id="adminTabBtn-tables" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Tables</button>
+            <button type="button" onclick="switchAdminSubPage('sales')" id="adminTabBtn-sales" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer">Sales</button>
             <button type="button" onclick="switchAdminSubPage('orders')" id="adminTabBtn-orders" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Live Orders</button>
-            <button type="button" onclick="switchAdminSubPage('menu')" id="adminTabBtn-menu" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Manage Menu</button>
+            <button type="button" onclick="switchAdminSubPage('menu')" id="adminTabBtn-menu" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Menu</button>
+            <button type="button" id="masterSwitchBackBtn" onclick="switchToMasterPanel()" class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-stone-950 cursor-pointer">Master Panel</button>
             <button type="button" onclick="logout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 cursor-pointer">Logout</button>
           </div>
         </div>
@@ -553,9 +552,9 @@
         <div id="adminSubPage-sales" class="admin-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 class="font-serif font-bold text-xl text-stone-900">Sales Analytics & Revenue</h3>
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-              <button type="button" onclick="printSalesReport()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
-                <i class="fa-solid fa-print"></i> Print / PDF
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
+              <button type="button" onclick="exportSalesToPdf()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-file-pdf"></i> Save as PDF / Print
               </button>
               <button type="button" onclick="resetSalesReport()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
                 Reset Report
@@ -582,19 +581,19 @@
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-stone-100 text-stone-600 font-bold uppercase">
+            <table id="salesExcelTable" class="w-full text-left text-xs border-collapse">
+              <thead class="bg-stone-100 text-stone-800 font-bold uppercase border-b border-stone-300">
                 <tr>
-                  <th class="p-3">Date</th>
-                  <th class="p-3">Order ID</th>
-                  <th class="p-3">Customer</th>
-                  <th class="p-3">Table</th>
-                  <th class="p-3">Phone</th>
-                  <th class="p-3">Status</th>
-                  <th class="p-3 text-right">Amount</th>
+                  <th class="p-2 border border-stone-300">Date</th>
+                  <th class="p-2 border border-stone-300">Order ID</th>
+                  <th class="p-2 border border-stone-300">Customer</th>
+                  <th class="p-2 border border-stone-300">Table</th>
+                  <th class="p-2 border border-stone-300">Phone</th>
+                  <th class="p-2 border border-stone-300">Status</th>
+                  <th class="p-2 border border-stone-300 text-right">Amount</th>
                 </tr>
               </thead>
-              <tbody id="salesReportTableBody" class="divide-y divide-stone-100"></tbody>
+              <tbody id="salesReportTableBody" class="divide-y divide-stone-200"></tbody>
             </table>
           </div>
         </div>
@@ -658,7 +657,7 @@
           </div>
 
           <div class="pt-6 border-t border-stone-200 space-y-4">
-            <h4 class="font-bold text-stone-800 text-sm">Manage Existing Menu Items</h4>
+            <h4 class="font-bold text-stone-800 text-sm">Manage Existing Menu Items & Availability</h4>
             <div id="adminMenuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-2"></div>
           </div>
         </div>
@@ -666,31 +665,31 @@
     </section>
   </main>
 
-  <!-- Hidden Printable Invoice Template for Kitchen/Counter Printing -->
-  <div id="printableInvoiceArea" class="hidden p-8 bg-white text-stone-900 max-w-md mx-auto">
-    <div class="text-center space-y-1 border-b pb-4">
-      <h2 id="printBrandName" class="font-serif font-bold text-xl">Hotel Royal Spice</h2>
-      <p class="text-xs text-stone-500">Kitchen & Counter Order Bill</p>
+  <!-- Hidden Printable Invoice Template for Thermal Printer / WhatsApp format -->
+  <div id="printableInvoiceArea" class="hidden p-4 bg-white text-stone-900 max-w-[80mm] mx-auto font-mono text-xs">
+    <div class="text-center space-y-1 border-b border-black pb-2 mb-2">
+      <h2 id="printBrandName" class="font-bold text-sm">HOTEL ROYAL SPICE</h2>
+      <p class="text-[10px]">TAX INVOICE / KITCHEN RECEIPT</p>
     </div>
-    <div class="py-4 space-y-1 text-xs">
-      <div class="flex justify-between"><span>Order ID:</span><span id="printOrderId" class="font-bold"></span></div>
-      <div class="flex justify-between"><span>Date/Time:</span><span id="printDate"></span></div>
-      <div class="flex justify-between"><span>Table No:</span><span id="printTable" class="font-bold"></span></div>
-      <div class="flex justify-between"><span>Customer:</span><span id="printCustomer"></span></div>
-      <div class="flex justify-between"><span>Phone:</span><span id="printPhone"></span></div>
+    <div class="space-y-0.5 text-[11px] mb-2">
+      <div>Order ID: <span id="printOrderId" class="font-bold"></span></div>
+      <div>Date: <span id="printDate"></span></div>
+      <div>Table No: <span id="printTable" class="font-bold"></span></div>
+      <div>Customer: <span id="printCustomer"></span></div>
+      <div>Phone: <span id="printPhone"></span></div>
     </div>
-    <div class="border-t border-b py-3 space-y-2 text-xs">
-      <div class="font-bold flex justify-between"><span>Item</span><span>Qty × Price</span></div>
-      <div id="printItemsList" class="space-y-1"></div>
+    <div class="border-t border-b border-black py-1.5 mb-2">
+      <div class="font-bold flex justify-between text-[11px]"><span>ITEM</span><span>QTY x PRICE</span></div>
+      <div id="printItemsList" class="space-y-1 mt-1"></div>
     </div>
-    <div class="py-3 space-y-1 text-xs border-b">
+    <div class="space-y-0.5 text-[11px] border-b border-black pb-2 mb-2">
       <div class="flex justify-between"><span>Subtotal:</span><span id="printSubTotal"></span></div>
       <div class="flex justify-between"><span id="printTaxLabel">Tax:</span><span id="printTaxAmount"></span></div>
-      <div class="flex justify-between font-bold text-sm pt-1"><span>Grand Total:</span><span id="printTotal"></span></div>
+      <div class="flex justify-between font-bold text-xs pt-1"><span>GRAND TOTAL:</span><span id="printTotal"></span></div>
     </div>
-    <div class="text-center pt-4 text-[10px] text-stone-500">
-      <p>Payment: <span id="printPaymentMethod" class="font-bold"></span></p>
-      <p class="mt-1">*** Thank You! Please Prepare Fresh ***</p>
+    <div class="text-center text-[10px] space-y-0.5">
+      <div>Payment: <span id="printPaymentMethod" class="font-bold"></span></div>
+      <div class="pt-1 font-bold">*** THANK YOU! PLEASE VISIT AGAIN ***</div>
     </div>
   </div>
 
@@ -704,7 +703,7 @@
   <!-- Application Script with FULL Firebase Live Sync -->
   <script>
     const _SYS_CFG = {
-      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZault-cnRkYi5maXJlYmFzZWlvLmNvbQ==",
+      db: "aHR0cHM6Ly9yb3lhbC1iaXRlcy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20=",
       upi: "OTM5MDE0MTY3MUB5Ymw=",
       payee: "Um95YWwgQml0ZXMgUmVzdGF1cmFudA=="
     };
@@ -727,6 +726,7 @@
     let foods = [];
     let cart = JSON.parse(localStorage.getItem("rb_cart")) || [];
     let orders = [];
+    let customerDeviceOrders = JSON.parse(localStorage.getItem("rb_cust_device_orders")) || [];
     let currentActiveOrderId = localStorage.getItem("rb_active_order_id") || null;
     let tables = [];
     let activeQrs = [];
@@ -746,14 +746,15 @@
     let selectedCategory = "All";
     let selectedTypeFilter = "All";
     let currentTableSession = null;
+    let loggedInRole = null; // 'master' or 'admin'
 
     const defaultFoods = [
-      { id: 1, name: "Hyderabadi Chicken Dum Biryani", price: 280, category: "Biryani", type: "Non-Veg", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
-      { id: 2, name: "Mutton Rara Masala", price: 380, category: "Main Course", type: "Non-Veg", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80" },
-      { id: 3, name: "Paneer Butter Masala", price: 240, category: "Main Course", type: "Veg", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80" },
-      { id: 4, name: "Crispy Veg Manchuria", price: 180, category: "Starters", type: "Veg", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80" },
-      { id: 5, name: "Tandoori Chicken Platter", price: 420, category: "Starters", type: "Non-Veg", image: "https://images.unsplash.com/photo-1599487488170-d3319028646b?auto=format&fit=crop&w=600&q=80" },
-      { id: 6, name: "Fresh Lime Soda", price: 80, category: "Beverages", type: "Veg", image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80" }
+      { id: 1, name: "Hyderabadi Chicken Dum Biryani", price: 280, category: "Biryani", type: "Non-Veg", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80", available: true },
+      { id: 2, name: "Mutton Rara Masala", price: 380, category: "Main Course", type: "Non-Veg", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80", available: true },
+      { id: 3, name: "Paneer Butter Masala", price: 240, category: "Main Course", type: "Veg", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80", available: true },
+      { id: 4, name: "Crispy Veg Manchuria", price: 180, category: "Starters", type: "Veg", image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=600&q=80", available: true },
+      { id: 5, name: "Tandoori Chicken Platter", price: 420, category: "Starters", type: "Non-Veg", image: "https://images.unsplash.com/photo-1599487488170-d3319028646b?auto=format&fit=crop&w=600&q=80", available: true },
+      { id: 6, name: "Fresh Lime Soda", price: 80, category: "Beverages", type: "Veg", image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80", available: true }
     ];
 
     const defaultTables = [
@@ -765,9 +766,7 @@
       { id: "T6", name: "T6", status: "Free" }
     ];
 
-    // REAL-TIME FIREBASE SYNC LISTENERS FOR ALL MODULES
     function initFirebaseRealtimeSync() {
-      // Always load local defaults first for instant display
       foods = JSON.parse(localStorage.getItem("rb_foods")) || defaultFoods;
       tables = JSON.parse(localStorage.getItem("rb_tables")) || defaultTables;
       activeQrs = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
@@ -780,7 +779,6 @@
 
       if (!dbRef) return;
 
-      // 1. Foods Sync
       dbRef.child("foods").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -797,7 +795,6 @@
         }
       });
 
-      // 2. Tables Sync
       dbRef.child("tables").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -812,7 +809,6 @@
         }
       });
 
-      // 3. Active Table QRs Sync
       dbRef.child("activeQrs").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -826,7 +822,6 @@
         }
       });
 
-      // 4. Orders Sync
       dbRef.child("orders").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -839,6 +834,8 @@
           orders = [];
         }
         localStorage.setItem("rb_orders", JSON.stringify(orders));
+        mergeCustomerDeviceOrders();
+
         if(!document.getElementById("page-admin").classList.contains("hidden")) {
           renderAdminOrders();
           renderSalesReport();
@@ -851,7 +848,6 @@
         }
       });
 
-      // 5. Branding Sync
       dbRef.child("branding").on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
@@ -860,6 +856,17 @@
           applyBranding();
         } else {
           dbRef.child("branding").set(branding);
+        }
+      });
+
+      dbRef.child("settings").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          if (data.taxLabel) localStorage.setItem("rb_tax_label", data.taxLabel);
+          if (data.taxRate !== undefined) localStorage.setItem("rb_tax_rate", data.taxRate);
+          if (data.masterPass) localStorage.setItem("rb_master_pass", data.masterPass);
+          if (data.adminPass) localStorage.setItem("rb_admin_pass", data.adminPass);
+          applyBranding();
         }
       });
     }
@@ -931,7 +938,10 @@
       const rate = parseFloat(document.getElementById("masterTaxRateInput").value) || 0;
       localStorage.setItem("rb_tax_label", label);
       localStorage.setItem("rb_tax_rate", rate);
-      showToast("Tax settings updated successfully!");
+      if (dbRef) {
+        dbRef.child("settings").update({ taxLabel: label, taxRate: rate });
+      }
+      showToast("Tax settings updated & synced!");
       renderCart();
     }
 
@@ -940,9 +950,15 @@
       const newAdminPass = document.getElementById("masterNewPasscodeInput").value.trim();
       if (newMasterPass) localStorage.setItem("rb_master_pass", newMasterPass);
       if (newAdminPass) localStorage.setItem("rb_admin_pass", newAdminPass);
+      if (dbRef) {
+        dbRef.child("settings").update({
+          masterPass: newMasterPass || localStorage.getItem("rb_master_pass") || "9999",
+          adminPass: newAdminPass || localStorage.getItem("rb_admin_pass") || "1234"
+        });
+      }
       document.getElementById("masterNewMasterPassInput").value = "";
       document.getElementById("masterNewPasscodeInput").value = "";
-      showToast("Passcodes updated successfully!");
+      showToast("Passcodes updated & synced!");
     }
 
     function saveAdminPasscodeOnly() {
@@ -952,8 +968,11 @@
         return;
       }
       localStorage.setItem("rb_admin_pass", newAdminPass);
+      if (dbRef) {
+        dbRef.child("settings").update({ adminPass: newAdminPass });
+      }
       document.getElementById("adminNewPassInput").value = "";
-      showToast("Staff admin passcode updated successfully!");
+      showToast("Staff admin passcode updated & synced!");
     }
 
     function showToast(msg) {
@@ -997,14 +1016,103 @@
       } else if (pageName === "myorders") {
         renderCustomerMyOrders();
       } else if (pageName === "admin") {
-        renderAdminTables();
-        switchAdminSubPage('tables');
-        renderAdminOrders();
-        renderSalesReport();
-        renderAdminMenuList();
-        renderActiveTablesQrList();
+        if (!loggedInRole) {
+          document.getElementById("loginBox").classList.remove("hidden");
+          document.getElementById("masterBox").classList.add("hidden");
+          document.getElementById("adminBox").classList.add("hidden");
+        } else if (loggedInRole === 'master') {
+          document.getElementById("loginBox").classList.add("hidden");
+          document.getElementById("masterBox").classList.remove("hidden");
+          document.getElementById("adminBox").classList.add("hidden");
+          switchMasterSubPage('qr');
+        } else {
+          document.getElementById("loginBox").classList.add("hidden");
+          document.getElementById("masterBox").classList.add("hidden");
+          document.getElementById("adminBox").classList.remove("hidden");
+          switchAdminSubPage('tables');
+        }
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // LOGIN & ROLE SWITCHING LOGIC
+    function login() {
+      const val = document.getElementById("passcodeInput").value.trim();
+      const masterPass = localStorage.getItem("rb_master_pass") || "9999";
+      const adminPass = localStorage.getItem("rb_admin_pass") || "1234";
+
+      if (val === masterPass) {
+        loggedInRole = 'master';
+        document.getElementById("loginMsg").innerText = "";
+        document.getElementById("passcodeInput").value = "";
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("masterBox").classList.remove("hidden");
+        document.getElementById("adminBox").classList.add("hidden");
+        switchMasterSubPage('qr');
+        showToast("Logged in as Master Owner!");
+      } else if (val === adminPass) {
+        loggedInRole = 'admin';
+        document.getElementById("loginMsg").innerText = "";
+        document.getElementById("passcodeInput").value = "";
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("masterBox").classList.add("hidden");
+        document.getElementById("adminBox").classList.remove("hidden");
+        document.getElementById("masterSwitchBackBtn").classList.add("hidden");
+        switchAdminSubPage('tables');
+        showToast("Logged in as Staff / Kitchen Admin!");
+      } else {
+        document.getElementById("loginMsg").innerText = "Invalid passcode! Please try again.";
+      }
+    }
+
+    function logout() {
+      loggedInRole = null;
+      document.getElementById("passcodeInput").value = "";
+      document.getElementById("loginMsg").innerText = "";
+      document.getElementById("masterBox").classList.add("hidden");
+      document.getElementById("adminBox").classList.add("hidden");
+      document.getElementById("loginBox").classList.remove("hidden");
+      showToast("Logged out successfully.");
+    }
+
+    function switchToMasterPanel() {
+      loggedInRole = 'master';
+      document.getElementById("adminBox").classList.add("hidden");
+      document.getElementById("masterBox").classList.remove("hidden");
+      switchMasterSubPage('qr');
+    }
+
+    function switchMasterSubPage(sub) {
+      document.querySelectorAll(".master-sub-page").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".master-sub-btn").forEach(b => {
+        b.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
+      });
+
+      document.getElementById("masterSubPage-" + sub).classList.remove("hidden");
+      const btn = document.getElementById("masterTabBtn-" + sub);
+      if (btn) {
+        btn.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer";
+      }
+
+      if (sub === 'qr') renderActiveTablesQrList();
+    }
+
+    function switchAdminSubPage(sub) {
+      document.querySelectorAll(".admin-sub-page").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".admin-sub-btn").forEach(b => {
+        b.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
+      });
+
+      document.getElementById("adminSubPage-" + sub).classList.remove("hidden");
+      const btn = document.getElementById("adminTabBtn-" + sub);
+      if (btn) {
+        btn.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer";
+      }
+
+      if (sub === 'tables') renderAdminTables();
+      else if (sub === 'orders') renderAdminOrders();
+      else if (sub === 'sales') renderSalesReport();
+      else if (sub === 'menu') renderAdminMenuList();
     }
 
     function renderCategories() {
@@ -1053,15 +1161,21 @@
       }
 
       grid.innerHTML = filtered.map(f => {
+        const isAvailable = f.available !== false;
         const inCart = cart.find(item => item.id === f.id);
         const qty = inCart ? inCart.qty : 0;
         return `
-          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div class="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow ${!isAvailable ? 'opacity-60 grayscale-[30%]' : ''}">
             <div class="relative h-44 bg-stone-100 overflow-hidden">
               <img src="${f.image || 'https://placehold.co/600x400/faf9f6/78350f?text=Dish'}" alt="${f.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/faf9f6/78350f?text=Dish'">
               <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg text-[10px] font-bold ${f.type === 'Veg' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'} shadow">
                 ${f.type}
               </span>
+              ${!isAvailable ? `
+                <div class="absolute inset-0 bg-stone-950/60 flex items-center justify-center">
+                  <span class="px-3 py-1.5 rounded-xl bg-red-600 text-white font-black text-xs shadow-lg uppercase tracking-wider">Out of Stock</span>
+                </div>
+              ` : ''}
             </div>
             <div class="p-4 space-y-2 flex-1 flex flex-col justify-between">
               <div>
@@ -1070,7 +1184,9 @@
               </div>
               <div class="flex items-center justify-between pt-2 border-t border-stone-100">
                 <span class="font-black text-lg text-stone-900">₹${f.price}</span>
-                ${qty === 0 ? `
+                ${!isAvailable ? `
+                  <span class="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-xl">Not Available</span>
+                ` : (qty === 0 ? `
                   <button type="button" onclick="addToCart(${f.id})" class="gold-gradient text-stone-950 font-extrabold px-4 py-2 rounded-xl text-xs shadow hover:opacity-95 transition-all cursor-pointer">
                     + Add
                   </button>
@@ -1080,7 +1196,7 @@
                     <span class="font-bold text-xs px-1">${qty}</span>
                     <button type="button" onclick="updateQty(${f.id}, 1)" class="w-7 h-7 bg-amber-500 rounded-lg shadow text-stone-950 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
                   </div>
-                `}
+                `)}
               </div>
             </div>
           </div>
@@ -1214,6 +1330,11 @@
     }
 
     function proceedToPayment() {
+      if (cart.length === 0) {
+        showToast("Your cart is empty! Please add items first.");
+        return;
+      }
+
       const name = document.getElementById("custName").value.trim();
       const phone = document.getElementById("custPhone").value.trim();
       const table = document.getElementById("custTable").value.trim();
@@ -1244,15 +1365,6 @@
 
       const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
       document.getElementById("dynamicUpiQr").src = qrImageUrl;
-      
-      const downloadQrBtn = document.getElementById("downloadQrBtn");
-      fetch(qrImageUrl).then(res => res.blob()).then(blob => {
-        const objectUrl = URL.createObjectURL(blob);
-        downloadQrBtn.href = objectUrl;
-        downloadQrBtn.download = "UPI_QR_Table_" + table + ".png";
-      }).catch(e => {
-        downloadQrBtn.href = qrImageUrl;
-      });
     }
 
     function confirmOrderAfterPayment(payMethod) {
@@ -1260,6 +1372,12 @@
       const phone = document.getElementById("custPhone").value.trim();
       const table = document.getElementById("custTable").value.trim();
       const totals = calculateCartTotals();
+
+      if (totals.grandTotal <= 0 || cart.length === 0) {
+        showToast("Your cart is empty or total is zero!");
+        showPage('cart');
+        return;
+      }
 
       const orderId = "#ORD" + Math.floor(1000 + Math.random() * 9000);
       const newOrder = {
@@ -1281,25 +1399,43 @@
       currentActiveOrderId = orderId;
       localStorage.setItem("rb_active_order_id", orderId);
 
+      customerDeviceOrders.unshift(newOrder);
+      localStorage.setItem("rb_cust_device_orders", JSON.stringify(customerDeviceOrders));
+
+      orders.unshift(newOrder);
+      localStorage.setItem("rb_orders", JSON.stringify(orders));
+
       if (dbRef) {
         dbRef.child("orders").push(newOrder).then(() => {
           showToast("Order placed & sent live to kitchen!");
         }).catch(err => {
-          orders.unshift(newOrder);
-          localStorage.setItem("rb_orders", JSON.stringify(orders));
+          console.log("Firebase sync warning, saved locally");
         });
       } else {
-        orders.unshift(newOrder);
-        localStorage.setItem("rb_orders", JSON.stringify(orders));
+        showToast("Order placed successfully!");
       }
 
       cart = [];
       saveCart();
       showPage('status');
+      renderOrderStatusTracker();
+    }
+
+    function mergeCustomerDeviceOrders() {
+      customerDeviceOrders.forEach(devOrd => {
+        const exists = orders.find(o => o.orderId === devOrd.orderId);
+        if (!exists) {
+          orders.push(devOrd);
+        } else {
+          devOrd.status = exists.status;
+        }
+      });
+      localStorage.setItem("rb_cust_device_orders", JSON.stringify(customerDeviceOrders));
     }
 
     function renderOrderStatusTracker() {
-      const order = orders.find(x => x.orderId === currentActiveOrderId) || orders[0];
+      mergeCustomerDeviceOrders();
+      const order = orders.find(x => x.orderId === currentActiveOrderId) || customerDeviceOrders[0] || orders[0];
       if (!order) return;
 
       document.getElementById("trackOrderId").innerText = order.orderId;
@@ -1335,215 +1471,159 @@
     }
 
     function renderCustomerMyOrders() {
+      mergeCustomerDeviceOrders();
       const list = document.getElementById("customerMyOrdersList");
-      if (orders.length === 0) {
+      const displayOrders = customerDeviceOrders.length > 0 ? customerDeviceOrders : orders;
+
+      if (displayOrders.length === 0) {
         list.innerHTML = `<div class="py-12 text-center text-stone-400 text-sm bg-white rounded-3xl border border-stone-200">No order history found.</div>`;
         return;
       }
 
-      list.innerHTML = orders.map(o => `
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-4">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
-            <div>
-              <span class="font-mono font-black text-amber-600 text-sm">${o.orderId}</span>
-              <span class="text-xs text-stone-400 block">${o.date}</span>
+      list.innerHTML = displayOrders.map(o => {
+        const liveMatch = orders.find(x => x.orderId === o.orderId);
+        const currentStatus = liveMatch ? liveMatch.status : o.status;
+
+        return `
+          <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
+              <div>
+                <span class="font-mono font-black text-amber-600 text-sm">${o.orderId}</span>
+                <span class="text-xs text-stone-400 block">${o.date}</span>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${currentStatus === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : currentStatus === 'Completed' ? 'bg-blue-100 text-blue-700' : currentStatus === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">
+                ${currentStatus}
+              </span>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold ${o.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : o.status === 'Completed' ? 'bg-blue-100 text-blue-700' : o.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">
-              ${o.status}
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between font-bold text-stone-700">
+                <span>Table: ${o.table}</span>
+                <span>Customer: ${o.name}</span>
+              </div>
+              <div class="border-t pt-2 space-y-1">
+                ${o.items.map(i => `<div class="flex justify-between text-stone-600"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // TABLE MANAGEMENT IN ADMIN
+    function renderAdminTables() {
+      const grid = document.getElementById("tableGrid");
+      grid.innerHTML = tables.map(t => `
+        <div class="bg-stone-50 p-4 rounded-2xl border border-stone-200 text-center space-y-3">
+          <div class="w-10 h-10 bg-amber-500/20 text-amber-700 rounded-xl flex items-center justify-center mx-auto font-bold text-sm">
+            <i class="fa-solid fa-chair"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-stone-900 text-base">Table ${t.name}</h4>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${t.status === 'Occupied' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+              ${t.status}
             </span>
           </div>
-          <div class="space-y-2 text-xs">
-            <div class="flex justify-between font-bold text-stone-700">
-              <span>Table: ${o.table}</span>
-              <span>Customer: ${o.name}</span>
-            </div>
-            <div class="border-t pt-2 space-y-1">
-              ${o.items.map(i => `<div class="flex justify-between text-stone-600"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
-            </div>
+          <div class="flex items-center justify-center gap-1 pt-1">
+            <button type="button" onclick="toggleTableStatus('${t.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white cursor-pointer ${t.status === 'Occupied' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'}">
+              ${t.status === 'Occupied' ? 'Make Free' : 'Occupy'}
+            </button>
+            <button type="button" onclick="deleteTable('${t.id}')" class="p-1.5 bg-stone-200 hover:bg-stone-300 rounded-lg text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       `).join("");
     }
 
-    function login() {
-      const pass = document.getElementById("passcodeInput").value.trim();
-      const masterPass = localStorage.getItem("rb_master_pass") || "9999";
-      const adminPass = localStorage.getItem("rb_admin_pass") || "1234";
-
-      if (pass === masterPass) {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("adminBox").classList.add("hidden");
-        document.getElementById("masterBox").classList.remove("hidden");
-        document.getElementById("page-admin").classList.remove("hidden");
-        switchMasterSubPage('qr');
-        renderActiveTablesQrList();
-        showToast("Logged in as Master!");
-      } else if (pass === adminPass) {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("masterBox").classList.add("hidden");
-        document.getElementById("adminBox").classList.remove("hidden");
-        document.getElementById("page-admin").classList.remove("hidden");
-        renderAdminTables();
-        switchAdminSubPage('tables');
-        renderAdminOrders();
-        renderSalesReport();
-        renderAdminMenuList();
-        showToast("Logged in as Staff Admin!");
-      } else {
-        document.getElementById("loginMsg").innerText = "Incorrect Passcode!";
-      }
-    }
-
-    function logout() {
-      document.getElementById("loginBox").classList.remove("hidden");
-      document.getElementById("adminBox").classList.add("hidden");
-      document.getElementById("masterBox").classList.add("hidden");
-      document.getElementById("passcodeInput").value = "";
-      document.getElementById("loginMsg").innerText = "";
-      showPage('menu');
-    }
-
-    function switchAdminSubPage(sub) {
-      document.querySelectorAll(".admin-sub-page").forEach(p => p.classList.add("hidden"));
-      document.querySelectorAll(".admin-sub-btn").forEach(b => {
-        b.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
-      });
-      document.getElementById("adminSubPage-" + sub).classList.remove("hidden");
-      const btn = document.getElementById("adminTabBtn-" + sub);
-      if (btn) btn.className = "admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer";
-      if(sub === 'tables') renderAdminTables();
-    }
-
-    function switchMasterSubPage(sub) {
-      document.querySelectorAll(".master-sub-page").forEach(p => p.classList.add("hidden"));
-      document.querySelectorAll(".master-sub-btn").forEach(b => {
-        b.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer";
-      });
-      document.getElementById("masterSubPage-" + sub).classList.remove("hidden");
-      const btn = document.getElementById("masterTabBtn-" + sub);
-      if (btn) btn.className = "master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer";
-      if (sub === 'qr') renderActiveTablesQrList();
-    }
-
-    // TABLE MANAGEMENT (FIREBASE SYNC)
-    function renderAdminTables() {
-      const grid = document.getElementById("tableGrid");
-      if (tables.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-8 text-center text-stone-400 text-xs">No tables added yet.</div>`;
-        return;
-      }
-
-      grid.innerHTML = tables.map(t => {
-        const isOccupied = t.status === "Occupied";
-        return `
-          <div class="p-5 rounded-2xl border text-center space-y-3 transition-all flex flex-col justify-between ${isOccupied ? 'bg-red-50 border-red-200 shadow-sm' : 'bg-emerald-50 border-emerald-200 shadow-sm'}">
-            <div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${isOccupied ? 'bg-red-200 text-red-800' : 'bg-emerald-200 text-emerald-800'}">
-                ${t.status}
-              </span>
-              <h4 class="font-serif font-black text-2xl text-stone-900 mt-2">${t.name}</h4>
-            </div>
-            <div class="space-y-1.5 pt-2 border-t border-stone-200/40">
-              <button type="button" onclick="toggleTableStatus('${t.id}')" class="w-full py-2 px-3 rounded-xl font-bold text-xs shadow-sm transition-all cursor-pointer ${isOccupied ? 'bg-stone-950 text-white hover:bg-stone-800' : 'bg-red-600 text-white hover:bg-red-700'}">
-                ${isOccupied ? 'Make Free' : 'Mark Occupied'}
-              </button>
-              <button type="button" onclick="deleteTable('${t.id}')" class="w-full py-1 text-[11px] text-stone-400 hover:text-red-600 cursor-pointer">
-                Delete Table
-              </button>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function toggleTableStatus(tableId) {
-      const t = tables.find(x => x.id === tableId);
-      if(!t) return;
-      t.status = t.status === "Occupied" ? "Free" : "Occupied";
-      saveTables();
-      showToast("Table " + t.name + " marked as " + t.status);
-    }
-
     function addNewTable() {
-      const nameInput = document.getElementById("newTableNameInput");
-      const name = nameInput.value.trim().toUpperCase();
+      const name = document.getElementById("newTableNameInput").value.trim();
       if (!name) {
         showToast("Please enter a table name!");
         return;
       }
-      if (tables.some(t => t.name === name)) {
-        showToast("Table with this name already exists!");
-        return;
-      }
-      const newTable = { id: name, name, status: "Free" };
-      tables.push(newTable);
-      saveTables();
-      nameInput.value = "";
-      showToast("Table " + name + " added!");
+      const newT = { id: name, name, status: "Free" };
+      tables.push(newT);
+      localStorage.setItem("rb_tables", JSON.stringify(tables));
+      if (dbRef) dbRef.child("tables").set(tables);
+      document.getElementById("newTableNameInput").value = "";
+      renderAdminTables();
+      showToast("Table " + name + " added successfully!");
     }
 
-    function deleteTable(tableId) {
-      tables = tables.filter(x => x.id !== tableId);
-      saveTables();
-      showToast("Table removed.");
-    }
-
-    function saveTables() {
+    function toggleTableStatus(id) {
+      const t = tables.find(x => x.id === id);
+      if (!t) return;
+      t.status = t.status === "Occupied" ? "Free" : "Occupied";
       localStorage.setItem("rb_tables", JSON.stringify(tables));
       if (dbRef) dbRef.child("tables").set(tables);
       renderAdminTables();
+      showToast("Table " + t.name + " marked as " + t.status);
     }
 
+    function deleteTable(id) {
+      tables = tables.filter(x => x.id !== id);
+      localStorage.setItem("rb_tables", JSON.stringify(tables));
+      if (dbRef) dbRef.child("tables").set(tables);
+      renderAdminTables();
+      showToast("Table deleted.");
+    }
+
+    // LIVE ORDERS & THERMAL BILL PRINTING
     function renderAdminOrders() {
       const list = document.getElementById("ordersList");
       if (orders.length === 0) {
-        list.innerHTML = `<div class="py-12 text-center text-stone-400 text-sm">No live orders.</div>`;
+        list.innerHTML = `<div class="py-12 text-center text-stone-400 text-sm">No live orders received yet.</div>`;
         return;
       }
 
       list.innerHTML = orders.map(o => {
-        const isAcceptedOrCompleted = o.status === 'Accepted' || o.status === 'Completed';
-        const isCompleted = o.status === 'Completed';
-        const isRejected = o.status === 'Rejected';
-
-        let statusBg = 'bg-amber-100 text-amber-700';
-        if (o.status === 'Accepted') statusBg = 'bg-emerald-100 text-emerald-700';
-        else if (o.status === 'Completed') statusBg = 'bg-blue-100 text-blue-700';
-        else if (o.status === 'Rejected') statusBg = 'bg-red-100 text-red-700';
-
-        const firebaseKeyId = o.firebaseKey || '';
+        const fKey = o.firebaseKey || "";
+        const status = o.status || "Pending";
+        
+        const isPending = status === "Pending";
+        const isAccepted = status === "Accepted";
+        const isFinished = status === "Completed" || status === "Rejected";
 
         return `
           <div class="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-3">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-2">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-3">
               <div>
-                <span class="font-mono font-black text-blue-900 text-sm">${o.orderId}</span>
-                <span class="text-xs text-stone-500 ml-2">Table: <b>${o.table}</b> | Customer: <b>${o.name}</b> (${o.phone})</span>
+                <span class="font-mono font-black text-amber-600 text-sm">${o.orderId}</span>
+                <span class="text-xs text-stone-500 ml-2">${o.date}</span>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBg}">
-                ${o.status}
-              </span>
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-bold ${status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' : status === 'Completed' ? 'bg-blue-100 text-blue-700' : status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}">
+                  ${status}
+                </span>
+              </div>
             </div>
-            <div class="space-y-1 text-xs">
-              ${o.items.map(i => `<div class="flex justify-between text-stone-700"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-bold text-stone-700">
+              <div>Customer: <span class="text-stone-900">${o.name}</span></div>
+              <div>Table: <span class="text-stone-900">${o.table}</span></div>
+              <div>Phone: <span class="text-stone-900">${o.phone}</span></div>
             </div>
-            <div class="pt-2 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="border-t pt-2 space-y-1 text-xs">
+              ${o.items.map(i => `<div class="flex justify-between text-stone-600"><span>${i.name} x ${i.qty}</span><span>₹${i.price * i.qty}</span></div>`).join("")}
+            </div>
+            <div class="border-t pt-2 flex justify-between items-center text-xs">
               <span class="font-black text-sm text-stone-900">Total: ₹${o.total} (${o.paymentMethod})</span>
-              <div class="flex items-center gap-2 flex-wrap">
-                <button type="button" onclick="printKitchenOrderBill('${o.orderId}')" class="px-3.5 py-1.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
-                  <i class="fa-solid fa-print"></i> Print Bill
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <!-- Print Bill is ALWAYS active -->
+                <button type="button" onclick="printKitchenOrderBill('${o.orderId}')" class="px-3 py-1.5 bg-stone-900 hover:bg-stone-800 text-white font-bold rounded-xl cursor-pointer">
+                  <i class="fa-solid fa-print mr-1"></i> Print Bill
                 </button>
-                ${!isAcceptedOrCompleted && !isRejected ? `
-                  <button type="button" onclick="acceptAndSendWhatsAppInvoice('${o.orderId}', '${firebaseKeyId}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
-                    <i class="fa-brands fa-whatsapp"></i> Accept & Invoice
-                  </button>
-                  <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Rejected', '${firebaseKeyId}')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
-                    Reject
-                  </button>
-                ` : ''}
                 
-                <button type="button" onclick="updateOrderStatus('${o.orderId}', 'Completed', '${firebaseKeyId}')" ${!isAcceptedOrCompleted || isCompleted || isRejected ? 'disabled class="px-3.5 py-1.5 bg-stone-200 text-stone-400 font-bold text-xs rounded-xl cursor-not-allowed opacity-60"' : 'class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer"'}>
+                <!-- Accept & WhatsApp / Accept -->
+                <button type="button" ${!isPending ? 'disabled class="px-3 py-1.5 bg-emerald-300 text-white font-bold rounded-xl cursor-not-allowed opacity-60"' : 'onclick="acceptAndSendWhatsAppInvoice(\'' + o.orderId + '\', \'' + fKey + '\')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl cursor-pointer"'}">
+                  <i class="fa-brands fa-whatsapp mr-1"></i> Accept & WhatsApp
+                </button>
+
+                <!-- Complete Button (Active only when Accepted) -->
+                <button type="button" ${!isAccepted ? 'disabled class="px-3 py-1.5 bg-blue-300 text-white font-bold rounded-xl cursor-not-allowed opacity-60"' : 'onclick="updateOrderStatus(\'' + o.orderId + '\', \'Completed\', \'' + fKey + '\')" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl cursor-pointer"'}">
                   Complete
+                </button>
+
+                <!-- Reject Button (Disabled once accepted or finished) -->
+                <button type="button" ${!isPending ? 'disabled class="px-3 py-1.5 bg-red-300 text-white font-bold rounded-xl cursor-not-allowed opacity-60"' : 'onclick="updateOrderStatus(\'' + o.orderId + '\', \'Rejected\', \'' + fKey + '\')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl cursor-pointer"'}">
+                  Reject
                 </button>
               </div>
             </div>
@@ -1552,7 +1632,6 @@
       }).join("");
     }
 
-    // PRINT KITCHEN OR COUNTER BILL
     function printKitchenOrderBill(orderId) {
       const o = orders.find(x => x.orderId === orderId);
       if (!o) return;
@@ -1570,12 +1649,19 @@
 
       document.getElementById("printItemsList").innerHTML = o.items.map(i => `
         <div class="flex justify-between">
-          <span>${i.name}</span>
-          <span>${i.qty} × ₹${i.price} = ₹${i.qty * i.price}</span>
+          <span>- ${i.name}</span>
+          <span>${i.qty} x ₹${i.price} = ₹${i.qty * i.price}</span>
         </div>
       `).join("");
 
       window.print();
+    }
+
+    function exportSalesToPdf() {
+      const originalTitle = document.title;
+      document.title = "Sales_Report_" + new Date().toISOString().slice(0, 10);
+      window.print();
+      document.title = originalTitle;
     }
 
     function resetLiveOrders() {
@@ -1665,24 +1751,44 @@
       }
     }
 
-    function printSalesReport() { window.print(); }
-
     function renderAdminMenuList() {
-      document.getElementById("adminMenuList").innerHTML = foods.map(f => `
-        <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center justify-between gap-2">
-          <div class="flex items-center gap-3">
-            <img src="${f.image || ''}" class="w-10 h-10 rounded-lg object-cover bg-stone-200" onerror="this.src='https://placehold.co/100x100/faf9f6/78350f?text=Dish'">
-            <div>
-              <h5 class="font-bold text-xs text-stone-900 line-clamp-1">${f.name}</h5>
-              <span class="text-[10px] text-amber-600 font-bold">₹${f.price} • ${f.type}</span>
+      document.getElementById("adminMenuList").innerHTML = foods.map(f => {
+        const isAvailable = f.available !== false;
+        return `
+          <div class="bg-stone-50 p-3 rounded-xl border border-stone-200 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-3">
+              <img src="${f.image || ''}" class="w-10 h-10 rounded-lg object-cover bg-stone-200" onerror="this.src='https://placehold.co/100x100/faf9f6/78350f?text=Dish'">
+              <div>
+                <h5 class="font-bold text-xs text-stone-900 line-clamp-1">${f.name}</h5>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] text-amber-600 font-bold">₹${f.price} • ${f.type}</span>
+                  <span class="px-2 py-0.5 rounded text-[9px] font-bold ${isAvailable ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">
+                    ${isAvailable ? 'Available' : 'Not Available'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="toggleFoodAvailability(${f.id})" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-white cursor-pointer ${isAvailable ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-700'}" title="Toggle Availability">
+                ${isAvailable ? 'Mark Unavail' : 'Mark Avail'}
+              </button>
+              <button type="button" onclick="editFood(${f.id})" class="p-1.5 bg-stone-200 hover:bg-stone-300 rounded-lg text-stone-700 text-xs cursor-pointer" title="Edit"><i class="fa-solid fa-pen"></i></button>
+              <button type="button" onclick="deleteFood(${f.id})" class="p-1.5 bg-red-100 hover:bg-red-200 rounded-lg text-red-600 text-xs cursor-pointer" title="Delete"><i class="fa-solid fa-trash"></i></button>
             </div>
           </div>
-          <div class="flex items-center gap-1">
-            <button type="button" onclick="editFood(${f.id})" class="p-1.5 bg-stone-200 hover:bg-stone-300 rounded-lg text-stone-700 text-xs cursor-pointer"><i class="fa-solid fa-pen"></i></button>
-            <button type="button" onclick="deleteFood(${f.id})" class="p-1.5 bg-red-100 hover:bg-red-200 rounded-lg text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
+    }
+
+    function toggleFoodAvailability(id) {
+      const f = foods.find(x => x.id === id);
+      if (!f) return;
+      f.available = f.available === false ? true : false;
+      localStorage.setItem("rb_foods", JSON.stringify(foods));
+      if (dbRef) dbRef.child("foods").set(foods);
+      renderAdminMenuList();
+      renderFood();
+      showToast(f.name + " marked as " + (f.available ? "Available" : "Not Available"));
     }
 
     function saveFoodItem() {
@@ -1704,7 +1810,7 @@
         showToast("Dish updated successfully!");
       } else {
         const newId = foods.length > 0 ? Math.max(...foods.map(x => x.id)) + 1 : 1;
-        foods.push({ id: newId, name, price, category, type, image });
+        foods.push({ id: newId, name, price, category, type, image, available: true });
         showToast("New dish added successfully!");
       }
 
@@ -1749,7 +1855,6 @@
       document.getElementById("cancelEditFoodBtn").classList.add("hidden");
     }
 
-    // TABLE QR MANAGER (FIREBASE CLOUD SYNCED)
     function generateTableQR() {
       const num = document.getElementById("tableGenNumber").value.trim();
       const durationMins = parseInt(document.getElementById("tableSessionDuration").value) || 60;
@@ -1771,17 +1876,11 @@
       document.getElementById("tableQRResult").classList.remove("hidden");
 
       const downloadBtn = document.getElementById("downloadTableQrBtn");
-      fetch(qrImageUrl).then(res => res.blob()).then(blob => {
-        const objectUrl = URL.createObjectURL(blob);
-        downloadBtn.href = objectUrl;
-        downloadBtn.download = "Table_" + num + "_QR.png";
-      }).catch(e => {
-        downloadBtn.href = qrImageUrl;
-      });
+      downloadBtn.href = qrImageUrl;
+      downloadBtn.download = "Table_" + num + "_QR.png";
 
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
-      const expireTime = new Date().getTime() + (durationMins * 60 * 1000);
-      activeQrs.push({ tableNum: num, url: finalUrl, durationMins, expireTime, status: 'Active' });
+      activeQrs.push({ tableNum: num, url: finalUrl, durationMins, status: 'Active' });
       
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       if (dbRef) dbRef.child("activeQrs").set(activeQrs);
@@ -1799,15 +1898,14 @@
 
       list.innerHTML = activeQrs.map(q => {
         const isPaused = q.status === 'Paused';
-        const isExpired = q.expireTime && new Date().getTime() > q.expireTime;
-        const displayStatus = isPaused ? 'Expired' : (isExpired ? 'Expired' : 'Active');
+        const displayStatus = isPaused ? 'Expired' : 'Active';
 
         return `
           <div class="p-3.5 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
             <div>
               <div class="flex items-center gap-2">
                 <span class="font-bold text-stone-900 text-sm">Table: ${q.tableNum}</span>
-                <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${displayStatus !== 'Active' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+                <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${isPaused ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
                   ${displayStatus}
                 </span>
                 <span class="text-[11px] text-stone-500 font-medium">${q.durationMins || 60} Mins Session</span>
@@ -1815,7 +1913,7 @@
               <span class="text-[10px] text-stone-500 font-mono truncate max-w-md block mt-0.5">${q.url}</span>
             </div>
             <div class="flex items-center gap-2">
-              ${displayStatus !== 'Active' ? 
+              ${isPaused ? 
                 `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Active')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg cursor-pointer">Active</button>` : 
                 `<button type="button" onclick="toggleTableQrStatus('${q.tableNum}', 'Paused')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold rounded-lg cursor-pointer">Expire</button>`
               }
@@ -1830,9 +1928,6 @@
       activeQrs.forEach(q => { 
         if (q.tableNum === num) {
           q.status = newStatus;
-          if (newStatus === 'Active') {
-            q.expireTime = new Date().getTime() + ((q.durationMins || 60) * 60 * 1000);
-          }
         }
       });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
@@ -1862,12 +1957,9 @@
       if (table) {
         const found = activeQrs.find(x => x.tableNum === table);
 
-        if (found) {
-          const isExpired = found.expireTime && new Date().getTime() > found.expireTime;
-          if (found.status === 'Paused' || isExpired) {
-            showPage('expired');
-            return;
-          }
+        if (found && found.status === 'Paused') {
+          showPage('expired');
+          return;
         }
 
         currentTableSession = { tableNum: table };
