@@ -888,6 +888,9 @@
 
       // 1. ADMIN LOGIN ROUTE (?admin=true / ?admin=1)
       if (isAdminRoute) {
+        // Remove ?admin=... from URL bar immediately so it cannot be copied with it
+        window.history.replaceState({}, document.title, window.location.pathname);
+
         if(page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.add("hidden");
@@ -904,11 +907,6 @@
 
       // 2. TABLE QR SESSION (?table=...)
       if (tableParam) {
-        if(page404) page404.classList.add("hidden");
-        mainApp.classList.remove("hidden");
-        if (header) header.classList.remove("hidden");
-        if (footer) header.classList.remove("hidden");
-
         const expParam = parseInt(params.get("exp") || "0", 10);
         const now = Date.now();
         if (expParam > 0 && now > expParam) {
@@ -928,6 +926,9 @@
 
       // 3. MAIN WEBSITE ROUTE (?main=true / ?main=1)
       if (isMainRoute) {
+        // Remove ?main=... from URL bar immediately so it cannot be copied with it
+        window.history.replaceState({}, document.title, window.location.pathname);
+
         if(page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.remove("hidden");
