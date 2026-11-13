@@ -880,24 +880,37 @@
       const isMainRoute = params.get("main") === "1" || params.get("main") === "true" || searchStr.includes("main=1") || searchStr.includes("main=true") || hashStr.includes("main=true");
       const tableParam = params.get("table");
 
+      // Save session mode immediately if present in URL
+      if (isAdminRoute) {
+        localStorage.setItem("rb_active_session_mode", "admin");
+      } else if (isMainRoute) {
+        localStorage.setItem("rb_active_session_mode", "main");
+      } else if (tableParam) {
+        let expParam = parseInt(params.get("exp") || "0", 10);
+        currentTableSession = { tableNum: tableParam, expiresAt: expParam };
+        localStorage.setItem("rb_table_session", JSON.stringify(currentTableSession));
+        localStorage.setItem("rb_active_session_mode", "table");
+      }
+
+      // Clear URL parameters cleanly without losing state
+      if (isAdminRoute || isMainRoute || tableParam) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
       const header = document.getElementById("mainSiteHeader");
       const footer = document.getElementById("mainSiteFooter");
       const whiteBar = document.getElementById("whiteNavBarContainer");
       const page404 = document.getElementById("page-404");
       const mainApp = document.getElementById("mainAppContainer");
 
-      // Check persistent session stored in localStorage to survive page refreshes
       const persistedMode = localStorage.getItem("rb_active_session_mode");
 
-      // 1. ADMIN LOGIN ROUTE (?admin=true / ?admin=1)
-      if (isAdminRoute || persistedMode === "admin") {
-        localStorage.setItem("rb_active_session_mode", "admin");
-        window.history.replaceState({}, document.title, window.location.pathname);
-
+      // 1. ADMIN LOGIN ROUTE
+      if (persistedMode === "admin") {
         if(page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.add("hidden");
-        if (footer) header.classList.add("hidden");
+        if (footer) footer.classList.add("hidden");
         if (whiteBar) whiteBar.classList.add("hidden");
 
         document.querySelectorAll(".page-section").forEach(s => s.classList.add("hidden"));
@@ -908,20 +921,10 @@
         return;
       }
 
-      // 2. TABLE QR SESSION (?table=...)
-      if (tableParam || persistedMode === "table") {
-        let tNum = tableParam;
-        let expParam = parseInt(params.get("exp") || "0", 10);
-
-        if (tableParam) {
-          currentTableSession = { tableNum: tableParam, expiresAt: expParam };
-          localStorage.setItem("rb_table_session", JSON.stringify(currentTableSession));
-          localStorage.setItem("rb_active_session_mode", "table");
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } else {
-          const savedTable = JSON.parse(localStorage.getItem("rb_table_session") || "null");
-          if (savedTable) currentTableSession = savedTable;
-        }
+      // 2. TABLE QR SESSION ROUTE
+      if (persistedMode === "table") {
+        const savedTable = JSON.parse(localStorage.getItem("rb_table_session") || "null");
+        if (savedTable) currentTableSession = savedTable;
 
         if (currentTableSession && currentTableSession.expiresAt > 0 && Date.now() > currentTableSession.expiresAt) {
           localStorage.removeItem("rb_active_session_mode");
@@ -941,11 +944,8 @@
         return;
       }
 
-      // 3. MAIN WEBSITE ROUTE (?main=true / ?main=1)
-      if (isMainRoute || persistedMode === "main") {
-        localStorage.setItem("rb_active_session_mode", "main");
-        window.history.replaceState({}, document.title, window.location.pathname);
-
+      // 3. MAIN WEBSITE ROUTE
+      if (persistedMode === "main") {
         if(page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.remove("hidden");
@@ -954,7 +954,7 @@
         return;
       }
 
-      // 4. DEFAULT DIRECT OPEN -> 404 / SESSION EXPIRED (Only if no active session exists)
+      // 4. DEFAULT DIRECT OPEN -> 404 / SESSION EXPIRED
       if(page404) page404.classList.remove("hidden");
       mainApp.classList.add("hidden");
       if (header) header.classList.add("hidden");
