@@ -895,8 +895,8 @@
       const hashStr = (window.location.hash || "").toLowerCase();
       const params = new URLSearchParams(window.location.search);
 
-      const isAdminRoute = params.get("admindashboard") === "1" || searchStr.includes("admindashboard=1") || hashStr.includes("admindashboard=1");
-      const isMainRoute = params.get("main") === "1" || params.get("originalwebsite") === "1" || searchStr.includes("main=1") || searchStr.includes("originalwebsite=1");
+      const isAdminRoute = params.get("admin") === "1" || searchStr.includes("admin=1") || hashStr.includes("admin=1");
+      const isMainRoute = params.get("main") === "1" || searchStr.includes("main=1") || hashStr.includes("main=1");
       const tableParam = params.get("table");
 
       const header = document.getElementById("mainSiteHeader");
@@ -905,7 +905,7 @@
       const page404 = document.getElementById("page-404");
       const mainApp = document.getElementById("mainAppContainer");
 
-      // 1. STANDALONE FULL-SCREEN STAFF / ADMIN DASHBOARD (?admindashboard=1)
+      // 1. ADMIN LOGIN ROUTE (?admin=1)
       if (isAdminRoute) {
         if(page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
@@ -960,28 +960,16 @@
         if(page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.remove("hidden");
-        if (footer) footer.classList.remove("hidden");
+        if (footer) header.classList.remove("hidden");
         showPage("home");
         return;
       }
 
-      // 4. DEFAULT DIRECT OPEN -> SHOW SESSION EXPIRED / CANNOT FIND WEBSITE
-      if(page404) {
-        page404.classList.remove("hidden");
-        page404.innerHTML = `
-          <div class="max-w-md space-y-4">
-            <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-4xl">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h1 class="text-4xl font-black text-stone-900 tracking-tight">Session Expired</h1>
-            <h2 class="text-xl font-bold text-stone-700">Cannot Find This Website</h2>
-            <p class="text-sm text-stone-500">Direct access to this web address without a valid table QR or authorized parameter is restricted or expired.</p>
-          </div>
-        `;
-      }
+      // 4. DEFAULT DIRECT OPEN -> 404 / SESSION EXPIRED
+      if(page404) page404.classList.remove("hidden");
       mainApp.classList.add("hidden");
       if (header) header.classList.add("hidden");
-      if (footer) footer.classList.add("hidden");
+      if (footer) header.classList.add("hidden");
       if (whiteBar) whiteBar.classList.add("hidden");
     }
 
@@ -2280,25 +2268,7 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       initFirebaseRealtimeSync();
-      
-      // Force preview directly to Staff Login page
-      const header = document.getElementById("mainSiteHeader");
-      const footer = document.getElementById("mainSiteFooter");
-      const whiteBar = document.getElementById("whiteNavBarContainer");
-      const page404 = document.getElementById("page-404");
-      const mainApp = document.getElementById("mainAppContainer");
-
-      if(page404) page404.classList.add("hidden");
-      mainApp.classList.remove("hidden");
-      if (header) header.classList.add("hidden");
-      if (footer) footer.classList.add("hidden");
-      if (whiteBar) whiteBar.classList.add("hidden");
-
-      document.querySelectorAll(".page-section").forEach(s => s.classList.add("hidden"));
-      document.getElementById("page-admin").classList.remove("hidden");
-      document.getElementById("loginBox").classList.remove("hidden");
-      document.getElementById("masterBox").classList.add("hidden");
-      document.getElementById("adminBox").classList.add("hidden");
+      routeFromURL();
     });
     window.addEventListener("hashchange", routeFromURL);
   </script>
