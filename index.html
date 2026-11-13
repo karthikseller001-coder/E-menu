@@ -258,36 +258,64 @@
     <section id="page-payment" class="page-section hidden max-w-lg mx-auto px-4 py-8">
       <div class="bg-white rounded-3xl shadow-xl border border-stone-200 overflow-hidden">
         <div class="dark-header text-white p-6 text-center space-y-1">
-          <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Secure Checkout</span>
+          <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Select Payment Method</span>
           <h2 class="text-3xl font-black" id="payScreenAmount">₹0</h2>
           <p class="text-xs text-stone-300" id="payScreenSummary">Table - • Customer</p>
         </div>
 
-        <div class="p-6 space-y-6 text-center">
-          <div class="space-y-2">
-            <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Scan QR to Pay Exact Amount</p>
-            <div class="inline-block p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-sm relative">
-              <img id="dynamicUpiQr" class="w-48 h-48 mx-auto" alt="UPI Payment QR">
+        <div class="p-6 space-y-5 text-center">
+          <!-- Step 1: Payment Choice Buttons -->
+          <div id="paymentChoiceStep" class="space-y-4">
+            <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Choose how you would like to pay</p>
+            
+            <button type="button" onclick="handlePaymentChoice('UPI')" class="w-full py-4 px-5 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-3 transition-all cursor-pointer">
+              <i class="fa-solid fa-qrcode text-lg"></i>
+              <span>Pay with UPI App</span>
+            </button>
+
+            <div class="flex items-center gap-3 text-xs text-stone-400 font-bold">
+              <span class="h-px bg-stone-200 flex-1"></span>
+              <span>OR</span>
+              <span class="h-px bg-stone-200 flex-1"></span>
             </div>
-            <p class="text-xs font-bold text-stone-700 pt-1">Pay with UPI</p>
+
+            <button type="button" onclick="handlePaymentChoice('Cash at Counter')" class="w-full py-4 px-5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-sm shadow-lg flex items-center justify-center gap-3 transition-all cursor-pointer">
+              <i class="fa-solid fa-money-bill-wave text-lg"></i>
+              <span>Pay Cash at Counter Instead</span>
+            </button>
+
+            <div class="pt-2">
+              <button type="button" onclick="showPage('cart')" class="text-xs text-stone-400 hover:text-stone-600 underline cursor-pointer">Back to Cart</button>
+            </div>
           </div>
 
-          <div class="space-y-2">
-            <a id="directUpiAppLink" href="#" class="w-full py-3.5 px-5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all">
-              <i class="fa-solid fa-mobile-screen-button"></i>
-              <span id="upiBtnLabel">Pay ₹0 with PhonePe / Any UPI App</span>
-            </a>
-            <p class="text-[11px] text-stone-400">Opens PhonePe, GPay, or Paytm with fixed cart amount</p>
-          </div>
+          <!-- Step 2: UPI QR & Direct App Link (Shown immediately after placing UPI order) -->
+          <div id="upiPaymentDetailsStep" class="hidden space-y-5">
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-bold">
+              <i class="fa-solid fa-circle-check mr-1"></i> Order Sent to Kitchen! Complete your UPI payment below.
+            </div>
 
-          <div class="border-t border-stone-200 pt-4 space-y-3">
-            <button type="button" onclick="confirmOrderAfterPayment('UPI')" class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer">
-              <i class="fa-solid fa-check-circle mr-1"></i> I Have Paid - Place Order
-            </button>
-            <button type="button" onclick="confirmOrderAfterPayment('Cash at Counter')" class="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs transition-all cursor-pointer">
-              Pay Cash at Counter Instead
-            </button>
-            <button type="button" onclick="showPage('cart')" class="text-xs text-stone-400 hover:text-stone-600 underline cursor-pointer">Back to Cart</button>
+            <div class="space-y-2">
+              <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Scan QR to Pay Exact Amount</p>
+              <div class="inline-block p-3 bg-white border-2 border-amber-500/40 rounded-2xl shadow-sm relative">
+                <img id="dynamicUpiQr" class="w-48 h-48 mx-auto" alt="UPI Payment QR">
+              </div>
+              <p class="text-xs font-bold text-stone-700 pt-1">Pay with UPI</p>
+            </div>
+
+            <div class="space-y-2">
+              <a id="directUpiAppLink" href="#" class="w-full py-3.5 px-5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <span id="upiBtnLabel">Pay ₹0 with PhonePe / Any UPI App</span>
+              </a>
+              <p class="text-[11px] text-stone-400">Opens PhonePe, GPay, or Paytm with fixed cart amount</p>
+            </div>
+
+            <div class="border-t border-stone-200 pt-4">
+              <button type="button" onclick="showPage('status')" class="w-full py-3.5 px-5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-sm shadow-md transition-all cursor-pointer">
+                Track My Order Status <i class="fa-solid fa-arrow-right ml-1"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -759,6 +787,7 @@
     let selectedCategory = "All";
     let selectedTypeFilter = "All";
     let currentTableSession = null;
+    let sessionExpiryInterval = null;
     let loggedInRole = null; // 'master' or 'admin'
 
     const defaultFoods = [
@@ -832,6 +861,11 @@
         localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
         if(!document.getElementById("page-admin").classList.contains("hidden")) {
           renderActiveTablesQrList();
+        }
+        // Re-verify active customer table session immediately on live Firebase update
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("table")) {
+          initTableSessionFromURL(true);
         }
       });
 
@@ -1384,6 +1418,9 @@
       const name = document.getElementById("custName").value.trim();
       const table = document.getElementById("custTable").value.trim();
 
+      document.getElementById("paymentChoiceStep").classList.remove("hidden");
+      document.getElementById("upiPaymentDetailsStep").classList.add("hidden");
+
       document.getElementById("payScreenAmount").innerText = "₹" + totals.grandTotal;
       document.getElementById("payScreenSummary").innerText = `Table ${table} • ${name}`;
       document.getElementById("upiBtnLabel").innerText = `Pay ₹${totals.grandTotal} with PhonePe / Any UPI App`;
@@ -1395,7 +1432,20 @@
       document.getElementById("dynamicUpiQr").src = qrImageUrl;
     }
 
-    function confirmOrderAfterPayment(payMethod) {
+    function handlePaymentChoice(payMethod) {
+      const placed = placeOrderImmediately(payMethod);
+      if (!placed) return;
+
+      if (payMethod === "UPI") {
+        document.getElementById("paymentChoiceStep").classList.add("hidden");
+        document.getElementById("upiPaymentDetailsStep").classList.remove("hidden");
+      } else {
+        showPage('status');
+        renderOrderStatusTracker();
+      }
+    }
+
+    function placeOrderImmediately(payMethod) {
       const name = document.getElementById("custName").value.trim();
       const phone = document.getElementById("custPhone").value.trim();
       const table = document.getElementById("custTable").value.trim();
@@ -1404,10 +1454,22 @@
       if (totals.grandTotal <= 0 || cart.length === 0) {
         showToast("Your cart is empty or total is zero!");
         showPage('cart');
-        return;
+        return false;
       }
 
-      const orderId = "#ORD" + Math.floor(1000 + Math.random() * 9000);
+      // Generate a strictly unique random #ORD number for every order
+      const existingIds = new Set([
+        ...orders.map(o => o.orderId),
+        ...customerDeviceOrders.map(o => o.orderId)
+      ]);
+      let orderId = "";
+      let attempts = 0;
+      do {
+        const randNum = Math.floor(10000 + Math.random() * 90000);
+        orderId = "#ORD" + randNum;
+        attempts++;
+      } while (existingIds.has(orderId) && attempts < 100);
+
       const newOrder = {
         orderId,
         date: new Date().toLocaleString(),
@@ -1435,7 +1497,7 @@
 
       if (dbRef) {
         dbRef.child("orders").push(newOrder).then(() => {
-          showToast("Order placed & sent live to kitchen!");
+          showToast("Order sent live to kitchen!");
         }).catch(err => {
           console.log("Firebase sync warning, saved locally");
         });
@@ -1445,8 +1507,7 @@
 
       cart = [];
       saveCart();
-      showPage('status');
-      renderOrderStatusTracker();
+      return true;
     }
 
     function renderOrderStatusTracker() {
@@ -1885,6 +1946,7 @@
 
       const urlObj = new URL(window.location.href);
       urlObj.searchParams.set("table", num);
+      urlObj.searchParams.set("dur", durationMins);
       const finalUrl = urlObj.toString();
 
       document.getElementById("tableQRTitle").innerText = "Table " + num + " QR Code";
@@ -1900,7 +1962,7 @@
       downloadBtn.download = "Table_" + num + "_QR.png";
 
       activeQrs = activeQrs.filter(x => x.tableNum !== num);
-      activeQrs.push({ tableNum: num, url: finalUrl, durationMins, status: 'Active' });
+      activeQrs.push({ tableNum: num, url: finalUrl, durationMins, createdAt: Date.now(), status: 'Active' });
       
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       if (dbRef) dbRef.child("activeQrs").set(activeQrs);
@@ -1948,6 +2010,9 @@
       activeQrs.forEach(q => { 
         if (q.tableNum === num) {
           q.status = newStatus;
+          if (newStatus === 'Active') {
+            q.createdAt = Date.now();
+          }
         }
       });
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
@@ -1970,31 +2035,66 @@
       showToast("Table URL copied to clipboard!");
     }
 
-    function initTableSessionFromURL() {
+    function initTableSessionFromURL(isLiveSync = false) {
       const params = new URLSearchParams(window.location.search);
       const table = params.get("table");
+      const urlDur = parseInt(params.get("dur"));
 
       if (table) {
         const found = activeQrs.find(x => x.tableNum === table);
 
         if (found && found.status === 'Paused') {
+          if (sessionExpiryInterval) clearInterval(sessionExpiryInterval);
+          currentTableSession = null;
+          document.getElementById("tableSessionBadge").classList.add("hidden");
+          document.getElementById("tableSessionBadge").classList.remove("flex");
           showPage('expired');
           return;
         }
 
-        currentTableSession = { tableNum: table };
+        const durationMins = (found && found.durationMins) ? parseInt(found.durationMins) : (urlDur || 60);
+        const sessionKey = "rb_table_scan_start_" + table;
+        let scanStartTime = parseInt(localStorage.getItem(sessionKey));
+
+        if (!scanStartTime || (found && found.createdAt && scanStartTime < found.createdAt)) {
+          scanStartTime = Date.now();
+          localStorage.setItem(sessionKey, scanStartTime);
+        }
+
+        const expiryTime = scanStartTime + (durationMins * 60 * 1000);
+
+        if (Date.now() >= expiryTime) {
+          if (sessionExpiryInterval) clearInterval(sessionExpiryInterval);
+          currentTableSession = null;
+          document.getElementById("tableSessionBadge").classList.add("hidden");
+          document.getElementById("tableSessionBadge").classList.remove("flex");
+          showPage('expired');
+          return;
+        }
+
+        currentTableSession = { tableNum: table, expiryTime };
         document.getElementById("badgeTableNum").innerText = table;
         document.getElementById("tableSessionBadge").classList.remove("hidden");
         document.getElementById("tableSessionBadge").classList.add("flex");
+
+        if (sessionExpiryInterval) clearInterval(sessionExpiryInterval);
+        sessionExpiryInterval = setInterval(() => {
+          const latestFound = activeQrs.find(x => x.tableNum === table);
+          if ((latestFound && latestFound.status === 'Paused') || Date.now() >= expiryTime) {
+            clearInterval(sessionExpiryInterval);
+            currentTableSession = null;
+            document.getElementById("tableSessionBadge").classList.add("hidden");
+            document.getElementById("tableSessionBadge").classList.remove("flex");
+            showPage('expired');
+          }
+        }, 1000);
       }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       saveCart();
       initFirebaseRealtimeSync();
-      setTimeout(() => {
-        initTableSessionFromURL();
-      }, 500);
+      initTableSessionFromURL();
       if (!currentTableSession || document.getElementById("page-expired").classList.contains("hidden")) {
         showPage('home');
       }
