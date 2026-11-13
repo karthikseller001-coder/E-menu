@@ -80,7 +80,7 @@
   </div>
 
   <!-- Top Navigation Header -->
-  <header class="dark-header text-white sticky top-0 z-40 shadow-lg border-b border-amber-500/20">
+  <header id="mainSiteHeader" class="dark-header text-white sticky top-0 z-40 shadow-lg border-b border-amber-500/20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
       <div onclick="showPage('home')" class="flex items-center gap-3 cursor-pointer group justify-start">
         <div id="brandLogoContainer" class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 overflow-hidden">
@@ -374,341 +374,21 @@
           <h2 class="font-serif font-bold text-2xl text-stone-900">Session Expired</h2>
           <p class="text-sm text-stone-600">Your dining table session has expired or been ended. Please scan the QR code at your table again or contact staff.</p>
         </div>
-        <button type="button" onclick="showPage('menu')" class="w-full py-3.5 rounded-xl bg-stone-900 text-white font-bold text-sm shadow cursor-pointer">
-          Browse Menu Anyway
-        </button>
       </div>
     </section>
 
-    <!-- CUSTOMER MY ORDERS -->
-    <section id="page-myorders" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-      <div class="flex items-center justify-between border-b border-stone-200 pb-4">
-        <div>
-          <h2 class="font-serif font-bold text-2xl sm:text-3xl text-stone-900">My Orders History</h2>
-          <p class="text-xs text-stone-500">Track all your food orders placed from this device/table</p>
+    <!-- 404 NOT FOUND PAGE (Direct URL Access Protection) -->
+    <section id="page-404" class="page-section hidden min-h-screen flex flex-col items-center justify-center px-4 text-center bg-stone-50">
+      <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl border border-stone-200 space-y-5">
+        <div class="w-20 h-20 bg-stone-100 text-stone-800 rounded-full flex items-center justify-center mx-auto text-4xl font-black">
+          404
         </div>
-        <button type="button" onclick="showPage('menu')" class="text-xs font-bold text-brand-800 hover:underline cursor-pointer">+ Order More</button>
-      </div>
-      <div id="customerMyOrdersList" class="space-y-4"></div>
-    </section>
-
-    <!-- STAFF / MASTER CONTROL LOGIN & PANELS -->
-    <section id="page-admin" class="page-section hidden max-w-6xl mx-auto px-4 py-8 space-y-6">
-      
-      <!-- Staff Login Box -->
-      <div id="loginBox" class="bg-white p-8 rounded-3xl shadow-xl max-w-md mx-auto border border-stone-200 text-center space-y-4">
-        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner">
-          <i class="fa-solid fa-shield-halved"></i>
+        <div class="space-y-2">
+          <h2 class="font-serif font-extrabold text-3xl text-stone-900">404 Not Found</h2>
+          <p class="text-sm text-stone-500">The requested URL was not found on this server. Please scan a valid Table QR Code at the restaurant to access the digital menu.</p>
         </div>
-        <div class="space-y-1">
-          <h2 class="font-serif font-bold text-2xl text-stone-900">Staff Login</h2>
-          <p class="text-xs text-stone-500">Enter Passcode</p>
-        </div>
-        <div class="space-y-3 pt-2">
-          <input id="passcodeInput" type="password" placeholder="Enter Passcode" class="w-full px-4 py-3 rounded-xl border border-stone-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none">
-          <button type="button" onclick="login()" class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-lg transition-all cursor-pointer">
-            Login
-          </button>
-          <p id="loginMsg" class="text-xs font-bold text-red-600"></p>
-        </div>
-        <div class="pt-4 border-t">
-          <button type="button" onclick="showPage('home')" class="text-xs text-stone-500 hover:underline cursor-pointer">← Back to Home</button>
-        </div>
-      </div>
-
-      <!-- Master Control Box -->
-      <div id="masterBox" class="hidden space-y-6">
-        <div class="bg-blue-900 text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-blue-300 text-xl font-bold">
-              <i class="fa-solid fa-crown"></i>
-            </div>
-            <div>
-              <h2 class="font-serif font-bold text-2xl">Master Panel Dashboard</h2>
-              <p class="text-xs text-blue-200">Full system owner controls & QR code generator</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <button type="button" onclick="switchMasterSubPage('qr')" id="masterTabBtn-qr" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-800 text-white shadow cursor-pointer">Table QR</button>
-            <button type="button" onclick="switchMasterSubPage('passcodes')" id="masterTabBtn-passcodes" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Passcodes</button>
-            <button type="button" onclick="switchMasterSubPage('branding')" id="masterTabBtn-branding" class="master-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Branding</button>
-            <button type="button" onclick="logout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 cursor-pointer">Logout</button>
-          </div>
-        </div>
-
-        <div id="masterSubPage-qr" class="master-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Table QR Link Manager & Session Timer</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Table Number/Name</label>
-              <input id="tableGenNumber" type="text" placeholder="e.g. 1 or VIP-1" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Session Duration (Minutes)</label>
-              <input id="tableSessionDuration" type="number" value="60" placeholder="e.g. 60 mins" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            <div class="flex items-end">
-              <button type="button" onclick="generateTableQR()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
-                Generate Table QR
-              </button>
-            </div>
-          </div>
-
-          <div id="tableQRResult" class="hidden p-6 bg-blue-50 rounded-2xl border border-blue-200 text-center space-y-4">
-            <h4 id="tableQRTitle" class="font-bold text-blue-900 text-base">Table QR</h4>
-            <div class="inline-block p-4 bg-white rounded-2xl shadow border border-stone-200">
-              <img id="tableQRImg" class="w-48 h-48 mx-auto object-contain bg-white" alt="Table QR" src="">
-            </div>
-            <div>
-              <a id="downloadTableQrBtn" href="#" download="Table_QR.png" class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 transition-colors shadow cursor-pointer">
-                <i class="fa-solid fa-download"></i> Download QR Code
-              </a>
-            </div>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
-              <p id="tableQRUrl" class="text-xs text-blue-700 font-mono break-all select-all bg-white p-2.5 rounded-xl border border-blue-200 flex-1"></p>
-              <button type="button" onclick="copyTableQRUrl()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shrink-0 cursor-pointer">
-                <i class="fa-solid fa-copy mr-1"></i> Copy URL
-              </button>
-            </div>
-          </div>
-
-          <div class="pt-6 border-t border-stone-200 space-y-4">
-            <h4 class="font-bold text-stone-800 text-sm">Tax / GST Name & Percentage Settings</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-stone-600 mb-1">Tax / GST Label Name</label>
-                <input id="masterTaxLabelInput" type="text" value="Tax" placeholder="e.g. GST or VAT" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-stone-600 mb-1">Tax Percentage (%)</label>
-                <input id="masterTaxRateInput" type="number" step="0.1" value="5" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
-              </div>
-              <div class="flex items-end">
-                <button type="button" onclick="saveMasterTaxSettings()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Save Tax Settings</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-6 border-t border-stone-200 space-y-4">
-            <h4 class="font-bold text-stone-800 text-sm">Generated Tables & Active Sessions</h4>
-            <div id="activeTablesQrList" class="space-y-2">
-              <p class="text-xs text-stone-400 italic">No table QR generated yet.</p>
-            </div>
-          </div>
-        </div>
-
-        <div id="masterSubPage-passcodes" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings</h3>
-          <div class="max-w-md space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">New Master Control Passcode</label>
-              <input id="masterNewMasterPassInput" type="text" placeholder="Enter new master passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Admin Passcode</label>
-              <input id="masterNewPasscodeInput" type="text" placeholder="Enter new staff admin passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-            <button type="button" onclick="saveNewPasscodes()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Passcodes</button>
-          </div>
-        </div>
-
-        <div id="masterSubPage-branding" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Website Branding & Content Customization</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Brand Name</label>
-              <input id="editBrandName" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Tagline</label>
-              <input id="editBrandTagline" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Header Logo Image URL</label>
-              <input id="editHeaderLogoUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">WhatsApp Invoice Header Title</label>
-              <input id="editWaTitle" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Home Hero Background Image URL</label>
-              <input id="editHeroBgUrl" type="text" placeholder="https://..." class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Home Badge</label>
-              <input id="editHomeBadge" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Home Title 1</label>
-              <input id="editHomeTitle1" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Home Title 2</label>
-              <input id="editHomeTitle2" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-stone-600 mb-1">Hero Description</label>
-              <textarea id="editHomeDesc" rows="2" class="w-full px-3 py-2 rounded-xl border text-sm"></textarea>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-stone-600 mb-1">Footer Text</label>
-              <input id="editFooterText" type="text" class="w-full px-3 py-2 rounded-xl border text-sm">
-            </div>
-          </div>
-          <button type="button" onclick="saveBrandingSettings()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Save Branding Settings</button>
-        </div>
-      </div>
-
-      <!-- Admin Box (Kitchen / Orders / Menu) -->
-      <div id="adminBox" class="hidden space-y-6">
-        <div class="bg-blue-900 text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-white/10 text-blue-300 rounded-xl flex items-center justify-center text-xl font-bold">
-              <i class="fa-solid fa-utensils"></i>
-            </div>
-            <div>
-              <h2 class="font-serif font-bold text-2xl">Admin Kitchen & Orders Panel</h2>
-              <p class="text-xs text-blue-200">Manage live orders, dishes & sales reports</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <button type="button" onclick="switchAdminSubPage('tables')" id="adminTabBtn-tables" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Tables</button>
-            <button type="button" onclick="switchAdminSubPage('sales')" id="adminTabBtn-sales" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow cursor-pointer">Sales</button>
-            <button type="button" onclick="switchAdminSubPage('orders')" id="adminTabBtn-orders" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Live Orders</button>
-            <button type="button" onclick="switchAdminSubPage('menu')" id="adminTabBtn-menu" class="admin-sub-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-blue-900 cursor-pointer">Menu</button>
-            <button type="button" id="masterSwitchBackBtn" onclick="switchToMasterPanel()" class="hidden px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-stone-950 cursor-pointer">Master Panel</button>
-            <button type="button" onclick="logout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white hover:bg-red-700 cursor-pointer">Logout</button>
-          </div>
-        </div>
-
-        <!-- TABLE MANAGEMENT SUB-PAGE -->
-        <div id="adminSubPage-tables" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4">
-            <div>
-              <h3 class="font-serif font-bold text-xl text-stone-900">Restaurant Table Management</h3>
-              <p class="text-xs text-stone-500">Track and toggle table occupancy status in real-time</p>
-            </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-              <input id="newTableNameInput" type="text" placeholder="Table Name (e.g. T4)" class="px-3.5 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none">
-              <button type="button" onclick="addNewTable()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer whitespace-nowrap">+ Add Table</button>
-            </div>
-          </div>
-          <div id="tableGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-        </div>
-
-        <!-- SALES REPORT SUB-PAGE -->
-        <div id="adminSubPage-sales" class="admin-sub-page bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h3 class="font-serif font-bold text-xl text-stone-900">Sales Analytics & Revenue</h3>
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
-              <button type="button" onclick="exportSalesToPdf()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer flex items-center gap-1.5">
-                <i class="fa-solid fa-file-pdf"></i> Save as PDF / Print
-              </button>
-              <button type="button" onclick="resetSalesReport()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
-                Reset Report
-              </button>
-              <select id="reportFilterType" onchange="renderSalesReport()" class="px-4 py-2 rounded-xl border border-stone-300 text-xs font-bold bg-stone-50 outline-none">
-                <option value="all">All-Time Sales</option>
-                <option value="daily">Today's Sales</option>
-                <option value="monthly">This Month's Sales</option>
-              </select>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="p-5 bg-stone-50 rounded-2xl border border-stone-200">
-              <span class="text-xs text-stone-500 font-bold uppercase tracking-wider block">Total Orders</span>
-              <span id="reportTotalOrders" class="text-2xl font-black text-stone-900 mt-1 block">0</span>
-            </div>
-            <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-200">
-              <span class="text-xs text-emerald-700 font-bold uppercase tracking-wider block">Accepted Orders</span>
-              <span id="reportAcceptedOrders" class="text-2xl font-black text-emerald-900 mt-1 block">0</span>
-            </div>
-            <div class="p-5 bg-blue-50 rounded-2xl border border-blue-200">
-              <span class="text-xs text-blue-800 font-bold uppercase tracking-wider block">Total Revenue</span>
-              <span id="reportTotalRevenue" class="text-2xl font-black text-blue-950 mt-1 block">₹0</span>
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table id="salesExcelTable" class="w-full text-left text-xs border-collapse">
-              <thead class="bg-stone-100 text-stone-800 font-bold uppercase border-b border-stone-300">
-                <tr>
-                  <th class="p-2 border border-stone-300">Date</th>
-                  <th class="p-2 border border-stone-300">Order ID</th>
-                  <th class="p-2 border border-stone-300">Customer</th>
-                  <th class="p-2 border border-stone-300">Table</th>
-                  <th class="p-2 border border-stone-300">Phone</th>
-                  <th class="p-2 border border-stone-300">Status</th>
-                  <th class="p-2 border border-stone-300 text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody id="salesReportTableBody" class="divide-y divide-stone-200"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- LIVE ORDERS SUB-PAGE -->
-        <div id="adminSubPage-orders" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-4">
-          <div class="flex justify-between items-center flex-wrap gap-2">
-            <h3 class="font-serif font-bold text-xl text-stone-900">Live Customer Orders</h3>
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="resetLiveOrders()" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Reset All Orders</button>
-              <button type="button" onclick="renderAdminOrders()" class="px-3 py-1.5 bg-stone-100 text-xs font-bold rounded-xl hover:bg-stone-200 cursor-pointer"><i class="fa-solid fa-rotate mr-1"></i> Refresh</button>
-            </div>
-          </div>
-          <div id="ordersList" class="space-y-3"></div>
-        </div>
-
-        <div id="adminSubPage-menu" class="admin-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 id="menuFormTitle" class="font-serif font-bold text-xl text-stone-900">Add New Dish to Menu</h3>
-          <input type="hidden" id="editFoodId" value="">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Dish Name *</label>
-              <input id="foodName" type="text" placeholder="e.g. Chicken Biryani" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Price (₹) *</label>
-              <input id="foodPrice" type="number" placeholder="250" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Category *</label>
-              <input id="foodCategory" type="text" placeholder="Starters / Biryani / Drinks" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">Type *</label>
-              <select id="foodType" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm bg-white outline-none">
-                <option value="Non-Veg">Non-Veg</option>
-                <option value="Veg">Veg</option>
-              </select>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-stone-600 mb-1">Image URL</label>
-              <input id="foodImage" type="text" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <button type="button" id="saveFoodBtn" onclick="saveFoodItem()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-6 py-3 rounded-xl text-xs shadow cursor-pointer">
-              + Add Dish to Digital Menu
-            </button>
-            <button type="button" id="cancelEditFoodBtn" onclick="resetFoodForm()" class="hidden bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold px-4 py-3 rounded-xl text-xs cursor-pointer">
-              Cancel Edit
-            </button>
-          </div>
-
-          <div class="pt-6 border-t border-stone-200 space-y-4 max-w-md">
-            <h4 class="font-bold text-stone-800 text-sm">Change Staff Admin Passcode</h4>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Admin Passcode</label>
-              <input id="adminNewPassInput" type="text" placeholder="Enter new admin passcode" class="w-full px-3.5 py-2 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-            <button type="button" onclick="saveAdminPasscodeOnly()" class="py-2.5 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Admin Passcode</button>
-          </div>
-
-          <div class="pt-6 border-t border-stone-200 space-y-4">
-            <h4 class="font-bold text-stone-800 text-sm">Manage Existing Menu Items & Availability</h4>
-            <div id="adminMenuList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-2"></div>
-          </div>
+        <div class="pt-2 border-t border-stone-100 text-[11px] text-stone-400 font-mono">
+          ERROR_CODE: DIRECT_ACCESS_RESTRICTED
         </div>
       </div>
     </section>
@@ -771,10 +451,10 @@
   </div>
 
   <!-- Footer -->
-  <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-xs mt-auto">
+  <footer id="mainSiteFooter" class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-xs mt-auto">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3">
       <div class="flex items-center gap-2.5">
-        <div onclick="showPage('admin')" title="Staff Login" class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 overflow-hidden cursor-pointer hover:bg-amber-500/30 transition-colors">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 overflow-hidden">
           <img id="footerLogoImg" src="" alt="Logo" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden')">
           <svg id="footerLogoSvg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
@@ -2051,12 +1731,20 @@
       const target = document.getElementById("page-" + pageName);
       if (target) target.classList.remove("hidden");
 
+      const headerEl = document.getElementById("mainSiteHeader");
+      const footerEl = document.getElementById("mainSiteFooter");
       const whiteNav = document.getElementById("whiteNavBarContainer");
-      if (whiteNav) {
-        if (pageName === "home") {
-          whiteNav.classList.add("hidden");
-        } else {
-          whiteNav.classList.remove("hidden");
+
+      if (pageName === "404" || pageName === "admin") {
+        if (headerEl) headerEl.classList.add("hidden");
+        if (footerEl) footerEl.classList.add("hidden");
+        if (whiteNav) whiteNav.classList.add("hidden");
+      } else {
+        if (headerEl) headerEl.classList.remove("hidden");
+        if (footerEl) footerEl.classList.remove("hidden");
+        if (whiteNav) {
+          if (pageName === "home") whiteNav.classList.add("hidden");
+          else whiteNav.classList.remove("hidden");
         }
       }
 
@@ -2081,13 +1769,20 @@
       } else if (pageName === "myorders") {
         renderCustomerMyOrders();
       } else if (pageName === "admin") {
+        const adminSec = document.getElementById("page-admin");
+        if (adminSec) {
+          adminSec.classList.add("min-h-screen", "flex", "flex-col", "justify-center");
+        }
+
         if (loggedInRole === "master") {
+          if (adminSec) adminSec.classList.remove("justify-center");
           document.getElementById("loginBox").classList.add("hidden");
           document.getElementById("masterBox").classList.remove("hidden");
           document.getElementById("adminBox").classList.add("hidden");
           loadBrandingInputs();
           loadTaxInputs();
         } else if (loggedInRole === "admin") {
+          if (adminSec) adminSec.classList.remove("justify-center");
           document.getElementById("loginBox").classList.add("hidden");
           document.getElementById("masterBox").classList.add("hidden");
           document.getElementById("adminBox").classList.remove("hidden");
@@ -2101,45 +1796,41 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function showToast(message) {
+    function showToast(msg) {
       const box = document.getElementById("toastBox");
       const text = document.getElementById("toastText");
       if (!box || !text) return;
-      text.innerText = message;
+      text.innerText = msg;
       box.classList.remove("translate-y-24", "opacity-0");
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => {
+      setTimeout(() => {
         box.classList.add("translate-y-24", "opacity-0");
-      }, 3000);
+      }, 2800);
     }
 
     function loadTaxInputs() {
-      const labelEl = document.getElementById("masterTaxLabelInput");
+      const lbl = localStorage.getItem("rb_tax_label") || "Tax";
+      const rate = localStorage.getItem("rb_tax_rate") || "5";
+      const lblEl = document.getElementById("masterTaxLabelInput");
       const rateEl = document.getElementById("masterTaxRateInput");
-      if (labelEl) labelEl.value = localStorage.getItem("rb_tax_label") || "Tax";
-      if (rateEl) rateEl.value = localStorage.getItem("rb_tax_rate") || "5";
+      if (lblEl) lblEl.value = lbl;
+      if (rateEl) rateEl.value = rate;
     }
 
     function saveMasterTaxSettings() {
       const taxLabel = document.getElementById("masterTaxLabelInput").value.trim() || "Tax";
       const taxRate = parseFloat(document.getElementById("masterTaxRateInput").value);
-      if (isNaN(taxRate) || taxRate < 0) {
-        showToast("Please enter a valid tax percentage!");
-        return;
-      }
+      const validRate = isNaN(taxRate) ? 5 : taxRate;
       localStorage.setItem("rb_tax_label", taxLabel);
-      localStorage.setItem("rb_tax_rate", taxRate);
-      if (dbRef) dbRef.child("settings").update({ taxLabel, taxRate });
+      localStorage.setItem("rb_tax_rate", validRate);
+      if (dbRef) {
+        dbRef.child("settings").update({ taxLabel, taxRate: validRate });
+      }
       showToast("Tax settings saved!");
     }
 
     function saveNewPasscodes() {
       const newMaster = document.getElementById("masterNewMasterPassInput").value.trim();
       const newAdmin = document.getElementById("masterNewPasscodeInput").value.trim();
-      if (!newMaster && !newAdmin) {
-        showToast("Enter at least one new passcode to update.");
-        return;
-      }
       const updates = {};
       if (newMaster) {
         localStorage.setItem("rb_master_pass", newMaster);
@@ -2148,6 +1839,10 @@
       if (newAdmin) {
         localStorage.setItem("rb_admin_pass", newAdmin);
         updates.adminPass = newAdmin;
+      }
+      if (Object.keys(updates).length === 0) {
+        showToast("Enter at least one new passcode!");
+        return;
       }
       if (dbRef) dbRef.child("settings").update(updates);
       document.getElementById("masterNewMasterPassInput").value = "";
@@ -2164,7 +1859,7 @@
       localStorage.setItem("rb_admin_pass", newAdmin);
       if (dbRef) dbRef.child("settings").update({ adminPass: newAdmin });
       document.getElementById("adminNewPassInput").value = "";
-      showToast("Admin passcode updated!");
+      showToast("Staff admin passcode updated!");
     }
 
     function loadBrandingInputs() {
@@ -2181,30 +1876,49 @@
     }
 
     function saveBrandingSettings() {
-      branding = {
-        brandName: document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice",
-        brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
-        headerLogoUrl: document.getElementById("editHeaderLogoUrl").value.trim(),
-        waTitle: document.getElementById("editWaTitle").value.trim() || "HOTEL ROYAL SPICE - TAX INVOICE",
-        heroBgUrl: document.getElementById("editHeroBgUrl").value.trim(),
-        homeBadge: document.getElementById("editHomeBadge").value.trim(),
-        homeTitle1: document.getElementById("editHomeTitle1").value.trim(),
-        homeTitle2: document.getElementById("editHomeTitle2").value.trim(),
-        homeDesc: document.getElementById("editHomeDesc").value.trim(),
-        footerText: document.getElementById("editFooterText").value.trim()
-      };
+      branding.brandName = document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice";
+      branding.brandTagline = document.getElementById("editBrandTagline").value.trim() || "Restaurant";
+      branding.headerLogoUrl = document.getElementById("editHeaderLogoUrl").value.trim();
+      branding.waTitle = document.getElementById("editWaTitle").value.trim() || "HOTEL ROYAL SPICE - TAX INVOICE";
+      branding.heroBgUrl = document.getElementById("editHeroBgUrl").value.trim();
+      branding.homeBadge = document.getElementById("editHomeBadge").value.trim();
+      branding.homeTitle1 = document.getElementById("editHomeTitle1").value.trim();
+      branding.homeTitle2 = document.getElementById("editHomeTitle2").value.trim();
+      branding.homeDesc = document.getElementById("editHomeDesc").value.trim();
+      branding.footerText = document.getElementById("editFooterText").value.trim();
+
+      if (branding.heroBgUrl) {
+        const heroImg = document.getElementById("homeHeroBgImg");
+        if (heroImg) heroImg.src = branding.heroBgUrl;
+      }
+
       localStorage.setItem("rb_branding", JSON.stringify(branding));
       if (dbRef) dbRef.child("branding").set(branding);
       applyBranding();
-      showToast("Branding settings saved!");
+      showToast("Branding & content updated!");
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      saveCart();
+    window.addEventListener("DOMContentLoaded", () => {
       initFirebaseRealtimeSync();
-      initTableSessionFromURL();
-      if (!currentTableSession || document.getElementById("page-expired").classList.contains("hidden")) {
-        showPage('home');
+      updateStickyCartBar();
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("admindashboard") === "1") {
+        // Admin portal never expires
+        if (sessionExpiryInterval) clearInterval(sessionExpiryInterval);
+        showPage("admin");
+      } else if (params.get("table")) {
+        // Table QR session with auto-expiry timer
+        initTableSessionFromURL();
+        if (currentTableSession) {
+          showPage("menu");
+        }
+      } else if (params.get("originalwebsite") === "1") {
+        // Explicit original website access
+        showPage("home");
+      } else {
+        // Direct URL without parameters shows 404 Not Found
+        showPage("404");
       }
     });
   </script>
