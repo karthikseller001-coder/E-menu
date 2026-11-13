@@ -40,18 +40,29 @@
   * { box-sizing: border-box; }
 
   @media print {
-    body * { visibility: hidden !important; }
-    #printableInvoiceArea, #printableInvoiceArea * { visibility: visible !important; }
-    #printableInvoiceArea {
-      position: absolute !important;
-      left: 0 !important;
-      top: 0 !important;
+    body.printing-receipt > *:not(#printableInvoiceArea) { display: none !important; }
+    body.printing-receipt #printableInvoiceArea {
+      display: block !important;
+      visibility: visible !important;
+      position: static !important;
       width: 100% !important;
       max-width: 80mm !important;
       margin: 0 auto !important;
-      padding: 10px !important;
+      padding: 12px !important;
       font-family: monospace !important;
       font-size: 12px !important;
+      color: #000 !important;
+      background: #fff !important;
+    }
+
+    body.printing-sales > *:not(#printableSalesArea) { display: none !important; }
+    body.printing-sales #printableSalesArea {
+      display: block !important;
+      visibility: visible !important;
+      position: static !important;
+      width: 100% !important;
+      padding: 20px !important;
+      font-family: 'Inter', sans-serif !important;
       color: #000 !important;
       background: #fff !important;
     }
@@ -121,9 +132,6 @@
           <i class="fa-solid fa-receipt text-amber-600"></i> My Orders
         </button>
       </nav>
-      <button type="button" onclick="showPage('admin')" class="w-10 h-10 rounded-xl bg-amber-500 text-stone-950 shadow cursor-pointer flex items-center justify-center shrink-0 hover:opacity-90 transition-opacity" title="Staff Login">
-        <i class="fa-solid fa-user-shield text-sm"></i>
-      </button>
     </div>
   </div>
 
@@ -726,7 +734,7 @@
     <div class="space-y-0.5 text-[11px] border-b border-black pb-2 mb-2">
       <div class="flex justify-between"><span>Subtotal:</span><span id="printSubTotal"></span></div>
       <div class="flex justify-between"><span id="printTaxLabel">Tax:</span><span id="printTaxAmount"></span></div>
-      <div class="flex justify-between font-bold text-xs pt-1"><span>GRAND TOTAL:</span><span id="printTotal"></span></div>
+      <div class="border border-black px-2 py-1 mt-1.5 flex justify-between font-bold text-xs"><span>GRAND TOTAL:</span><span id="printTotal"></span></div>
     </div>
     <div class="text-center text-[10px] space-y-0.5">
       <div>Payment: <span id="printPaymentMethod" class="font-bold"></span></div>
@@ -734,10 +742,47 @@
     </div>
   </div>
 
+  <!-- Hidden Printable Sales Report Template -->
+  <div id="printableSalesArea" class="hidden p-6 bg-white text-stone-900 w-full font-sans text-xs">
+    <div class="text-center border-b-2 border-stone-800 pb-3 mb-4">
+      <h2 id="printSalesBrandName" class="font-bold text-lg uppercase">HOTEL ROYAL SPICE</h2>
+      <p class="text-xs font-semibold text-stone-600">SALES & REVENUE REPORT</p>
+      <p id="printSalesDate" class="text-[11px] text-stone-500 mt-1"></p>
+    </div>
+    <div class="grid grid-cols-3 gap-4 mb-4 border border-stone-300 p-3 rounded bg-stone-50">
+      <div><strong>Total Orders:</strong> <span id="printSalesTotalOrders">0</span></div>
+      <div><strong>Accepted Orders:</strong> <span id="printSalesAcceptedOrders">0</span></div>
+      <div><strong>Total Revenue:</strong> <span id="printSalesTotalRevenue">₹0</span></div>
+    </div>
+    <table class="w-full text-left text-xs border-collapse border border-stone-400">
+      <thead class="bg-stone-200 text-stone-900 font-bold">
+        <tr>
+          <th class="p-2 border border-stone-400">Date</th>
+          <th class="p-2 border border-stone-400">Order ID</th>
+          <th class="p-2 border border-stone-400">Customer</th>
+          <th class="p-2 border border-stone-400">Table</th>
+          <th class="p-2 border border-stone-400">Phone</th>
+          <th class="p-2 border border-stone-400">Status</th>
+          <th class="p-2 border border-stone-400 text-right">Amount</th>
+        </tr>
+      </thead>
+      <tbody id="printSalesTableBody"></tbody>
+    </table>
+  </div>
+
   <!-- Footer -->
-  <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-center text-xs mt-auto">
-    <div class="max-w-7xl mx-auto px-4">
-      <p id="footerDisplayText">© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love.</p>
+  <footer class="dark-header text-stone-400 py-4 pb-8 border-t border-amber-500/20 text-xs mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div onclick="showPage('admin')" title="Staff Login" class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 overflow-hidden cursor-pointer hover:bg-amber-500/30 transition-colors">
+          <img id="footerLogoImg" src="" alt="Logo" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden')">
+          <svg id="footerLogoSvg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/>
+            <line x1="6" y1="17" x2="18" y2="17"/>
+          </svg>
+        </div>
+        <p id="footerDisplayText" class="text-left">© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love.</p>
+      </div>
     </div>
   </footer>
 
@@ -930,154 +975,23 @@
 
       const logoImg = document.getElementById("headerLogoImg");
       const logoSvg = document.getElementById("headerLogoSvg");
+      const footerLogoImg = document.getElementById("footerLogoImg");
+      const footerLogoSvg = document.getElementById("footerLogoSvg");
       if (branding.headerLogoUrl) {
         logoImg.src = branding.headerLogoUrl;
         logoImg.classList.remove("hidden");
         logoSvg.classList.add("hidden");
+        if (footerLogoImg && footerLogoSvg) {
+          footerLogoImg.src = branding.headerLogoUrl;
+          footerLogoImg.classList.remove("hidden");
+          footerLogoSvg.classList.add("hidden");
+        }
       } else {
         logoImg.classList.add("hidden");
         logoSvg.classList.remove("hidden");
-      }
-
-      const heroImg = document.getElementById("homeHeroBgImg");
-      if (branding.heroBgUrl) heroImg.src = branding.heroBgUrl;
-
-      document.getElementById("editBrandName").value = branding.brandName;
-      document.getElementById("editBrandTagline").value = branding.brandTagline;
-      document.getElementById("editHeaderLogoUrl").value = branding.headerLogoUrl || "";
-      document.getElementById("editWaTitle").value = branding.waTitle || "HOTEL ROYAL SPICE - TAX INVOICE";
-      document.getElementById("editHeroBgUrl").value = branding.heroBgUrl || "";
-      document.getElementById("editHomeBadge").value = branding.homeBadge;
-      document.getElementById("editHomeTitle1").value = branding.homeTitle1;
-      document.getElementById("editHomeTitle2").value = branding.homeTitle2;
-      document.getElementById("editHomeDesc").value = branding.homeDesc;
-      document.getElementById("editFooterText").value = branding.footerText;
-
-      const savedTaxLabel = localStorage.getItem("rb_tax_label") || "Tax";
-      const savedTaxRate = localStorage.getItem("rb_tax_rate") || "5";
-      const taxLabelInput = document.getElementById("masterTaxLabelInput");
-      const taxRateInput = document.getElementById("masterTaxRateInput");
-      if (taxLabelInput) taxLabelInput.value = savedTaxLabel;
-      if (taxRateInput) taxRateInput.value = savedTaxRate;
-    }
-
-    function saveBrandingSettings() {
-      branding = {
-        brandName: document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice",
-        brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
-        headerLogoUrl: document.getElementById("editHeaderLogoUrl").value.trim(),
-        waTitle: document.getElementById("editWaTitle").value.trim() || "HOTEL ROYAL SPICE - TAX INVOICE",
-        heroBgUrl: document.getElementById("editHeroBgUrl").value.trim() || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80",
-        homeBadge: document.getElementById("editHomeBadge").value.trim() || "Welcome",
-        homeTitle1: document.getElementById("editHomeTitle1").value.trim() || "Good Food",
-        homeTitle2: document.getElementById("editHomeTitle2").value.trim() || "Good Mood",
-        homeDesc: document.getElementById("editHomeDesc").value.trim(),
-        footerText: document.getElementById("editFooterText").value.trim()
-      };
-      localStorage.setItem("rb_branding", JSON.stringify(branding));
-      if (dbRef) dbRef.child("branding").set(branding);
-      applyBranding();
-      showToast("Website branding settings saved & synced!");
-    }
-
-    function saveMasterTaxSettings() {
-      const label = document.getElementById("masterTaxLabelInput").value.trim() || "Tax";
-      const rate = parseFloat(document.getElementById("masterTaxRateInput").value) || 0;
-      localStorage.setItem("rb_tax_label", label);
-      localStorage.setItem("rb_tax_rate", rate);
-      if (dbRef) {
-        dbRef.child("settings").update({ taxLabel: label, taxRate: rate });
-      }
-      showToast("Tax settings updated & synced!");
-      renderCart();
-    }
-
-    function saveNewPasscodes() {
-      const newMasterPass = document.getElementById("masterNewMasterPassInput").value.trim();
-      const newAdminPass = document.getElementById("masterNewPasscodeInput").value.trim();
-      if (newMasterPass) localStorage.setItem("rb_master_pass", newMasterPass);
-      if (newAdminPass) localStorage.setItem("rb_admin_pass", newAdminPass);
-      if (dbRef) {
-        dbRef.child("settings").update({
-          masterPass: newMasterPass || localStorage.getItem("rb_master_pass") || "9999",
-          adminPass: newAdminPass || localStorage.getItem("rb_admin_pass") || "1234"
-        });
-      }
-      document.getElementById("masterNewMasterPassInput").value = "";
-      document.getElementById("masterNewPasscodeInput").value = "";
-      showToast("Passcodes updated & synced!");
-    }
-
-    function saveAdminPasscodeOnly() {
-      const newAdminPass = document.getElementById("adminNewPassInput").value.trim();
-      if (!newAdminPass) {
-        showToast("Please enter a valid passcode!");
-        return;
-      }
-      localStorage.setItem("rb_admin_pass", newAdminPass);
-      if (dbRef) {
-        dbRef.child("settings").update({ adminPass: newAdminPass });
-      }
-      document.getElementById("adminNewPassInput").value = "";
-      showToast("Staff admin passcode updated & synced!");
-    }
-
-    function showToast(msg) {
-      const box = document.getElementById("toastBox");
-      document.getElementById("toastText").innerText = msg;
-      box.classList.remove("translate-y-24", "opacity-0");
-      setTimeout(() => box.classList.add("translate-y-24", "opacity-0"), 2800);
-    }
-
-    function showPage(pageName) {
-      document.querySelectorAll(".page-section").forEach(sec => sec.classList.add("hidden"));
-      const target = document.getElementById("page-" + pageName);
-      if (target) target.classList.remove("hidden");
-
-      const whiteNavBar = document.getElementById("whiteNavBarContainer");
-      if (whiteNavBar) {
-        if (pageName === "home") whiteNavBar.classList.add("hidden");
-        else whiteNavBar.classList.remove("hidden");
-      }
-
-      document.querySelectorAll(".nav-btn").forEach(btn => {
-        btn.classList.remove("text-amber-600", "bg-stone-100");
-        btn.classList.add("text-stone-600");
-      });
-      const activeNav = document.getElementById("nav-" + pageName);
-      if (activeNav) {
-        activeNav.classList.remove("text-stone-600");
-        activeNav.classList.add("text-amber-600", "bg-stone-100");
-      }
-
-      if (pageName === "menu") {
-        renderCategories();
-        renderFood();
-      } else if (pageName === "cart") {
-        renderCart();
-        applyFixedTableNumber();
-      } else if (pageName === "payment") {
-        updatePaymentScreen();
-      } else if (pageName === "status") {
-        renderOrderStatusTracker();
-      } else if (pageName === "myorders") {
-        renderCustomerMyOrders();
-      } else if (pageName === "admin") {
-        if (!loggedInRole) {
-          document.getElementById("loginBox").classList.remove("hidden");
-          document.getElementById("masterBox").classList.add("hidden");
-          document.getElementById("adminBox").classList.add("hidden");
-        } else if (loggedInRole === 'master') {
-          document.getElementById("loginBox").classList.add("hidden");
-          document.getElementById("masterBox").classList.remove("hidden");
-          document.getElementById("adminBox").classList.add("hidden");
-          switchMasterSubPage('qr');
-        } else {
-          document.getElementById("loginBox").classList.add("hidden");
-          document.getElementById("masterBox").classList.add("hidden");
-          document.getElementById("adminBox").classList.remove("hidden");
-          document.getElementById("masterSwitchBackBtn").classList.add("hidden");
-          switchAdminSubPage('tables');
+        if (footerLogoImg && footerLogoSvg) {
+          footerLogoImg.classList.add("hidden");
+          footerLogoSvg.classList.remove("hidden");
         }
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1717,6 +1631,7 @@
       const o = orders.find(x => x.orderId === orderId);
       if (!o) return;
 
+      document.getElementById("printBrandName").innerText = branding.brandName || "HOTEL ROYAL SPICE";
       document.getElementById("printOrderId").innerText = o.orderId;
       document.getElementById("printDate").innerText = o.date;
       document.getElementById("printTable").innerText = o.table;
@@ -1735,14 +1650,52 @@
         </div>
       `).join("");
 
-      window.print();
+      const area = document.getElementById("printableInvoiceArea");
+      area.classList.remove("hidden");
+      document.body.classList.add("printing-receipt");
+
+      setTimeout(() => {
+        window.print();
+        document.body.classList.remove("printing-receipt");
+        area.classList.add("hidden");
+      }, 150);
     }
 
     function exportSalesToPdf() {
+      const filtered = orders.filter(o => o.status === "Accepted" || o.status === "Completed");
+      document.getElementById("printSalesBrandName").innerText = branding.brandName || "HOTEL ROYAL SPICE";
+      document.getElementById("printSalesDate").innerText = "Generated on: " + new Date().toLocaleString();
+      document.getElementById("printSalesTotalOrders").innerText = orders.length;
+      document.getElementById("printSalesAcceptedOrders").innerText = filtered.length;
+      document.getElementById("printSalesTotalRevenue").innerText = "₹" + filtered.reduce((sum, o) => sum + o.total, 0);
+
+      document.getElementById("printSalesTableBody").innerHTML = filtered.length === 0 
+        ? `<tr><td colspan="7" class="p-3 text-center border border-stone-400">No sales records found.</td></tr>`
+        : filtered.map(o => `
+          <tr>
+            <td class="p-2 border border-stone-400">${o.date}</td>
+            <td class="p-2 border border-stone-400 font-bold">${o.orderId}</td>
+            <td class="p-2 border border-stone-400">${o.name}</td>
+            <td class="p-2 border border-stone-400">${o.table}</td>
+            <td class="p-2 border border-stone-400">${o.phone}</td>
+            <td class="p-2 border border-stone-400">${o.status}</td>
+            <td class="p-2 border border-stone-400 text-right font-bold">₹${o.total}</td>
+          </tr>
+        `).join("");
+
+      const area = document.getElementById("printableSalesArea");
+      area.classList.remove("hidden");
+      document.body.classList.add("printing-sales");
+
       const originalTitle = document.title;
       document.title = "Sales_Report_" + new Date().toISOString().slice(0, 10);
-      window.print();
-      document.title = originalTitle;
+
+      setTimeout(() => {
+        window.print();
+        document.title = originalTitle;
+        document.body.classList.remove("printing-sales");
+        area.classList.add("hidden");
+      }, 150);
     }
 
     function resetLiveOrders() {
@@ -1793,7 +1746,9 @@
       msg += `--------------------------------\n`;
       msg += `Sub-Total: ₹${o.subTotal}\n`;
       msg += `${o.taxLabel || 'Tax'} (${o.taxRate || 5}%): ₹${o.taxAmount}\n`;
-      msg += `Grand Total: ₹${o.total}\n`;
+      msg += `┌──────────────────────────┐\n`;
+      msg += `│ GRAND TOTAL: ₹${o.total}\n`;
+      msg += `└──────────────────────────┘\n`;
       msg += `Payment: ${o.paymentMethod}\n`;
       msg += `--------------------------------\n`;
       msg += `Thank you for dining with us!\n`;
@@ -2089,6 +2044,159 @@
           }
         }, 1000);
       }
+    }
+
+    function showPage(pageName) {
+      document.querySelectorAll(".page-section").forEach(sec => sec.classList.add("hidden"));
+      const target = document.getElementById("page-" + pageName);
+      if (target) target.classList.remove("hidden");
+
+      const whiteNav = document.getElementById("whiteNavBarContainer");
+      if (whiteNav) {
+        if (pageName === "home") {
+          whiteNav.classList.add("hidden");
+        } else {
+          whiteNav.classList.remove("hidden");
+        }
+      }
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("bg-amber-500/20", "text-amber-800");
+      });
+      const activeNav = document.getElementById("nav-" + pageName);
+      if (activeNav) {
+        activeNav.classList.add("bg-amber-500/20", "text-amber-800");
+      }
+
+      if (pageName === "menu") {
+        renderCategories();
+        renderFood();
+      } else if (pageName === "cart") {
+        renderCart();
+        applyFixedTableNumber();
+      } else if (pageName === "payment") {
+        updatePaymentScreen();
+      } else if (pageName === "status") {
+        renderOrderStatusTracker();
+      } else if (pageName === "myorders") {
+        renderCustomerMyOrders();
+      } else if (pageName === "admin") {
+        if (loggedInRole === "master") {
+          document.getElementById("loginBox").classList.add("hidden");
+          document.getElementById("masterBox").classList.remove("hidden");
+          document.getElementById("adminBox").classList.add("hidden");
+          loadBrandingInputs();
+          loadTaxInputs();
+        } else if (loggedInRole === "admin") {
+          document.getElementById("loginBox").classList.add("hidden");
+          document.getElementById("masterBox").classList.add("hidden");
+          document.getElementById("adminBox").classList.remove("hidden");
+        } else {
+          document.getElementById("loginBox").classList.remove("hidden");
+          document.getElementById("masterBox").classList.add("hidden");
+          document.getElementById("adminBox").classList.add("hidden");
+        }
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showToast(message) {
+      const box = document.getElementById("toastBox");
+      const text = document.getElementById("toastText");
+      if (!box || !text) return;
+      text.innerText = message;
+      box.classList.remove("translate-y-24", "opacity-0");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add("translate-y-24", "opacity-0");
+      }, 3000);
+    }
+
+    function loadTaxInputs() {
+      const labelEl = document.getElementById("masterTaxLabelInput");
+      const rateEl = document.getElementById("masterTaxRateInput");
+      if (labelEl) labelEl.value = localStorage.getItem("rb_tax_label") || "Tax";
+      if (rateEl) rateEl.value = localStorage.getItem("rb_tax_rate") || "5";
+    }
+
+    function saveMasterTaxSettings() {
+      const taxLabel = document.getElementById("masterTaxLabelInput").value.trim() || "Tax";
+      const taxRate = parseFloat(document.getElementById("masterTaxRateInput").value);
+      if (isNaN(taxRate) || taxRate < 0) {
+        showToast("Please enter a valid tax percentage!");
+        return;
+      }
+      localStorage.setItem("rb_tax_label", taxLabel);
+      localStorage.setItem("rb_tax_rate", taxRate);
+      if (dbRef) dbRef.child("settings").update({ taxLabel, taxRate });
+      showToast("Tax settings saved!");
+    }
+
+    function saveNewPasscodes() {
+      const newMaster = document.getElementById("masterNewMasterPassInput").value.trim();
+      const newAdmin = document.getElementById("masterNewPasscodeInput").value.trim();
+      if (!newMaster && !newAdmin) {
+        showToast("Enter at least one new passcode to update.");
+        return;
+      }
+      const updates = {};
+      if (newMaster) {
+        localStorage.setItem("rb_master_pass", newMaster);
+        updates.masterPass = newMaster;
+      }
+      if (newAdmin) {
+        localStorage.setItem("rb_admin_pass", newAdmin);
+        updates.adminPass = newAdmin;
+      }
+      if (dbRef) dbRef.child("settings").update(updates);
+      document.getElementById("masterNewMasterPassInput").value = "";
+      document.getElementById("masterNewPasscodeInput").value = "";
+      showToast("Passcodes updated successfully!");
+    }
+
+    function saveAdminPasscodeOnly() {
+      const newAdmin = document.getElementById("adminNewPassInput").value.trim();
+      if (!newAdmin) {
+        showToast("Please enter a new admin passcode!");
+        return;
+      }
+      localStorage.setItem("rb_admin_pass", newAdmin);
+      if (dbRef) dbRef.child("settings").update({ adminPass: newAdmin });
+      document.getElementById("adminNewPassInput").value = "";
+      showToast("Admin passcode updated!");
+    }
+
+    function loadBrandingInputs() {
+      document.getElementById("editBrandName").value = branding.brandName || "";
+      document.getElementById("editBrandTagline").value = branding.brandTagline || "";
+      document.getElementById("editHeaderLogoUrl").value = branding.headerLogoUrl || "";
+      document.getElementById("editWaTitle").value = branding.waTitle || "";
+      document.getElementById("editHeroBgUrl").value = branding.heroBgUrl || "";
+      document.getElementById("editHomeBadge").value = branding.homeBadge || "";
+      document.getElementById("editHomeTitle1").value = branding.homeTitle1 || "";
+      document.getElementById("editHomeTitle2").value = branding.homeTitle2 || "";
+      document.getElementById("editHomeDesc").value = branding.homeDesc || "";
+      document.getElementById("editFooterText").value = branding.footerText || "";
+    }
+
+    function saveBrandingSettings() {
+      branding = {
+        brandName: document.getElementById("editBrandName").value.trim() || "Hotel Royal Spice",
+        brandTagline: document.getElementById("editBrandTagline").value.trim() || "Restaurant",
+        headerLogoUrl: document.getElementById("editHeaderLogoUrl").value.trim(),
+        waTitle: document.getElementById("editWaTitle").value.trim() || "HOTEL ROYAL SPICE - TAX INVOICE",
+        heroBgUrl: document.getElementById("editHeroBgUrl").value.trim(),
+        homeBadge: document.getElementById("editHomeBadge").value.trim(),
+        homeTitle1: document.getElementById("editHomeTitle1").value.trim(),
+        homeTitle2: document.getElementById("editHomeTitle2").value.trim(),
+        homeDesc: document.getElementById("editHomeDesc").value.trim(),
+        footerText: document.getElementById("editFooterText").value.trim()
+      };
+      localStorage.setItem("rb_branding", JSON.stringify(branding));
+      if (dbRef) dbRef.child("branding").set(branding);
+      applyBranding();
+      showToast("Branding settings saved!");
     }
 
     document.addEventListener("DOMContentLoaded", () => {
