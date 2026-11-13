@@ -886,9 +886,12 @@
       const page404 = document.getElementById("page-404");
       const mainApp = document.getElementById("mainAppContainer");
 
+      // Check persistent session stored in localStorage to survive page refreshes
+      const persistedMode = localStorage.getItem("rb_active_session_mode");
+
       // 1. ADMIN LOGIN ROUTE (?admin=true / ?admin=1)
-      if (isAdminRoute) {
-        // Remove ?admin=... from URL bar immediately so it cannot be copied with it
+      if (isAdminRoute || persistedMode === "admin") {
+        localStorage.setItem("rb_active_session_mode", "admin");
         window.history.replaceState({}, document.title, window.location.pathname);
 
         if(page404) page404.classList.add("hidden");
@@ -906,27 +909,41 @@
       }
 
       // 2. TABLE QR SESSION (?table=...)
-      if (tableParam) {
-        const expParam = parseInt(params.get("exp") || "0", 10);
-        const now = Date.now();
-        if (expParam > 0 && now > expParam) {
+      if (tableParam || persistedMode === "table") {
+        let tNum = tableParam;
+        let expParam = parseInt(params.get("exp") || "0", 10);
+
+        if (tableParam) {
+          currentTableSession = { tableNum: tableParam, expiresAt: expParam };
+          localStorage.setItem("rb_table_session", JSON.stringify(currentTableSession));
+          localStorage.setItem("rb_active_session_mode", "table");
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+          const savedTable = JSON.parse(localStorage.getItem("rb_table_session") || "null");
+          if (savedTable) currentTableSession = savedTable;
+        }
+
+        if (currentTableSession && currentTableSession.expiresAt > 0 && Date.now() > currentTableSession.expiresAt) {
+          localStorage.removeItem("rb_active_session_mode");
+          localStorage.removeItem("rb_table_session");
           showPage("expired");
           return;
         }
 
-        currentTableSession = { tableNum: tableParam, expiresAt: expParam };
-        document.getElementById("tableSessionBadge").classList.remove("hidden");
-        document.getElementById("tableSessionBadge").classList.add("flex");
-        document.getElementById("badgeTableNum").innerText = tableParam;
-        applyFixedTableNumber();
+        if (currentTableSession && currentTableSession.tableNum) {
+          document.getElementById("tableSessionBadge").classList.remove("hidden");
+          document.getElementById("tableSessionBadge").classList.add("flex");
+          document.getElementById("badgeTableNum").innerText = currentTableSession.tableNum;
+          applyFixedTableNumber();
+        }
 
         showPage("menu");
         return;
       }
 
       // 3. MAIN WEBSITE ROUTE (?main=true / ?main=1)
-      if (isMainRoute) {
-        // Remove ?main=... from URL bar immediately so it cannot be copied with it
+      if (isMainRoute || persistedMode === "main") {
+        localStorage.setItem("rb_active_session_mode", "main");
         window.history.replaceState({}, document.title, window.location.pathname);
 
         if(page404) page404.classList.add("hidden");
@@ -937,7 +954,7 @@
         return;
       }
 
-      // 4. DEFAULT DIRECT OPEN -> 404 / SESSION EXPIRED
+      // 4. DEFAULT DIRECT OPEN -> 404 / SESSION EXPIRED (Only if no active session exists)
       if(page404) page404.classList.remove("hidden");
       mainApp.classList.add("hidden");
       if (header) header.classList.add("hidden");
