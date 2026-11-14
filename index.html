@@ -83,8 +83,9 @@
         </button>
       </div>
 
-      <div id="tableSessionBadge" class="hidden items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 px-3 py-1 rounded-full text-xs">
+      <div id="tableSessionBadge" class="hidden items-center gap-2 bg-amber-500/20 border border-amber-400/50 px-3 py-1 rounded-full text-xs">
         <span class="font-bold text-amber-300"><i class="fa-solid fa-chair mr-1"></i>Table <span id="badgeTableNum">-</span></span>
+        <span id="badgeSessionTimer" class="text-[10px] font-mono bg-stone-950/60 text-amber-200 px-2 py-0.5 rounded-full">60:00</span>
       </div>
     </div>
   </header>
@@ -136,6 +137,10 @@
                 <span>View Menu</span>
                 <i class="fa-solid fa-arrow-right"></i>
               </button>
+              <button type="button" onclick="showPage('myorders')" class="px-6 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm sm:text-base backdrop-blur-sm transition-all flex items-center gap-2 cursor-pointer z-20 relative">
+                <i class="fa-solid fa-receipt text-amber-400"></i>
+                <span>My Orders</span>
+              </button>
             </div>
           </div>
         </div>
@@ -169,7 +174,7 @@
 
       <div id="foodGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
 
-      <div id="stickyCartBar" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 w-11/12 max-w-md bg-stone-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-amber-500/40 items-center justify-between">
+      <div id="stickyCartBar" class="hidden fixed bottom-16 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-40 w-11/12 max-w-md bg-stone-900/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-amber-500/40 items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-amber-500 text-stone-950 font-black flex items-center justify-center text-sm shadow">
             <span id="stickyCartCount">0</span>
@@ -187,7 +192,7 @@
     </section>
 
     <!-- CART PAGE -->
-    <section id="page-cart" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <section id="page-cart" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 pb-20 space-y-6">
       <div class="flex items-center justify-between border-b border-stone-200 pb-4">
         <h2 class="font-serif font-bold text-2xl sm:text-3xl text-stone-900">Your Order Cart</h2>
         <button type="button" onclick="showPage('menu')" class="text-xs font-bold text-amber-700 hover:underline cursor-pointer">+ Add More Items</button>
@@ -238,7 +243,7 @@
     </section>
 
     <!-- PAYMENT PAGE -->
-    <section id="page-payment" class="page-section hidden max-w-lg mx-auto px-4 py-8">
+    <section id="page-payment" class="page-section hidden max-w-lg mx-auto px-4 py-8 pb-20">
       <div class="bg-white rounded-3xl shadow-xl border border-stone-200 overflow-hidden">
         <div class="dark-header text-white p-6 text-center space-y-1">
           <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Select Payment Method</span>
@@ -274,7 +279,7 @@
     </section>
 
     <!-- ORDER STATUS TRACKER -->
-    <section id="page-status" class="page-section hidden max-w-lg mx-auto px-4 py-12">
+    <section id="page-status" class="page-section hidden max-w-lg mx-auto px-4 py-12 pb-20">
       <div class="bg-white rounded-3xl shadow-xl border border-stone-200 p-8 text-center space-y-6">
         <div id="statusIconBox" class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-4xl animate-pulse">
           <i id="statusIcon" class="fa-solid fa-clock-rotate-left"></i>
@@ -309,7 +314,7 @@
     </section>
 
     <!-- CUSTOMER MY ORDERS -->
-    <section id="page-myorders" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <section id="page-myorders" class="page-section hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 pb-20 space-y-6">
       <div class="flex items-center justify-between border-b border-stone-200 pb-4">
         <div>
           <h2 class="font-serif font-bold text-2xl sm:text-3xl text-stone-900">My Orders History</h2>
@@ -321,7 +326,7 @@
     </section>
 
     <!-- STANDALONE STAFF / MASTER CONTROL LOGIN & PANELS -->
-    <section id="page-admin" class="page-section hidden min-h-screen flex flex-col justify-center max-w-6xl mx-auto px-4 py-8 space-y-6">
+    <section id="page-admin" class="page-section hidden min-h-screen flex flex-col justify-center max-w-6xl mx-auto px-4 py-8 pb-20 space-y-6">
       
       <!-- Staff Login Box -->
       <div id="loginBox" class="bg-white p-8 sm:p-10 rounded-3xl shadow-2xl max-w-md w-full mx-auto border border-stone-200 text-center space-y-5">
@@ -331,6 +336,7 @@
         <div class="space-y-1">
           <h2 class="font-serif font-bold text-2xl text-stone-900">Staff Login</h2>
           <p class="text-xs text-stone-500">Enter authorized passcode to access dashboard</p>
+          <p class="text-[11px] text-blue-600 font-semibold">(Admin: 1234 • Master Owner: 9999)</p>
         </div>
         <div class="space-y-3 pt-2">
           <input id="passcodeInput" type="password" onkeydown="if(event.key==='Enter') login()" placeholder="Enter Passcode" class="w-full px-4 py-3.5 rounded-xl border border-stone-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 outline-none">
@@ -420,20 +426,22 @@
               <p class="text-xs text-stone-400 italic">No table QR generated yet.</p>
             </div>
           </div>
-        </div>
 
-        <div id="masterSubPage-passcodes" class="master-sub-page hidden bg-white p-6 rounded-3xl shadow-sm border border-stone-200 space-y-6">
-          <h3 class="font-serif font-bold text-xl text-stone-900">Passcodes Settings</h3>
-          <div class="max-w-md space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">New Master Control Passcode</label>
-              <input id="masterNewMasterPassInput" type="text" placeholder="Enter new master passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
+          <div class="pt-6 border-t border-stone-200 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div>
+                <h4 class="font-bold text-stone-800 text-sm">Home Page Website QR & Staff Portal QR</h4>
+                <p class="text-xs text-stone-500">Generate direct QR codes for customers (Home Page) or Staff login.</p>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" onclick="generateSpecialQR('home')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs rounded-xl shadow cursor-pointer">
+                  <i class="fa-solid fa-house mr-1"></i> Home Page QR
+                </button>
+                <button type="button" onclick="generateSpecialQR('staff')" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                  <i class="fa-solid fa-shield-halved mr-1"></i> Staff Mini-Site QR
+                </button>
+              </div>
             </div>
-            <div>
-              <label class="block text-xs font-bold text-stone-600 mb-1">New Staff Admin Passcode</label>
-              <input id="masterNewPasscodeInput" type="text" placeholder="Enter new staff admin passcode" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm outline-none">
-            </div>
-            <button type="button" onclick="saveNewPasscodes()" class="py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow cursor-pointer">Update Passcodes</button>
           </div>
         </div>
 
@@ -654,6 +662,13 @@
         </div>
         <p id="footerDisplayText" class="text-left">© 2026 Hotel Royal Spice Restaurant. Freshly Served with Love.</p>
       </div>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="showPage('home')" class="hover:text-amber-400 cursor-pointer">Home</button>
+        <span>•</span>
+        <button type="button" onclick="showPage('menu')" class="hover:text-amber-400 cursor-pointer">Menu</button>
+        <span>•</span>
+        <button type="button" onclick="showPage('myorders')" class="hover:text-amber-400 cursor-pointer">My Orders</button>
+      </div>
     </div>
   </footer>
 
@@ -698,7 +713,7 @@
     let selectedTypeFilter = "All";
     let currentTableSession = null;
     let loggedInRole = null;
-
+    let sessionCountdownInterval = null;
     const defaultFoods = [
       { id: 1, name: "Hyderabadi Chicken Dum Biryani", price: 280, category: "Biryani", type: "Non-Veg", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80", available: true },
       { id: 2, name: "Mutton Rara Masala", price: 380, category: "Main Course", type: "Non-Veg", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80", available: true },
@@ -716,6 +731,22 @@
       { id: "T5", name: "T5", status: "Free" },
       { id: "T6", name: "T6", status: "Free" }
     ];
+
+    function mergeCustomerDeviceOrders() {
+      if (!orders || orders.length === 0) return;
+      let updated = false;
+      customerDeviceOrders = customerDeviceOrders.map(devOrd => {
+        const liveOrd = orders.find(o => o.orderId === devOrd.orderId);
+        if (liveOrd && liveOrd.status !== devOrd.status) {
+          updated = true;
+          return { ...devOrd, status: liveOrd.status };
+        }
+        return devOrd;
+      });
+      if (updated) {
+        localStorage.setItem("rb_cust_device_orders", JSON.stringify(customerDeviceOrders));
+      }
+    }
 
     function initFirebaseRealtimeSync() {
       foods = JSON.parse(localStorage.getItem("rb_foods")) || defaultFoods;
@@ -859,7 +890,63 @@
       }
     }
 
-    // STRICT TAB-ISOLATED SESSION ROUTING & REFRESH FIX
+    // Helper for Preview Switcher Bar
+    function switchPreviewMode(mode) {
+      if (mode === "admin") {
+        sessionStorage.setItem("rb_tab_mode", "admin");
+        sessionStorage.removeItem("rb_tab_table");
+      } else if (mode === "table") {
+        const activeQrsList = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+        const existingT1 = activeQrsList.find(q => String(q.table) === "1");
+        const durationMins = existingT1 ? (existingT1.duration || 60) : 60;
+        const expTime = existingT1 && existingT1.expiresAt ? existingT1.expiresAt : (Date.now() + durationMins * 60 * 1000);
+        if (existingT1 && (existingT1.isExpired || Date.now() > expTime)) {
+          show404Error();
+          return;
+        }
+        currentTableSession = { tableNum: "1", expiresAt: expTime, token: "qr_valid_1" };
+        sessionStorage.setItem("rb_tab_table", JSON.stringify(currentTableSession));
+        sessionStorage.setItem("rb_tab_mode", "table");
+        sessionStorage.setItem("rb_tab_page", "home");
+      } else {
+        sessionStorage.setItem("rb_tab_mode", "main");
+        sessionStorage.removeItem("rb_tab_table");
+        sessionStorage.removeItem("rb_tab_role");
+        sessionStorage.setItem("rb_tab_page", "home");
+        if (sessionCountdownInterval) clearInterval(sessionCountdownInterval);
+        const badge = document.getElementById("tableSessionBadge");
+        if (badge) { badge.classList.add("hidden"); badge.classList.remove("flex"); }
+        const tInput = document.getElementById("custTable");
+        if (tInput) { tInput.readOnly = false; tInput.value = ""; }
+        const lockLabel = document.getElementById("tableLockedLabel");
+        if (lockLabel) lockLabel.classList.add("hidden");
+      }
+      routeFromURL();
+    }
+
+    function startSessionTimer() {
+      if (sessionCountdownInterval) clearInterval(sessionCountdownInterval);
+      const updateTimer = () => {
+        if (!currentTableSession || !currentTableSession.expiresAt) return;
+        const remaining = currentTableSession.expiresAt - Date.now();
+        if (remaining <= 0) {
+          clearInterval(sessionCountdownInterval);
+          sessionStorage.removeItem("rb_tab_table");
+          show404Error();
+          return;
+        }
+        const mins = Math.floor(remaining / 60000);
+        const secs = Math.floor((remaining % 60000) / 1000);
+        const timerEl = document.getElementById("badgeSessionTimer");
+        if (timerEl) {
+          timerEl.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+      };
+      updateTimer();
+      sessionCountdownInterval = setInterval(updateTimer, 1000);
+    }
+
+    // STRICT TAB-ISOLATED SESSION ROUTING, EXPIRY & COPY-PASTE LINK PROTECTION
     function routeFromURL() {
       const searchStr = (window.location.search || "").toLowerCase();
       const params = new URLSearchParams(window.location.search);
@@ -867,6 +954,7 @@
       const isAdminRoute = params.get("admin") === "1" || params.get("admin") === "true" || searchStr.includes("admin=1");
       const isMainRoute = params.get("main") === "1" || params.get("mainweb") === "1" || searchStr.includes("main=1") || searchStr.includes("mainweb=1");
       const tableParam = params.get("table");
+      const tokenParam = params.get("token");
 
       if (isAdminRoute) {
         sessionStorage.setItem("rb_tab_mode", "admin");
@@ -884,28 +972,40 @@
         const activeQrsList = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
         const foundQr = activeQrsList.find(q => String(q.table) === String(tableParam));
 
-        if (!foundQr || foundQr.isExpired) {
+        // Block if QR does not exist, was manually expired, or its expiry timestamp passed
+        if (!foundQr || foundQr.isExpired || (foundQr.expiresAt && Date.now() > foundQr.expiresAt)) {
           show404Error();
           return;
         }
 
-        let existingSession = JSON.parse(sessionStorage.getItem("rb_tab_table") || "null");
-        let expTime = 0;
-
-        if (existingSession && String(existingSession.tableNum) === String(tableParam) && existingSession.expiresAt > Date.now()) {
-          expTime = existingSession.expiresAt;
-        } else {
-          const durationMins = foundQr.duration || 60;
-          expTime = Date.now() + (durationMins * 60 * 1000);
+        // Prevent unauthorized URL copy-paste sharing across devices if token doesn't match or already claimed elsewhere
+        if (foundQr.token && tokenParam && foundQr.token !== tokenParam) {
+          show404Error();
+          return;
         }
 
-        currentTableSession = { tableNum: tableParam, expiresAt: expTime };
+        const claimedDeviceKey = `rb_qr_claimed_${tableParam}_${foundQr.token || foundQr.id}`;
+        const existingTabSession = JSON.parse(sessionStorage.getItem("rb_tab_table") || "null");
+
+        if (localStorage.getItem(claimedDeviceKey) && (!existingTabSession || existingTabSession.token !== (foundQr.token || String(foundQr.id)))) {
+          // Link was copy-pasted into a new tab/browser after initial scan
+          show404Error();
+          return;
+        }
+
+        const expTime = foundQr.expiresAt || (Date.now() + ((foundQr.duration || 60) * 60 * 1000));
+        localStorage.setItem(claimedDeviceKey, "1");
+
+        currentTableSession = {
+          tableNum: tableParam,
+          expiresAt: expTime,
+          token: foundQr.token || String(foundQr.id)
+        };
         sessionStorage.setItem("rb_tab_table", JSON.stringify(currentTableSession));
         sessionStorage.setItem("rb_tab_mode", "table");
         sessionStorage.removeItem("rb_tab_role");
-        if (!sessionStorage.getItem("rb_tab_page")) {
-          sessionStorage.setItem("rb_tab_page", "menu");
-        }
+        // Open Home Page first when scanning QR
+        sessionStorage.setItem("rb_tab_page", "home");
         window.history.replaceState({}, document.title, window.location.pathname);
       }
 
@@ -916,6 +1016,12 @@
       const mainApp = document.getElementById("mainAppContainer");
 
       const activeMode = sessionStorage.getItem("rb_tab_mode");
+
+      // Normal base website link without valid route/session MUST show 404
+      if (!activeMode) {
+        show404Error();
+        return;
+      }
 
       if (activeMode === "admin") {
         if (page404) page404.classList.add("hidden");
@@ -954,7 +1060,11 @@
         const savedTable = JSON.parse(sessionStorage.getItem("rb_tab_table") || "null");
         if (savedTable) currentTableSession = savedTable;
 
-        if (!currentTableSession || (currentTableSession.expiresAt > 0 && Date.now() > currentTableSession.expiresAt)) {
+        const activeQrsList = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+        const liveQr = currentTableSession ? activeQrsList.find(q => String(q.table) === String(currentTableSession.tableNum)) : null;
+
+        if (!currentTableSession || (currentTableSession.expiresAt > 0 && Date.now() > currentTableSession.expiresAt) || (liveQr && liveQr.isExpired)) {
+          sessionStorage.removeItem("rb_tab_table");
           show404Error();
           return;
         }
@@ -962,16 +1072,17 @@
         if (page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.remove("hidden");
-        if (footer) header.classList.remove("hidden");
+        if (footer) footer.classList.remove("hidden");
 
         if (currentTableSession && currentTableSession.tableNum) {
           document.getElementById("tableSessionBadge").classList.remove("hidden");
           document.getElementById("tableSessionBadge").classList.add("flex");
           document.getElementById("badgeTableNum").innerText = currentTableSession.tableNum;
           applyFixedTableNumber();
+          startSessionTimer();
         }
 
-        const lastPage = sessionStorage.getItem("rb_tab_page") || "menu";
+        const lastPage = sessionStorage.getItem("rb_tab_page") || "home";
         showPage(lastPage);
         return;
       }
@@ -980,7 +1091,7 @@
         if (page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.remove("hidden");
-        if (footer) header.classList.remove("hidden");
+        if (footer) footer.classList.remove("hidden");
         const lastPage = sessionStorage.getItem("rb_tab_page") || "home";
         showPage(lastPage);
         return;
@@ -1146,22 +1257,110 @@
         return;
       }
 
+      const token = Math.random().toString(36).substring(2, 10);
+      const expiresAt = Date.now() + (mins * 60 * 1000);
       const baseUrl = window.location.origin + window.location.pathname;
-      const fullUrl = `${baseUrl}?table=${encodeURIComponent(tNum)}`;
+      const fullUrl = `${baseUrl}?table=${encodeURIComponent(tNum)}&token=${token}`;
       const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fullUrl)}`;
 
-      document.getElementById("tableQRTitle").innerText = `Table ${tNum} (Permanent QR)`;
+      document.getElementById("tableQRTitle").innerText = `Table ${tNum} QR (Expires in ${mins} mins)`;
       document.getElementById("tableQRImg").src = qrSrc;
       document.getElementById("tableQRUrl").innerText = fullUrl;
       document.getElementById("downloadTableQrBtn").href = qrSrc;
       document.getElementById("tableQRResult").classList.remove("hidden");
 
-      const qrEntry = { id: Date.now(), table: tNum, url: fullUrl, duration: mins, isExpired: false };
+      const qrEntry = { id: Date.now(), table: tNum, url: fullUrl, duration: mins, expiresAt, token, isExpired: false };
       activeQrs = [qrEntry, ...activeQrs.filter(x => String(x.table) !== String(tNum))];
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       if (dbRef) dbRef.child("activeQrs").set(activeQrs);
       renderActiveTablesQrList();
-      showToast(`Permanent QR Code generated for Table ${tNum}!`);
+      showToast(`QR Code generated for Table ${tNum} (${mins} min expiry)!`);
+    }
+
+    function generateSpecialQR(type) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      const fullUrl = type === "staff" ? `${baseUrl}?admin=1` : `${baseUrl}?main=1`;
+      const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fullUrl)}`;
+
+      document.getElementById("tableQRTitle").innerText = type === "staff" ? "Staff Mini-Website Login QR" : "Customer Home Page Website QR";
+      document.getElementById("tableQRImg").src = qrSrc;
+      document.getElementById("tableQRUrl").innerText = fullUrl;
+      document.getElementById("downloadTableQrBtn").href = qrSrc;
+      document.getElementById("tableQRResult").classList.remove("hidden");
+      showToast(type === "staff" ? "Staff Portal QR generated!" : "Home Page QR generated!");
+    }
+
+    function renderActiveTablesQrList() {
+      const list = document.getElementById("activeTablesQrList");
+      if (!list) return;
+      if (activeQrs.length === 0) {
+        list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet.</p>`;
+        return;
+      }
+      list.innerHTML = activeQrs.map(q => {
+        const isExp = q.isExpired === true || (q.expiresAt && Date.now() > q.expiresAt);
+        const expTimeStr = q.expiresAt ? new Date(q.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : `${q.duration}m`;
+        return `
+          <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+            <div>
+              <span class="font-bold text-stone-900">Table ${q.table}</span>
+              <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${isExp ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+                ${isExp ? 'Expired / Blocked' : 'Active until ' + expTimeStr}
+              </span>
+              <p class="text-[11px] text-stone-500 break-all mt-1">${q.url}</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="toggleQrSessionStatus(${q.id})" class="px-3 py-1.5 font-bold rounded-lg cursor-pointer ${isExp ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}">
+                ${isExp ? 'Renew (' + (q.duration || 60) + 'm)' : 'Expire Now'}
+              </button>
+              <button type="button" onclick="deleteQrSession(${q.id})" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-lg cursor-pointer">
+                <i class="fa-solid fa-trash mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleQrSessionStatus(id) {
+      const q = activeQrs.find(x => x.id === id);
+      if (q) {
+        const currentlyExpired = q.isExpired === true || (q.expiresAt && Date.now() > q.expiresAt);
+        if (currentlyExpired) {
+          q.isExpired = false;
+          q.expiresAt = Date.now() + ((q.duration || 60) * 60 * 1000);
+          q.token = Math.random().toString(36).substring(2, 10);
+          const baseUrl = window.location.origin + window.location.pathname;
+          q.url = `${baseUrl}?table=${encodeURIComponent(q.table)}&token=${q.token}`;
+          showToast(`Table ${q.table} QR renewed for ${q.duration || 60} mins!`);
+        } else {
+          q.isExpired = true;
+          q.expiresAt = Date.now() - 1000;
+          showToast(`Table ${q.table} QR expired immediately.`);
+        }
+        localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+        if (dbRef) dbRef.child("activeQrs").set(activeQrs);
+        renderActiveTablesQrList();
+      }
+    }
+
+    function deleteQrSession(id) {
+      activeQrs = activeQrs.filter(x => x.id !== id);
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      if (dbRef) dbRef.child("activeQrs").set(activeQrs);
+      renderActiveTablesQrList();
+      showToast("Table QR session deleted permanently.");
+    }
+
+    function copyTableQRUrl() {
+      const urlText = document.getElementById("tableQRUrl").innerText;
+      const temp = document.createElement("textarea");
+      temp.value = urlText;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("QR URL copied to clipboard!");
     }
 
     function renderActiveTablesQrList() {
@@ -1223,62 +1422,6 @@
       document.execCommand("copy");
       document.body.removeChild(temp);
       showToast("Table QR URL copied to clipboard!");
-    }
-
-    function renderActiveTablesQrList() {
-      const list = document.getElementById("activeTablesQrList");
-      if (!list) return;
-      if (activeQrs.length === 0) {
-        list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet.</p>`;
-        return;
-      }
-      list.innerHTML = activeQrs.map(q => {
-        const isExp = Date.now() > q.expiresAt;
-        return `
-          <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
-            <div>
-              <span class="font-bold text-stone-900">Table ${q.table}</span>
-              <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${isExp ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
-                ${isExp ? 'Expired' : 'Active (' + q.duration + 'm)'}
-              </span>
-              <p class="text-[11px] text-stone-500 break-all mt-1">${q.url}</p>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <button type="button" onclick="toggleQrSessionStatus(${q.id})" class="px-3 py-1.5 font-bold rounded-lg cursor-pointer ${isExp ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}">
-                ${isExp ? 'Make Active' : 'Expire'}
-              </button>
-              <button type="button" onclick="deleteQrSession(${q.id})" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-lg cursor-pointer">
-                <i class="fa-solid fa-trash mr-1"></i> Delete
-              </button>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function toggleQrSessionStatus(id) {
-      const q = activeQrs.find(x => x.id === id);
-      if (q) {
-        const isExp = Date.now() > q.expiresAt;
-        if (isExp) {
-          q.expiresAt = Date.now() + (q.duration * 60 * 1000);
-          showToast(`Table ${q.table} QR session is now Active!`);
-        } else {
-          q.expiresAt = Date.now() - 1000;
-          showToast(`Table ${q.table} QR session expired.`);
-        }
-        localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
-        if (dbRef) dbRef.child("activeQrs").set(activeQrs);
-        renderActiveTablesQrList();
-      }
-    }
-
-    function deleteQrSession(id) {
-      activeQrs = activeQrs.filter(x => x.id !== id);
-      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
-      if (dbRef) dbRef.child("activeQrs").set(activeQrs);
-      renderActiveTablesQrList();
-      showToast("Table QR session deleted successfully.");
     }
 
     function saveMasterTaxSettings() {
@@ -2180,4 +2323,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
