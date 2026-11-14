@@ -859,31 +859,14 @@
       }
     }
 
-    function mergeCustomerDeviceOrders() {
-      const localDevOrders = JSON.parse(localStorage.getItem("rb_cust_device_orders")) || [];
-      const globalOrders = JSON.parse(localStorage.getItem("rb_orders")) || [];
-      const mergedMap = new Map();
-      [...globalOrders, ...localDevOrders].forEach(o => {
-        if (o && o.orderId) mergedMap.set(o.orderId, o);
-      });
-      customerDeviceOrders = Array.from(mergedMap.values());
-      localStorage.setItem("rb_cust_device_orders", JSON.stringify(customerDeviceOrders));
-    }
-
-    // STRICT TAB-ISOLATED SESSION ROUTING (NO PERMANENT LOCALSTORAGE LOCK)
+    // STRICT TAB-ISOLATED SESSION ROUTING & REFRESH FIX
     function routeFromURL() {
       const searchStr = (window.location.search || "").toLowerCase();
       const params = new URLSearchParams(window.location.search);
 
-      const isAdminRoute = params.get("admin") === "1" || params.get("admin") === "true" || searchStr.includes("admin=1") || searchStr.includes("admin=true");
-      const isMainRoute = params.get("main") === "1" || params.get("main") === "true" || searchStr.includes("main=1") || searchStr.includes("main=true");
+      const isAdminRoute = params.get("admin") === "1" || params.get("admin") === "true" || searchStr.includes("admin=1");
+      const isMainRoute = params.get("main") === "1" || params.get("mainweb") === "1" || searchStr.includes("main=1") || searchStr.includes("mainweb=1");
       const tableParam = params.get("table");
-
-      // Clean old permanent localStorage routing keys if any existed
-      localStorage.removeItem("rb_route_mode");
-      localStorage.removeItem("rb_table_session");
-      localStorage.removeItem("rb_logged_role");
-      localStorage.removeItem("rb_last_viewed_page");
 
       if (isAdminRoute) {
         sessionStorage.setItem("rb_tab_mode", "admin");
@@ -893,15 +876,36 @@
         sessionStorage.setItem("rb_tab_mode", "main");
         sessionStorage.removeItem("rb_tab_table");
         sessionStorage.removeItem("rb_tab_role");
-        sessionStorage.setItem("rb_tab_page", "home");
+        if (!sessionStorage.getItem("rb_tab_page")) {
+          sessionStorage.setItem("rb_tab_page", "home");
+        }
         window.history.replaceState({}, document.title, window.location.pathname);
       } else if (tableParam) {
-        let expParam = parseInt(params.get("exp") || "0", 10);
-        currentTableSession = { tableNum: tableParam, expiresAt: expParam };
+        const activeQrsList = JSON.parse(localStorage.getItem("rb_active_qrs")) || [];
+        const foundQr = activeQrsList.find(q => String(q.table) === String(tableParam));
+
+        if (!foundQr || foundQr.isExpired) {
+          show404Error();
+          return;
+        }
+
+        let existingSession = JSON.parse(sessionStorage.getItem("rb_tab_table") || "null");
+        let expTime = 0;
+
+        if (existingSession && String(existingSession.tableNum) === String(tableParam) && existingSession.expiresAt > Date.now()) {
+          expTime = existingSession.expiresAt;
+        } else {
+          const durationMins = foundQr.duration || 60;
+          expTime = Date.now() + (durationMins * 60 * 1000);
+        }
+
+        currentTableSession = { tableNum: tableParam, expiresAt: expTime };
         sessionStorage.setItem("rb_tab_table", JSON.stringify(currentTableSession));
         sessionStorage.setItem("rb_tab_mode", "table");
         sessionStorage.removeItem("rb_tab_role");
-        sessionStorage.setItem("rb_tab_page", "menu");
+        if (!sessionStorage.getItem("rb_tab_page")) {
+          sessionStorage.setItem("rb_tab_page", "menu");
+        }
         window.history.replaceState({}, document.title, window.location.pathname);
       }
 
@@ -913,7 +917,6 @@
 
       const activeMode = sessionStorage.getItem("rb_tab_mode");
 
-      // 1. ADMIN LOGIN ROUTE (?admin=1)
       if (activeMode === "admin") {
         if (page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
@@ -947,26 +950,19 @@
         return;
       }
 
-      // 2. TABLE QR SESSION ROUTE (?table=...)
       if (activeMode === "table") {
         const savedTable = JSON.parse(sessionStorage.getItem("rb_tab_table") || "null");
         if (savedTable) currentTableSession = savedTable;
 
         if (!currentTableSession || (currentTableSession.expiresAt > 0 && Date.now() > currentTableSession.expiresAt)) {
-          sessionStorage.removeItem("rb_tab_mode");
-          sessionStorage.removeItem("rb_tab_table");
-          if (page404) page404.classList.remove("hidden");
-          mainApp.classList.add("hidden");
-          if (header) header.classList.add("hidden");
-          if (footer) footer.classList.add("hidden");
-          if (whiteBar) whiteBar.classList.add("hidden");
+          show404Error();
           return;
         }
 
         if (page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.remove("hidden");
-        if (footer) footer.classList.remove("hidden");
+        if (footer) header.classList.remove("hidden");
 
         if (currentTableSession && currentTableSession.tableNum) {
           document.getElementById("tableSessionBadge").classList.remove("hidden");
@@ -980,20 +976,28 @@
         return;
       }
 
-      // 3. MAIN WEBSITE ROUTE (?main=1)
       if (activeMode === "main") {
         if (page404) page404.classList.add("hidden");
         mainApp.classList.remove("hidden");
         if (header) header.classList.remove("hidden");
-        if (footer) footer.classList.remove("hidden");
+        if (footer) header.classList.remove("hidden");
         const lastPage = sessionStorage.getItem("rb_tab_page") || "home";
         showPage(lastPage);
         return;
       }
 
-      // 4. DIRECT BARE LINK -> 404 ERROR
+      show404Error();
+    }
+
+    function show404Error() {
+      const page404 = document.getElementById("page-404");
+      const mainApp = document.getElementById("mainAppContainer");
+      const header = document.getElementById("mainSiteHeader");
+      const footer = document.getElementById("mainSiteFooter");
+      const whiteBar = document.getElementById("whiteNavBarContainer");
+
       if (page404) page404.classList.remove("hidden");
-      mainApp.classList.add("hidden");
+      if (mainApp) mainApp.classList.add("hidden");
       if (header) header.classList.add("hidden");
       if (footer) footer.classList.add("hidden");
       if (whiteBar) whiteBar.classList.add("hidden");
@@ -1142,23 +1146,72 @@
         return;
       }
 
-      const expTime = Date.now() + (mins * 60 * 1000);
       const baseUrl = window.location.origin + window.location.pathname;
-      const fullUrl = `${baseUrl}?table=${encodeURIComponent(tNum)}&exp=${expTime}`;
+      const fullUrl = `${baseUrl}?table=${encodeURIComponent(tNum)}`;
       const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fullUrl)}`;
 
-      document.getElementById("tableQRTitle").innerText = `Table ${tNum} (Valid for ${mins} mins)`;
+      document.getElementById("tableQRTitle").innerText = `Table ${tNum} (Permanent QR)`;
       document.getElementById("tableQRImg").src = qrSrc;
       document.getElementById("tableQRUrl").innerText = fullUrl;
       document.getElementById("downloadTableQrBtn").href = qrSrc;
       document.getElementById("tableQRResult").classList.remove("hidden");
 
-      const qrEntry = { id: Date.now(), table: tNum, url: fullUrl, expiresAt: expTime, duration: mins };
-      activeQrs = [qrEntry, ...activeQrs.filter(x => x.table !== tNum)];
+      const qrEntry = { id: Date.now(), table: tNum, url: fullUrl, duration: mins, isExpired: false };
+      activeQrs = [qrEntry, ...activeQrs.filter(x => String(x.table) !== String(tNum))];
       localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
       if (dbRef) dbRef.child("activeQrs").set(activeQrs);
       renderActiveTablesQrList();
-      showToast(`QR Code generated for Table ${tNum}!`);
+      showToast(`Permanent QR Code generated for Table ${tNum}!`);
+    }
+
+    function renderActiveTablesQrList() {
+      const list = document.getElementById("activeTablesQrList");
+      if (!list) return;
+      if (activeQrs.length === 0) {
+        list.innerHTML = `<p class="text-xs text-stone-400 italic">No table QR generated yet.</p>`;
+        return;
+      }
+      list.innerHTML = activeQrs.map(q => {
+        const isExp = q.isExpired === true;
+        return `
+          <div class="p-3 bg-stone-50 rounded-xl border border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+            <div>
+              <span class="font-bold text-stone-900">Table ${q.table}</span>
+              <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${isExp ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">
+                ${isExp ? 'Expired / Blocked' : 'Active (' + q.duration + 'm session)'}
+              </span>
+              <p class="text-[11px] text-stone-500 break-all mt-1">${q.url}</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="toggleQrSessionStatus(${q.id})" class="px-3 py-1.5 font-bold rounded-lg cursor-pointer ${isExp ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}">
+                ${isExp ? 'Make Active' : 'Expire'}
+              </button>
+              <button type="button" onclick="deleteQrSession(${q.id})" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-lg cursor-pointer">
+                <i class="fa-solid fa-trash mr-1"></i> Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleQrSessionStatus(id) {
+      const q = activeQrs.find(x => x.id === id);
+      if (q) {
+        q.isExpired = !q.isExpired;
+        localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+        if (dbRef) dbRef.child("activeQrs").set(activeQrs);
+        renderActiveTablesQrList();
+        showToast(`Table ${q.table} QR status updated.`);
+      }
+    }
+
+    function deleteQrSession(id) {
+      activeQrs = activeQrs.filter(x => x.id !== id);
+      localStorage.setItem("rb_active_qrs", JSON.stringify(activeQrs));
+      if (dbRef) dbRef.child("activeQrs").set(activeQrs);
+      renderActiveTablesQrList();
+      showToast("Table QR session deleted permanently.");
     }
 
     function copyTableQRUrl() {
