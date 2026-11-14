@@ -246,7 +246,7 @@
     <section id="page-payment" class="page-section hidden max-w-lg mx-auto px-4 py-8 pb-20">
       <div class="bg-white rounded-3xl shadow-xl border border-stone-200 overflow-hidden">
         <div class="dark-header text-white p-6 text-center space-y-1">
-          <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Select Payment Method</span>
+          <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Fixed Cart Total Amount</span>
           <h2 class="text-3xl font-black" id="payScreenAmount">₹0</h2>
           <p class="text-xs text-stone-300" id="payScreenSummary">Table - • Customer</p>
         </div>
@@ -254,9 +254,11 @@
         <div class="p-6 space-y-5 text-center">
           <div id="paymentChoiceStep" class="space-y-4">
             <p class="text-xs font-bold text-stone-500 uppercase tracking-wider">Choose how you would like to pay</p>
+            
+            <!-- Fixed Amount UPI Button -->
             <button type="button" onclick="handlePaymentChoice('UPI')" class="w-full py-4 px-5 rounded-2xl bg-purple-700 hover:bg-purple-800 text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-3 transition-all cursor-pointer">
               <i class="fa-solid fa-qrcode text-lg"></i>
-              <span id="upiBtnLabel">Pay with PhonePe / Any UPI App</span>
+              <span id="upiBtnLabel">Pay Fixed Amount with PhonePe / Any UPI App</span>
             </button>
 
             <div class="flex items-center gap-3 text-xs text-stone-400 font-bold">
@@ -1729,15 +1731,16 @@
 
       document.getElementById("payScreenAmount").innerText = "₹" + totals.grandTotal;
       document.getElementById("payScreenSummary").innerText = `Table ${table} • ${name}`;
-      document.getElementById("upiBtnLabel").innerText = `Pay ₹${totals.grandTotal} with PhonePe / Any UPI App`;
+      document.getElementById("upiBtnLabel").innerText = `Pay Fixed ₹${totals.grandTotal} with PhonePe / Any UPI App`;
     }
 
     function handlePaymentChoice(payMethod) {
+      const totals = calculateCartTotals();
       const placed = placeOrderImmediately(payMethod);
       if (!placed) return;
 
       if (payMethod === "UPI") {
-        const totals = calculateCartTotals();
+        // Automatically injects exact fixed cart grand total into UPI payment URI parameters (`am`)
         const upiUrl = `upi://pay?pa=${CONFIG.phonePeUpiId}&pn=${encodeURIComponent(CONFIG.payeeName)}&am=${totals.grandTotal.toFixed(2)}&cu=INR`;
         window.location.href = upiUrl;
       }
@@ -2323,4 +2326,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
